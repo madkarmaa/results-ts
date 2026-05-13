@@ -163,6 +163,9 @@ function createResult<T, E extends { code: string }>(
             this: Result<T, E>,
             fn: (val: T) => boolean
         ): this is Result<T, never> {
+            if (typeof fn !== 'function')
+                throw new TypeError('isOkAnd requires a function');
+
             return this.isOk() && fn(tuple[0] as T);
         },
 
@@ -174,35 +177,60 @@ function createResult<T, E extends { code: string }>(
             this: Result<T, E>,
             fn: (err: E) => boolean
         ): this is Result<never, E> {
+            if (typeof fn !== 'function')
+                throw new TypeError('isErrAnd requires a function');
+
             return this.isErr() && fn(tuple[1] as E);
         },
 
         map: function <U>(fn: (val: T) => U) {
+            if (typeof fn !== 'function')
+                throw new TypeError('map requires a function');
+
             if (this.isErr()) return Err(tuple[1] as E);
             return Ok(fn(tuple[0] as T));
         },
 
         mapOr: function <U>(fallback: U, fn: (val: T) => U) {
+            if (typeof fn !== 'function')
+                throw new TypeError('mapOr requires a function');
+
             if (this.isErr()) return fallback;
             return fn(tuple[0] as T);
         },
 
         mapOrElse: function <U>(fallbackFn: (err: E) => U, fn: (val: T) => U) {
+            if (typeof fallbackFn !== 'function')
+                throw new TypeError(
+                    'mapOrElse requires fallbackFn to be a function'
+                );
+            if (typeof fn !== 'function')
+                throw new TypeError('mapOrElse requires fn to be a function');
+
             if (this.isErr()) return fallbackFn(tuple[1] as E);
             return fn(tuple[0] as T);
         },
 
         mapErr: function <F extends E>(fn: (err: E) => F) {
+            if (typeof fn !== 'function')
+                throw new TypeError('mapErr requires a function');
+
             if (this.isErr()) return Err(fn(tuple[1] as E));
             return Ok(tuple[0] as T);
         },
 
         inspect: function (this: Result<T, E>, fn: (val: T) => void) {
+            if (typeof fn !== 'function')
+                throw new TypeError('inspect requires a function');
+
             if (this.isOk()) fn(tuple[0] as T);
             return this;
         },
 
         inspectErr: function (this: Result<T, E>, fn: (err: E) => void) {
+            if (typeof fn !== 'function')
+                throw new TypeError('inspectErr requires a function');
+
             if (this.isErr()) fn(tuple[1] as E);
             return this;
         },
@@ -212,6 +240,9 @@ function createResult<T, E extends { code: string }>(
         },
 
         expect: function (this: Result<T, E>, msg: string) {
+            if (typeof msg !== 'string')
+                throw new TypeError('expect requires a string message');
+
             if (this.isErr()) throw new Error(msg);
             return tuple[0] as T;
         },
@@ -222,6 +253,9 @@ function createResult<T, E extends { code: string }>(
         },
 
         expectErr: function (this: Result<T, E>, msg: string) {
+            if (typeof msg !== 'string')
+                throw new TypeError('expectErr requires a string message');
+
             if (this.isOk()) throw new Error(msg);
             return tuple[1] as E;
         },
@@ -237,6 +271,9 @@ function createResult<T, E extends { code: string }>(
         },
 
         andThen: function <U>(fn: (val: T) => Result<U, E>) {
+            if (typeof fn !== 'function')
+                throw new TypeError('andThen requires a function');
+
             if (this.isOk()) return fn(tuple[0] as T);
             return Err(tuple[1] as E);
         },
@@ -247,6 +284,9 @@ function createResult<T, E extends { code: string }>(
         },
 
         orElse: function (fn: (err: E) => Result<T, any>) {
+            if (typeof fn !== 'function')
+                throw new TypeError('orElse requires a function');
+
             if (this.isErr()) return fn(tuple[1] as E);
             return Ok(tuple[0] as T);
         },
@@ -257,6 +297,9 @@ function createResult<T, E extends { code: string }>(
         },
 
         unwrapOrElse: function (fn: (err: E) => T) {
+            if (typeof fn !== 'function')
+                throw new TypeError('unwrapOrElse requires a function');
+
             if (this.isErr()) return fn(tuple[1] as E);
             return tuple[0] as T;
         }
