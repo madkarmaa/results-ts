@@ -52,6 +52,8 @@ else console.log(`Hello, ${user.name}!`);
 
 Instead of Rust's `match` expressions, check `[value, error]` directly and use a JavaScript `switch` on `error.code` to emulate pattern matching.
 
+This library is essentially a type-safe helper for TypeScript developers. It does **not** include any of the chainable methods found in the actual Rust `Result` type. Its sole purpose is to enforce explicit error handling through control flow.
+
 ## Contributing
 
 Contributions are welcome! Feel free to [open an issue](https://github.com/madkarmaa/result-ts/issues/new) or submit a pull request if you'd like to improve the library or fix any bugs.
