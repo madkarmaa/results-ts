@@ -54,4 +54,11 @@ export const Ok = <T>(value: T): Result<T, never> => [value, null];
  */
 export const Err = <const C extends string, E extends { code: C }>(
     error: E
-): Result<never, E> => [null, error];
+): Result<never, E> => {
+    if (typeof error.code !== 'string')
+        throw new TypeError(
+            'Error object must have a code property of type string'
+        );
+
+    return [null, error];
+};
