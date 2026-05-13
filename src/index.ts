@@ -31,7 +31,7 @@ export type Result<T, E extends { code: string }> = [T, null] | [null, E];
  *
  * @example
  * ```typescript
- * const result = Ok(42);
+ * const [value, _] = Ok(42);
  * ```
  *
  * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
@@ -45,7 +45,7 @@ export const Ok = <T>(value: T): Result<T, never> => [value, null];
  *
  * @example
  * ```typescript
- * const result = Err({ code: 'NOT_FOUND' });
+ * const [_, error] = Err({ code: 'NOT_FOUND' });
  * ```
  *
  * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
