@@ -50,11 +50,11 @@ else console.log(`Hello, ${user.name}!`);
 
 ### How this differs from Rust
 
-Tuple-based, not chainable. Instead of Rust's `match` expressions, check `[value, error]` directly and use a JavaScript `switch` on `error.code` to emulate pattern matching.
+Instead of Rust's `match` expressions, check `[value, error]` directly and use a JavaScript `switch` on `error.code` to emulate pattern matching.
 
 ## Contributing
 
-Contributions are welcome! Feel free to [open an issue](https://github.com/madkarmaa/result-ts/issues/new) or submit a pull request if you'd like to improve the tool or fix any bugs.
+Contributions are welcome! Feel free to [open an issue](https://github.com/madkarmaa/result-ts/issues/new) or submit a pull request if you'd like to improve the library or fix any bugs.
 
 ## License
 
