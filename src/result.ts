@@ -1,4 +1,10 @@
-type ResultTuple<T, E> = [T, null] | [null, E];
+interface SafeTuple<T, E> extends Array<T | E> {
+    0: T;
+    1: E;
+    length: 2;
+}
+
+type ResultTuple<T, E> = SafeTuple<T, null> | SafeTuple<null, E>;
 
 interface ResultMethods<T, E extends { code: string }> {
     /**
