@@ -25,7 +25,7 @@
         "patch": "bun pm version patch && bun run tags",
         "minor": "bun pm version minor && bun run tags",
         "major": "bun pm version major && bun run tags",
-        "postinstall": "git config core.hooksPath .githooks"
+        "prepare": "git config core.hooksPath .githooks"
     },
     "repository": {
         "type": "git",
