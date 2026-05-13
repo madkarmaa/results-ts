@@ -22,7 +22,7 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * This function can be used to compose the results of two functions.
      */
-    mapc<U>(fn: (val: T) => U): Result<U, E>;
+    mapr<U>(fn: (val: T) => U): Result<U, E>;
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
@@ -191,7 +191,7 @@ function createResult<T, E extends { code: string }>(
             return this.isErr() && fn(tuple[1] as E);
         },
 
-        mapc: function <U>(fn: (val: T) => U) {
+        mapr: function <U>(fn: (val: T) => U) {
             if (typeof fn !== 'function')
                 throw new TypeError('map requires a function');
 
@@ -356,3 +356,12 @@ export function Err<const C extends string, E extends { code: C }>(
 
     return createResult<any, E>([null, error]) as Result<never, E>;
 }
+
+const divide = (a: number, b: number) => {
+    if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
+    return Ok(a / b);
+};
+
+const [value, error] = divide(10, 2).mapr((x) => x * 2);
+if (error) console.error(error.code);
+else console.log(value > 50);
