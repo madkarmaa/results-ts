@@ -2,6 +2,8 @@
 
 Rust's Result type, for TypeScript. Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified.
 
+This library mimics the Rust `Result` enum and includes its chainable methods adapted for TypeScript. For full documentation on the available methods, please refer to the [official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html) (or read the JSDocs directly in your editor).
+
 ## Installation
 
 ```bash
@@ -19,40 +21,49 @@ yarn add @madkarma/result
 ```typescript
 import { Ok, Err } from '@madkarma/result';
 
-const getUser = (id: number) => {
-    if (typeof id !== 'number')
-        return Err({ code: 'NOT_A_NUMBER', message: 'ID must be a number' });
+const parseUserId = (id: string) => {
+    const parsed = parseInt(id, 10);
+    if (isNaN(parsed))
+        return Err({
+            code: 'INVALID_INPUT',
+            message: 'ID must be a valid number'
+        });
 
-    if (id < 0)
+    if (parsed <= 0)
         return Err({ code: 'INVALID_ID', message: 'ID must be positive' });
 
-    if (id === 0) return Err({ code: 'NOT_FOUND', message: 'User not found' });
-
-    return Ok({ id, name: 'Alice' });
+    return Ok(parsed);
 };
 
-const [user, error] = getUser(10);
+const fetchUser = (id: number) => {
+    if (id === 13) return Err({ code: 'NOT_FOUND', message: 'User not found' });
 
-if (error)
+    return Ok({ id, name: 'Alice', role: 'admin' });
+};
+
+// Processing an input by chaining methods
+const [user, error] = parseUserId('10')
+    .map((id) => id + 3) // Transform the Ok value (10 -> 13)
+    .andThen(fetchUser); // Chain operations that return another Result
+
+if (error) {
     switch (error.code) {
-        case 'NOT_A_NUMBER':
-            console.error(error.message);
-            break;
+        case 'INVALID_INPUT':
         case 'INVALID_ID':
-            console.error(error.message);
+            console.error(`Validation Error: ${error.message}`);
             break;
         case 'NOT_FOUND':
-            console.error(error.message);
+            console.error(`Database Error: ${error.message}`);
             break;
     }
-else console.log(`Hello, ${user.name}!`);
+} else {
+    console.log(`Welcome, ${user.role} ${user.name}!`);
+}
 ```
 
-### How this differs from Rust
+## How this differs from Rust
 
 Instead of Rust's `match` expressions, check `[value, error]` directly and use a JavaScript `switch` on `error.code` to emulate pattern matching.
-
-This library is essentially a type-safe helper for TypeScript developers. It does **not** include any of the chainable methods found in the actual Rust `Result` type. Its sole purpose is to enforce explicit error handling through control flow.
 
 ## Contributing
 

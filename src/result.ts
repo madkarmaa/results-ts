@@ -1,11 +1,3 @@
-interface SafeTuple<T, E> extends Array<T | E> {
-    0: T;
-    1: E;
-    length: 2;
-}
-
-type ResultTuple<T, E> = SafeTuple<T, null> | SafeTuple<null, E>;
-
 interface ResultMethods<T, E extends { code: string }> {
     /**
      * Returns `true` if the result is `Ok`.
@@ -30,7 +22,7 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * This function can be used to compose the results of two functions.
      */
-    map<U>(fn: (val: T) => U): Result<U, E>;
+    mapc<U>(fn: (val: T) => U): Result<U, E>;
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
@@ -48,7 +40,7 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * This function can be used to pass through a successful result while handling an error.
      */
-    mapErr<F extends E>(fn: (err: E) => F): Result<T, F>;
+    mapErr<F extends { code: string }>(fn: (err: E) => F): Result<T, F>;
     /**
      * Calls a function with a reference to the contained value if `Ok`.
      *
@@ -103,19 +95,23 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * This function can be used for control flow based on `Result` values.
      */
-    andThen<U>(fn: (val: T) => Result<U, E>): Result<U, E>;
+    andThen<U, F extends { code: string }>(
+        fn: (val: T) => Result<U, F>
+    ): Result<U, E | F>;
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
      * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
      */
-    or<F extends E>(res: Result<T, F>): Result<T, F>;
+    or<F extends { code: string }>(res: Result<T, F>): Result<T, F>;
     /**
      * Calls `fn` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
      * This function can be used for control flow based on result values.
      */
-    orElse<F extends E>(fn: (err: E) => Result<T, F>): Result<T, F>;
+    orElse<F extends { code: string }>(
+        fn: (err: E) => Result<T, F>
+    ): Result<T, F>;
     /**
      * Returns the contained `Ok` value or a provided default.
      *
@@ -127,6 +123,13 @@ interface ResultMethods<T, E extends { code: string }> {
      */
     unwrapOrElse(fn: (err: E) => T): T;
 }
+
+type ResultTuple<T, E> = [T, null] | [null, E];
+
+type OkResult<T> = [T, null] & ResultMethods<T, never>;
+
+type ErrResult<E extends { code: string }> = [null, E] &
+    ResultMethods<never, E>;
 
 /**
  * `Result<T, E>` is the type used for returning and propagating errors.
@@ -154,8 +157,7 @@ interface ResultMethods<T, E extends { code: string }> {
  * @template T - Contains the success value.
  * @template E - Contains the error value. Must have a `code` property of type `string`.
  */
-export type Result<T, E extends { code: string }> = ResultTuple<T, E> &
-    ResultMethods<T, E>;
+export type Result<T, E extends { code: string }> = OkResult<T> | ErrResult<E>;
 
 function createResult<T, E extends { code: string }>(
     tuple: ResultTuple<T, E>
@@ -189,7 +191,7 @@ function createResult<T, E extends { code: string }>(
             return this.isErr() && fn(tuple[1] as E);
         },
 
-        map: function <U>(fn: (val: T) => U) {
+        mapc: function <U>(fn: (val: T) => U) {
             if (typeof fn !== 'function')
                 throw new TypeError('map requires a function');
 
@@ -217,7 +219,7 @@ function createResult<T, E extends { code: string }>(
             return fn(tuple[0] as T);
         },
 
-        mapErr: function <F extends E>(fn: (err: E) => F) {
+        mapErr: function <F extends { code: string }>(fn: (err: E) => F) {
             if (typeof fn !== 'function')
                 throw new TypeError('mapErr requires a function');
 
@@ -276,12 +278,14 @@ function createResult<T, E extends { code: string }>(
             return Err(tuple[1] as E);
         },
 
-        andThen: function <U>(fn: (val: T) => Result<U, E>) {
+        andThen: function <U, F extends { code: string }>(
+            fn: (val: T) => Result<U, F>
+        ) {
             if (typeof fn !== 'function')
                 throw new TypeError('andThen requires a function');
 
             if (this.isOk()) return fn(tuple[0] as T);
-            return Err(tuple[1] as E);
+            return Err(tuple[1] as E) as Result<never, E | F>;
         },
 
         or: function (res: Result<T, any>) {
@@ -311,7 +315,7 @@ function createResult<T, E extends { code: string }>(
         }
     } satisfies ResultMethods<T, E>;
 
-    return Object.assign(tuple, methods);
+    return Object.assign(tuple, methods) as unknown as Result<T, E>;
 }
 
 /**
