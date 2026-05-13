@@ -1,0 +1,37 @@
+{
+    "name": "@madkarma/result",
+    "version": "0.0.1",
+    "description": "Rust's Result type, for TypeScript",
+    "devDependencies": {
+        "prettier": "3.8.3"
+    },
+    "peerDependencies": {
+        "typescript": "^6.0.3"
+    },
+    "type": "module",
+    "exports": {
+        ".": {
+            "default": "./index.js",
+            "types": "./index.d.ts"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "format": "prettier --write --ignore-unknown .",
+        "tags": "git push origin --tags && git push",
+        "patch": "bun pm version patch && bun run tags",
+        "minor": "bun pm version minor && bun run tags",
+        "major": "bun pm version major && bun run tags",
+        "postinstall": "git config core.hooksPath .githooks"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/madkarmaa/result-ts.git"
+    },
+    "license": "MIT"
+}

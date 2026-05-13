@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+git diff --cached --quiet && exit 0
+
+git diff --cached --name-only --diff-filter=ACM -z |
+  xargs -0 bunx prettier --write --ignore-unknown
+
+git diff --cached --name-only --diff-filter=ACM -z |
+  xargs -0 git add --
