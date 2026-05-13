@@ -1,6 +1,6 @@
 # @madkarma/result
 
-Rust's Result type, for TypeScript.
+Rust's Result type, for TypeScript. Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified.
 
 ## Installation
 
