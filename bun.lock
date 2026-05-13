@@ -6,8 +6,6 @@
       "name": "@madkarma/result",
       "devDependencies": {
         "prettier": "3.8.3",
-      },
-      "peerDependencies": {
         "typescript": "^6.0.3",
       },
     },
