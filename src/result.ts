@@ -205,7 +205,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     isErr(): this is ErrResult<T, E> {
-        return this.error !== null;
+        return this.value === null;
     }
 
     isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E> {
