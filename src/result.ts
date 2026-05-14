@@ -1,28 +1,78 @@
-interface ResultMethods<T, E extends { code: string }> {
+/**
+ * The base interface for all errors returned by a `Result`.
+ * It requires a `code` property which can be used to identify the error type.
+ */
+export interface ResultError {
+    code: string;
+}
+
+/**
+ * Represents a successful `Result` containing a value of type `T`.
+ */
+export type OkResult<T, E extends ResultError> = {
+    readonly value: T;
+    readonly error: null;
+} & ResultMethods<T, E>;
+
+/**
+ * Represents a failed `Result` containing an error of type `E`.
+ */
+export type ErrResult<T, E extends ResultError> = {
+    readonly value: null;
+    readonly error: E;
+} & ResultMethods<T, E>;
+
+/**
+ * `Result<T, E>` is the type used for returning and propagating errors.
+ *
+ * It is a type with the parameters, `Ok(T)`, representing success and containing a value,
+ * and `Err(E)`, representing error and containing an error value.
+ *
+ * Functions return `Result` whenever errors are expected and recoverable.
+ *
+ * The error type `E` must extend `ResultError` which contains a `code` property of type `string`.
+ *
+ * @example
+ * ```typescript
+ * const divide = (a: number, b: number) => {
+ *   if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
+ *   return Ok(a / b);
+ * }
+ *
+ * const { value, error } = divide(10, 2);
+ * if (error) console.error(error.code);
+ * else console.log(value);
+ * ```
+ *
+ * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
+ * @template T - Contains the success value.
+ * @template E - Contains the error value. Must have a `code` property of type `string`.
+ */
+export type Result<T, E extends ResultError> = OkResult<T, E> | ErrResult<T, E>;
+
+interface ResultMethods<T, E extends ResultError> {
     /**
      * Returns `true` if the result is `Ok`.
      */
-    isOk(): this is Result<T, never>;
+    isOk(): this is OkResult<T, E>;
     /**
      * Returns `true` if the result is `Ok` and the value inside of it matches a predicate.
      */
-    isOkAnd(fn: (val: T) => boolean): this is Result<T, never>;
+    isOkAnd(fn: (val: T) => boolean): this is OkResult<T, E>;
     /**
      * Returns `true` if the result is `Err`.
      */
-    isErr(): this is Result<never, E>;
+    isErr(): this is ErrResult<T, E>;
     /**
      * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
      */
-    isErrAnd(fn: (err: E) => boolean): this is Result<never, E>;
-    // TODO: ok(): missing Option type
-    // TODO: err(): missing Option type
+    isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E>;
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
      *
      * This function can be used to compose the results of two functions.
      */
-    mapr<U>(fn: (val: T) => U): Result<U, E>;
+    map<U>(fn: (val: T) => U): Result<U, E>;
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
@@ -40,7 +90,7 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * This function can be used to pass through a successful result while handling an error.
      */
-    mapErr<F extends { code: string }>(fn: (err: E) => F): Result<T, F>;
+    mapErr<F extends ResultError>(fn: (err: E) => F): Result<T, F>;
     /**
      * Calls a function with a reference to the contained value if `Ok`.
      *
@@ -71,7 +121,6 @@ interface ResultMethods<T, E extends { code: string }> {
      * @throws Throws if the value is an `Err`, with an error message provided by the `Err`'s value.
      */
     unwrap(): T;
-    // TODO: unwrapOrDefault(): missing Default interface
     /**
      * Returns the contained `Err` value, consuming the `self` value.
      *
@@ -95,7 +144,7 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * This function can be used for control flow based on `Result` values.
      */
-    andThen<U, F extends { code: string }>(
+    andThen<U, F extends ResultError>(
         fn: (val: T) => Result<U, F>
     ): Result<U, E | F>;
     /**
@@ -103,15 +152,13 @@ interface ResultMethods<T, E extends { code: string }> {
      *
      * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
      */
-    or<F extends { code: string }>(res: Result<T, F>): Result<T, F>;
+    or<F extends ResultError>(res: Result<T, F>): Result<T, F>;
     /**
      * Calls `fn` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
      * This function can be used for control flow based on result values.
      */
-    orElse<F extends { code: string }>(
-        fn: (err: E) => Result<T, F>
-    ): Result<T, F>;
+    orElse<F extends ResultError>(fn: (err: E) => Result<T, F>): Result<T, F>;
     /**
      * Returns the contained `Ok` value or a provided default.
      *
@@ -124,198 +171,138 @@ interface ResultMethods<T, E extends { code: string }> {
     unwrapOrElse(fn: (err: E) => T): T;
 }
 
-type ResultTuple<T, E> = [T, null] | [null, E];
+class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
+    // will error at runtime if trying to access # fields
+    #value: T | null;
+    #error: E | null;
 
-type OkResult<T> = [T, null] & ResultMethods<T, never>;
+    constructor(value: T | null, error: E | null) {
+        this.#value = value;
+        this.#error = error;
+    }
 
-type ErrResult<E extends { code: string }> = [null, E] &
-    ResultMethods<never, E>;
+    // will prevent mutation at runtime
+    get value(): T | null {
+        return this.#value;
+    }
 
-/**
- * `Result<T, E>` is the type used for returning and propagating errors.
- *
- * It is a type with the parameters, `Ok(T)`, representing success and containing a value,
- * and `Err(E)`, representing error and containing an error value.
- *
- * Functions return `Result` whenever errors are expected and recoverable.
- *
- * The error type `E` must be an object that contains a `code` property of type `string`.
- *
- * @example
- * ```typescript
- * const divide = (a: number, b: number) => {
- *   if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
- *   return Ok(a / b);
- * }
- *
- * const [value, error] = divide(10, 2);
- * if (error) console.error(error.code);
- * else console.log(value);
- * ```
- *
- * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
- * @template T - Contains the success value.
- * @template E - Contains the error value. Must have a `code` property of type `string`.
- */
-export type Result<T, E extends { code: string }> = OkResult<T> | ErrResult<E>;
+    // will prevent mutation at runtime
+    get error(): E | null {
+        return this.#error;
+    }
 
-function createResult<T, E extends { code: string }>(
-    tuple: ResultTuple<T, E>
-): Result<T, E> {
-    const methods = {
-        isOk: function (this: Result<T, E>): this is Result<T, never> {
-            return tuple[0] !== null;
-        },
+    isOk(): this is OkResult<T, E> {
+        return this.error === null;
+    }
 
-        isOkAnd: function (
-            this: Result<T, E>,
-            fn: (val: T) => boolean
-        ): this is Result<T, never> {
-            if (typeof fn !== 'function')
-                throw new TypeError('isOkAnd requires a function');
+    isOkAnd(fn: (val: T) => boolean): this is OkResult<T, E> {
+        return this.isOk() && fn(this.value as T);
+    }
 
-            return this.isOk() && fn(tuple[0] as T);
-        },
+    isErr(): this is ErrResult<T, E> {
+        return this.error !== null;
+    }
 
-        isErr: function (this: Result<T, E>): this is Result<never, E> {
-            return tuple[1] !== null;
-        },
+    isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E> {
+        return this.isErr() && fn(this.error as E);
+    }
 
-        isErrAnd: function (
-            this: Result<T, E>,
-            fn: (err: E) => boolean
-        ): this is Result<never, E> {
-            if (typeof fn !== 'function')
-                throw new TypeError('isErrAnd requires a function');
-
-            return this.isErr() && fn(tuple[1] as E);
-        },
-
-        mapr: function <U>(fn: (val: T) => U) {
-            if (typeof fn !== 'function')
-                throw new TypeError('map requires a function');
-
-            if (this.isErr()) return Err(tuple[1] as E);
-            return Ok(fn(tuple[0] as T));
-        },
-
-        mapOr: function <U>(fallback: U, fn: (val: T) => U) {
-            if (typeof fn !== 'function')
-                throw new TypeError('mapOr requires a function');
-
-            if (this.isErr()) return fallback;
-            return fn(tuple[0] as T);
-        },
-
-        mapOrElse: function <U>(fallbackFn: (err: E) => U, fn: (val: T) => U) {
-            if (typeof fallbackFn !== 'function')
-                throw new TypeError(
-                    'mapOrElse requires fallbackFn to be a function'
-                );
-            if (typeof fn !== 'function')
-                throw new TypeError('mapOrElse requires fn to be a function');
-
-            if (this.isErr()) return fallbackFn(tuple[1] as E);
-            return fn(tuple[0] as T);
-        },
-
-        mapErr: function <F extends { code: string }>(fn: (err: E) => F) {
-            if (typeof fn !== 'function')
-                throw new TypeError('mapErr requires a function');
-
-            if (this.isErr()) return Err(fn(tuple[1] as E));
-            return Ok(tuple[0] as T);
-        },
-
-        inspect: function (this: Result<T, E>, fn: (val: T) => void) {
-            if (typeof fn !== 'function')
-                throw new TypeError('inspect requires a function');
-
-            if (this.isOk()) fn(tuple[0] as T);
-            return this;
-        },
-
-        inspectErr: function (this: Result<T, E>, fn: (err: E) => void) {
-            if (typeof fn !== 'function')
-                throw new TypeError('inspectErr requires a function');
-
-            if (this.isErr()) fn(tuple[1] as E);
-            return this;
-        },
-
-        iter: function* (this: Result<T, E>) {
-            if (this.isOk()) yield tuple[0] as T;
-        },
-
-        expect: function (this: Result<T, E>, msg: string) {
-            if (typeof msg !== 'string')
-                throw new TypeError('expect requires a string message');
-
-            if (this.isErr()) throw new Error(msg);
-            return tuple[0] as T;
-        },
-
-        unwrap: function () {
-            if (this.isErr()) throw tuple[1];
-            return tuple[0] as T;
-        },
-
-        expectErr: function (this: Result<T, E>, msg: string) {
-            if (typeof msg !== 'string')
-                throw new TypeError('expectErr requires a string message');
-
-            if (this.isOk()) throw new Error(msg);
-            return tuple[1] as E;
-        },
-
-        unwrapErr: function () {
-            if (this.isOk()) throw new Error(`${tuple[0]}`);
-            return tuple[1] as E;
-        },
-
-        and: function (res: Result<any, E>) {
-            if (this.isOk()) return res;
-            return Err(tuple[1] as E);
-        },
-
-        andThen: function <U, F extends { code: string }>(
-            fn: (val: T) => Result<U, F>
-        ) {
-            if (typeof fn !== 'function')
-                throw new TypeError('andThen requires a function');
-
-            if (this.isOk()) return fn(tuple[0] as T);
-            return Err(tuple[1] as E) as Result<never, E | F>;
-        },
-
-        or: function (res: Result<T, any>) {
-            if (this.isErr()) return res;
-            return Ok(tuple[0] as T);
-        },
-
-        orElse: function (fn: (err: E) => Result<T, any>) {
-            if (typeof fn !== 'function')
-                throw new TypeError('orElse requires a function');
-
-            if (this.isErr()) return fn(tuple[1] as E);
-            return Ok(tuple[0] as T);
-        },
-
-        unwrapOr: function (fallback: T) {
-            if (this.isErr()) return fallback;
-            return tuple[0] as T;
-        },
-
-        unwrapOrElse: function (fn: (err: E) => T) {
-            if (typeof fn !== 'function')
-                throw new TypeError('unwrapOrElse requires a function');
-
-            if (this.isErr()) return fn(tuple[1] as E);
-            return tuple[0] as T;
+    map<U>(fn: (val: T) => U): Result<U, E> {
+        if (this.isErr()) {
+            return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
         }
-    } satisfies ResultMethods<T, E>;
+        return new ResultImpl<U, E>(fn(this.value as T), null) as Result<U, E>;
+    }
 
-    return Object.assign(tuple, methods) as unknown as Result<T, E>;
+    mapOr<U>(fallback: U, fn: (val: T) => U): U {
+        if (this.isErr()) return fallback;
+        return fn(this.value as T);
+    }
+
+    mapOrElse<U>(fallbackFn: (err: E) => U, fn: (val: T) => U): U {
+        if (this.isErr()) return fallbackFn(this.error as E);
+        return fn(this.value as T);
+    }
+
+    mapErr<F extends ResultError>(fn: (err: E) => F): Result<T, F> {
+        if (this.isErr())
+            return new ResultImpl<T, F>(null, fn(this.error as E)) as Result<
+                T,
+                F
+            >;
+        return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
+    }
+
+    inspect(fn: (val: T) => void): Result<T, E> {
+        if (this.isOk()) fn(this.value as T);
+        return this as unknown as Result<T, E>;
+    }
+
+    inspectErr(fn: (err: E) => void): Result<T, E> {
+        if (this.isErr()) fn(this.error as E);
+        return this as unknown as Result<T, E>;
+    }
+
+    *iter(): Iterable<T> {
+        if (this.isOk()) yield this.value as T;
+    }
+
+    expect(msg: string): T {
+        if (this.isErr()) throw new Error(msg);
+        return this.value as T;
+    }
+
+    unwrap(): T {
+        if (this.error !== null) {
+            throw new Error(
+                `Tried to unwrap an error with code: ${this.error.code}`
+            );
+        }
+        return this.value as T;
+    }
+
+    expectErr(msg: string): E {
+        if (this.isOk()) throw new Error(msg);
+        return this.error as E;
+    }
+
+    unwrapErr(): E {
+        if (this.isOk())
+            throw new Error(`Tried to unwrapErr but has value: ${this.value}`);
+        return this.error as E;
+    }
+
+    and<U>(res: Result<U, E>): Result<U, E> {
+        if (this.isOk()) return res;
+        return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
+    }
+
+    andThen<U, F extends ResultError>(
+        fn: (val: T) => Result<U, F>
+    ): Result<U, E | F> {
+        if (this.isOk()) return fn(this.value as T);
+        return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
+    }
+
+    or<F extends ResultError>(res: Result<T, F>): Result<T, F> {
+        if (this.isErr()) return res;
+        return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
+    }
+
+    orElse<F extends ResultError>(fn: (err: E) => Result<T, F>): Result<T, F> {
+        if (this.isErr()) return fn(this.error as E);
+        return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
+    }
+
+    unwrapOr(fallback: T): T {
+        if (this.isErr()) return fallback;
+        return this.value as T;
+    }
+
+    unwrapOrElse(fn: (err: E) => T): T {
+        if (this.isErr()) return fn(this.error as E);
+        return this.value as T;
+    }
 }
 
 /**
@@ -323,45 +310,58 @@ function createResult<T, E extends { code: string }>(
  *
  * @example
  * ```typescript
- * const [value, _] = Ok(42);
+ * const { value } = Ok(42);
  * ```
  *
  * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
-export function Ok<T>(value: T): Result<T, never> {
-    return createResult<T, any>([value, null]) as Result<T, never>;
-}
+export const Ok = <T, E extends ResultError = never>(
+    value: T
+): Result<T, E> => {
+    return new ResultImpl<T, E>(value, null) as Result<T, E>;
+};
 
 /**
  * Contains the error value.
  *
  * @example
  * ```typescript
- * const [_, error] = Err({ code: 'NOT_FOUND' });
+ * const { error } = Err({ code: 'NOT_FOUND' });
  * ```
  *
  * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
  * @param error - The error to wrap in a failed result. Must have a `code` property of type `string`.
  * @returns A `Result` representing a failed outcome.
  */
-export function Err<const C extends string, E extends { code: C }>(
+export const Err = <
+    const C extends string,
+    E extends ResultError & { code: C }
+>(
     error: E
-): Result<never, E> {
-    if (typeof error.code !== 'string')
-        throw new TypeError(
-            'Error object must have a code property of type string'
-        );
-
-    return createResult<any, E>([null, error]) as Result<never, E>;
-}
+): Result<never, E> => {
+    return new ResultImpl<never, E>(null, error) as Result<never, E>;
+};
 
 const divide = (a: number, b: number) => {
     if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
     return Ok(a / b);
 };
 
-const [value, error] = divide(10, 2).mapr((x) => x * 2);
+const { value, error } = divide(10, 2).map((x) => x * 2);
 if (error) console.error(error.code);
 else console.log(value > 50);
+
+const ok = Ok(5);
+const err = Err({ code: 'ERROR' });
+
+if (ok.isOk()) {
+    ok.error;
+    console.log(ok.value > 8);
+}
+
+if (err.isErr()) {
+    err.value;
+    console.log(err.error.code === 'ERROR');
+}
