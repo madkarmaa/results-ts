@@ -245,7 +245,7 @@ describe('Option', () => {
         expect(optNone.unwrap()).toBe(20);
     });
 
-    describe('Complex Usage tests', () => {
+    describe('Complex usage tests', () => {
         test('Scenario 1: Parsing HTTP query configurations with safe fallbacks', () => {
             interface AppConfig {
                 port: number;
@@ -272,7 +272,7 @@ describe('Option', () => {
             expect(config.debug).toBe(false);
         });
 
-        test('Scenario 2: Hierarchical configuration lookups with fallback environments', () => {
+        test('Scenario 2: Hierarchical configuration lookups with fallbacks', () => {
             const envOverride: Record<string, string> = {};
             const userConfig: Record<string, string> = { theme: 'dark' };
             const defaultConfig: Record<string, string> = {
@@ -288,15 +288,17 @@ describe('Option', () => {
                     .or(lookup(key, userConfig))
                     .or(lookup(key, defaultConfig))
                     .expect(
-                        `Mandatory setting ${key} missing from configuration cascades`
+                        `Mandatory setting ${key} missing from configuration all config sources`
                     );
 
             expect(getSetting('theme')).toBe('dark');
             expect(getSetting('language')).toBe('en');
-            expect(() => getSetting('invalid_key')).toThrow();
+            expect(() => getSetting('invalid_key')).toThrow(
+                'Mandatory setting invalid_key missing from configuration all config sources'
+            );
         });
 
-        test('Scenario 3: Tracking state mutations and implementing a single-item cache buffer', () => {
+        test('Scenario 3: Tracking state mutations', () => {
             class CacheBuffer<T> {
                 #slot: Option<T> = None();
 

@@ -167,7 +167,7 @@ describe('Result', () => {
         ).toBe(3);
     });
 
-    describe('Complex Usage tests', () => {
+    describe('Complex usage tests', () => {
         test('Chaining multiple transformations', () => {
             const result = Ok(5)
                 .map((x) => x * 2)
@@ -192,7 +192,7 @@ describe('Result', () => {
             expect(process(-5).unwrap()).toBe(1);
         });
 
-        test('Parsing and Validation flow', () => {
+        test('Parsing and validation flow', () => {
             const parseJson = (str: string) => {
                 try {
                     return Ok(JSON.parse(str));
