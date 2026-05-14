@@ -258,11 +258,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     unwrap(): T {
-        if (this.error !== null) {
-            throw new Error(
-                `Tried to unwrap an error with code: ${this.error.code}`
-            );
-        }
+        if (this.error !== null) throw this.error;
         return this.value as T;
     }
 
@@ -272,8 +268,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     unwrapErr(): E {
-        if (this.isOk())
-            throw new Error(`Tried to unwrapErr but has value: ${this.value}`);
+        if (this.isOk()) throw new Error(String(this.value));
         return this.error as E;
     }
 
