@@ -122,7 +122,6 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws Throws if the value is an `Err`, with an error message provided by the `Err`'s value.
      */
     unwrap(): T;
-    // TODO: unwrapOrDefault(): missing Default interface
     /**
      * Returns the contained `Err` value, consuming the `self` value.
      *
