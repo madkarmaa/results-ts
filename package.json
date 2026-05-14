@@ -1,6 +1,6 @@
 {
     "name": "@madkarma/result",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Rust's Result type, for TypeScript",
     "devDependencies": {
         "prettier": "3.8.3",
