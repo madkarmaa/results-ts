@@ -200,7 +200,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     isOkAnd(fn: (val: T) => boolean): this is OkResult<T, E> {
-        return this.isOk() && fn(this.value as T);
+        return this.isOk() && fn(this.value);
     }
 
     isErr(): this is ErrResult<T, E> {
@@ -208,13 +208,12 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E> {
-        return this.isErr() && fn(this.error as E);
+        return this.isErr() && fn(this.error);
     }
 
     map<U>(fn: (val: T) => U): Result<U, E> {
-        if (this.isErr()) {
+        if (this.isErr())
             return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
-        }
         return new ResultImpl<U, E>(fn(this.value as T), null) as Result<U, E>;
     }
 
@@ -224,31 +223,29 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     mapOrElse<U>(fallbackFn: (err: E) => U, fn: (val: T) => U): U {
-        if (this.isErr()) return fallbackFn(this.error as E);
+        if (this.isErr()) return fallbackFn(this.error);
         return fn(this.value as T);
     }
 
     mapErr<F extends ResultError>(fn: (err: E) => F): Result<T, F> {
         if (this.isErr())
-            return new ResultImpl<T, F>(null, fn(this.error as E)) as Result<
-                T,
-                F
-            >;
+            return new ResultImpl<T, F>(null, fn(this.error)) as Result<T, F>;
         return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
     }
 
     inspect(fn: (val: T) => void): Result<T, E> {
-        if (this.isOk()) fn(this.value as T);
-        return this as unknown as Result<T, E>;
+        if (this.isOk()) fn(this.value);
+        return this as Result<T, E>;
     }
 
     inspectErr(fn: (err: E) => void): Result<T, E> {
-        if (this.isErr()) fn(this.error as E);
-        return this as unknown as Result<T, E>;
+        if (this.isErr()) fn(this.error);
+        return this as Result<T, E>;
     }
 
+    // FIXME: it should return an Option type, but that is not implemented yet
     *iter(): Iterable<T> {
-        if (this.isOk()) yield this.value as T;
+        if (this.isOk()) yield this.value;
     }
 
     expect(msg: string): T {
@@ -279,7 +276,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     andThen<U, F extends ResultError>(
         fn: (val: T) => Result<U, F>
     ): Result<U, E | F> {
-        if (this.isOk()) return fn(this.value as T);
+        if (this.isOk()) return fn(this.value);
         return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
     }
 
@@ -291,7 +288,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     orElse<T2, F extends ResultError>(
         fn: (err: E) => Result<T2, F>
     ): Result<T | T2, F> {
-        if (this.isErr()) return fn(this.error as E);
+        if (this.isErr()) return fn(this.error);
         return new ResultImpl<T | T2, F>(this.value, null) as Result<T | T2, F>;
     }
 
@@ -301,7 +298,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     unwrapOrElse<T2>(fn: (err: E) => T2): T | T2 {
-        if (this.isErr()) return fn(this.error as E);
+        if (this.isErr()) return fn(this.error);
         return this.value as T;
     }
 }
