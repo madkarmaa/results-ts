@@ -44,7 +44,6 @@ export type ErrResult<T, E extends ResultError> = {
  * else console.log(value);
  * ```
  *
- * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
  * @template T - Contains the success value.
  * @template E - Contains the error value. Must have a `code` property of type `string`.
  */
@@ -315,7 +314,6 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
  * const { value } = Ok(42);
  * ```
  *
- * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
@@ -333,7 +331,6 @@ export const Ok = <T, E extends ResultError = never>(
  * const { error } = Err({ code: 'NOT_FOUND' });
  * ```
  *
- * @see https://www.youtube.com/watch?v=ovnyeq-Xxrc
  * @param error - The error to wrap in a failed result. Must have a `code` property of type `string`.
  * @returns A `Result` representing a failed outcome.
  */
