@@ -1,6 +1,8 @@
 # @madkarma/result
 
-Rust's Result type, for TypeScript. Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified.
+Rust's Result type, for TypeScript.
+
+Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified and [vultix/ts-results](https://github.com/vultix/ts-results).
 
 This library mimics the Rust `Result` enum and includes its chainable methods adapted for TypeScript. For full documentation on the available methods, please refer to the [official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html) (or read the JSDocs directly in your editor).
 
@@ -42,7 +44,7 @@ const fetchUser = (id: number) => {
 };
 
 // Processing an input by chaining methods
-const [user, error] = parseUserId('10')
+const { value: user, error } = parseUserId('10')
     .map((id) => id + 3) // Transform the Ok value (10 -> 13)
     .andThen(fetchUser); // Chain operations that return another Result
 
@@ -63,7 +65,7 @@ if (error) {
 
 ## How this differs from Rust
 
-Instead of Rust's `match` expressions, check `[value, error]` directly and use a JavaScript `switch` on `error.code` to emulate pattern matching.
+Instead of Rust's `match` expressions, check `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching.
 
 ## Contributing
 
