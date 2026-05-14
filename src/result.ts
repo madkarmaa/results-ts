@@ -343,25 +343,3 @@ export const Err = <
 ): Result<never, E> => {
     return new ResultImpl<never, E>(null, error) as Result<never, E>;
 };
-
-const divide = (a: number, b: number) => {
-    if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
-    return Ok(a / b);
-};
-
-const { value, error } = divide(10, 2).map((x) => x * 2);
-if (error) console.error(error.code);
-else console.log(value > 50);
-
-const ok = Ok(5);
-const err = Err({ code: 'ERROR' });
-
-if (ok.isOk()) {
-    ok.error;
-    console.log(ok.value > 8);
-}
-
-if (err.isErr()) {
-    err.value;
-    console.log(err.error.code === 'ERROR');
-}
