@@ -1,20 +1,14 @@
-name: Release
+name: Test PR code
 
 on:
-    workflow_dispatch:
-    push:
-        tags:
-            - 'v*.*.*'
-
-permissions:
-    id-token: write
-    contents: write
+    pull_request:
+        types:
+            - opened
+            - synchronize
 
 jobs:
-    build-and-publish:
-        name: Build and Publish
+    test:
         runs-on: ubuntu-latest
-
         steps:
             - name: Checkout
               uses: actions/checkout@v6
@@ -35,16 +29,6 @@ jobs:
               run: bun install --frozen-lockfile
 
             - name: Run tests
-              run: bun run test
-
-            - name: Build
-              id: build
-              run: bun run build
-
-            - name: Publish to NPM
-              run: bunx npm@latest publish --access public
-
-            - name: Release
-              run: gh release create ${{ github.ref_name }} --generate-notes
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_ACTIONS: true
+              run: bun run test

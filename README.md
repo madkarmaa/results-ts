@@ -1,10 +1,10 @@
 # @madkarma/result
 
-Rust's Result type, for TypeScript.
+Rust's `Result` and `Option` types, for TypeScript.
 
-Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified and [vultix/ts-results](https://github.com/vultix/ts-results).
+This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
 
-This library mimics the Rust `Result` enum and includes its chainable methods adapted for TypeScript. For full documentation on the available methods, please refer to the [official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html) (or read the JSDocs directly in your editor).
+> Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by **Web Dev Simplified** and [vultix/ts-results](https://github.com/vultix/ts-results).
 
 ## Installation
 
@@ -19,6 +19,10 @@ yarn add @madkarma/result
 ```
 
 ## Usage
+
+### Result
+
+[Official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html)
 
 ```typescript
 import { Ok, Err } from '@madkarma/result';
@@ -39,14 +43,12 @@ const parseUserId = (id: string) => {
 
 const fetchUser = (id: number) => {
     if (id === 13) return Err({ code: 'NOT_FOUND', message: 'User not found' });
-
     return Ok({ id, name: 'Alice', role: 'admin' });
 };
 
-// Processing an input by chaining methods
 const { value: user, error } = parseUserId('10')
-    .map((id) => id + 3) // Transform the Ok value (10 -> 13)
-    .andThen(fetchUser); // Chain operations that return another Result
+    .map((id) => id + 3)
+    .andThen(fetchUser);
 
 if (error) {
     switch (error.code) {
@@ -63,9 +65,30 @@ if (error) {
 }
 ```
 
+### Option
+
+[Official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
+
+```typescript
+import { Some, None } from '@madkarma/result';
+
+const parseNickname = (nickname?: string) => {
+    if (!nickname) return None();
+
+    const trimmed = nickname.trim();
+    return trimmed.length > 0 ? Some(trimmed) : None();
+};
+
+const displayName = parseNickname('  Ada  ')
+    .map((name) => name.toUpperCase())
+    .unwrapOr('ANONYMOUS');
+
+console.log(displayName);
+```
+
 ## How this differs from Rust
 
-Instead of Rust's `match` expressions, check `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching.
+Instead of Rust's `match` expressions, check `Result` values as `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching. `Option` values are handled directly with `isSome()` / `isNone()` checks.
 
 ## Contributing
 

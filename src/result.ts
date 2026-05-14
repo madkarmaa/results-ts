@@ -1,3 +1,5 @@
+import { type Option, Some, None } from './option';
+
 /**
  * The base interface for all errors returned by a `Result`.
  * It requires a `code` property which can be used to identify the error type.
@@ -57,7 +59,7 @@ interface ResultMethods<T, E extends ResultError> {
     /**
      * Returns `true` if the result is `Ok` and the value inside of it matches a predicate.
      */
-    isOkAnd(fn: (val: T) => boolean): this is OkResult<T, E>;
+    isOkAnd(f: (val: T) => boolean): this is OkResult<T, E>;
     /**
      * Returns `true` if the result is `Err`.
      */
@@ -65,49 +67,59 @@ interface ResultMethods<T, E extends ResultError> {
     /**
      * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
      */
-    isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E>;
-    // TODO: ok(): missing Option type
-    // TODO: err(): missing Option type
+    isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E>;
+    /**
+     * Converts from `Result<T, E>` to `Option<T>`.
+     *
+     * Converts self into an `Option<T>`, consuming self, and converting the error to `None`, if any.
+     */
+    ok(): Option<T>;
+    /**
+     * Converts from `Result<T, E>` to `Option<E>`.
+     *
+     * Converts self into an `Option<E>`, consuming self, and discarding the success value, if any.
+     */
+    err(): Option<E>;
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
      *
      * This function can be used to compose the results of two functions.
      */
-    map<U>(fn: (val: T) => U): Result<U, E>;
+    map<U>(f: (val: T) => U): Result<U, E>;
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
      * Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `mapOrElse`, which is lazily evaluated.
      */
-    mapOr<U>(fallback: U, fn: (val: T) => U): U;
+    mapOr<U>(fallback: U, f: (val: T) => U): U;
     /**
-     * Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `fn` to a contained `Ok` value.
+     * Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
      *
      * This function can be used to unpack a successful result while handling an error.
      */
-    mapOrElse<U>(fallbackFn: (err: E) => U, fn: (val: T) => U): U;
+    mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U;
     /**
      * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
      *
      * This function can be used to pass through a successful result while handling an error.
      */
-    mapErr<F extends ResultError>(fn: (err: E) => F): Result<T, F>;
+    mapErr<F extends ResultError>(f: (err: E) => F): Result<T, F>;
     /**
      * Calls a function with a reference to the contained value if `Ok`.
      *
      * Returns the original result.
      */
-    inspect(fn: (val: T) => void): Result<T, E>;
+    inspect(f: (val: T) => void): Result<T, E>;
     /**
      * Calls a function with a reference to the contained value if `Err`.
      *
      * Returns the original result.
      */
-    inspectErr(fn: (err: E) => void): Result<T, E>;
+    inspectErr(f: (err: E) => void): Result<T, E>;
     /**
      * Returns an iterator over the possibly contained value.
      *
-     * The iterator yields one value if the result is `Result::Ok`, otherwise none.
+     * The iterator yields one value if the result is `Ok`, otherwise none.
      */
     iter(): Iterable<T>;
     /**
@@ -122,7 +134,6 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws Throws if the value is an `Err`, with an error message provided by the `Err`'s value.
      */
     unwrap(): T;
-    // TODO: unwrapOrDefault(): missing Default interface
     /**
      * Returns the contained `Err` value, consuming the `self` value.
      *
@@ -142,12 +153,12 @@ interface ResultMethods<T, E extends ResultError> {
      */
     and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2>;
     /**
-     * Calls `fn` if the result is `Ok`, otherwise returns the `Err` value of `self`.
+     * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
      *
      * This function can be used for control flow based on `Result` values.
      */
     andThen<U, F extends ResultError>(
-        fn: (val: T) => Result<U, F>
+        f: (val: T) => Result<U, F>
     ): Result<U, E | F>;
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
@@ -156,12 +167,12 @@ interface ResultMethods<T, E extends ResultError> {
      */
     or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F>;
     /**
-     * Calls `fn` if the result is `Err`, otherwise returns the `Ok` value of `self`.
+     * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
      * This function can be used for control flow based on result values.
      */
     orElse<T2, F extends ResultError>(
-        fn: (err: E) => Result<T2, F>
+        f: (err: E) => Result<T2, F>
     ): Result<T | T2, F>;
     /**
      * Returns the contained `Ok` value or a provided default.
@@ -172,7 +183,7 @@ interface ResultMethods<T, E extends ResultError> {
     /**
      * Returns the contained `Ok` value or computes it from a closure.
      */
-    unwrapOrElse<T2>(fn: (err: E) => T2): T | T2;
+    unwrapOrElse<T2>(f: (err: E) => T2): T | T2;
 }
 
 class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
@@ -199,56 +210,62 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.error === null;
     }
 
-    isOkAnd(fn: (val: T) => boolean): this is OkResult<T, E> {
-        return this.isOk() && fn(this.value as T);
+    isOkAnd(f: (val: T) => boolean): this is OkResult<T, E> {
+        return this.isOk() && f(this.value);
     }
 
     isErr(): this is ErrResult<T, E> {
         return this.value === null;
     }
 
-    isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E> {
-        return this.isErr() && fn(this.error as E);
+    isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E> {
+        return this.isErr() && f(this.error);
     }
 
-    map<U>(fn: (val: T) => U): Result<U, E> {
-        if (this.isErr()) {
-            return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
-        }
-        return new ResultImpl<U, E>(fn(this.value as T), null) as Result<U, E>;
+    ok(): Option<T> {
+        if (this.isOk()) return Some(this.value);
+        return None();
     }
 
-    mapOr<U>(fallback: U, fn: (val: T) => U): U {
-        if (this.isErr()) return fallback;
-        return fn(this.value as T);
+    err(): Option<E> {
+        if (this.isErr()) return Some(this.error);
+        return None();
     }
 
-    mapOrElse<U>(fallbackFn: (err: E) => U, fn: (val: T) => U): U {
-        if (this.isErr()) return fallbackFn(this.error as E);
-        return fn(this.value as T);
-    }
-
-    mapErr<F extends ResultError>(fn: (err: E) => F): Result<T, F> {
+    map<U>(f: (val: T) => U): Result<U, E> {
         if (this.isErr())
-            return new ResultImpl<T, F>(null, fn(this.error as E)) as Result<
-                T,
-                F
-            >;
+            return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
+        return new ResultImpl<U, E>(f(this.value as T), null) as Result<U, E>;
+    }
+
+    mapOr<U>(fallback: U, f: (val: T) => U): U {
+        if (this.isErr()) return fallback;
+        return f(this.value as T);
+    }
+
+    mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U {
+        if (this.isErr()) return fallbackFn(this.error);
+        return f(this.value as T);
+    }
+
+    mapErr<F extends ResultError>(f: (err: E) => F): Result<T, F> {
+        if (this.isErr())
+            return new ResultImpl<T, F>(null, f(this.error)) as Result<T, F>;
         return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
     }
 
-    inspect(fn: (val: T) => void): Result<T, E> {
-        if (this.isOk()) fn(this.value as T);
-        return this as unknown as Result<T, E>;
+    inspect(f: (val: T) => void): Result<T, E> {
+        if (this.isOk()) f(this.value);
+        return this as Result<T, E>;
     }
 
-    inspectErr(fn: (err: E) => void): Result<T, E> {
-        if (this.isErr()) fn(this.error as E);
-        return this as unknown as Result<T, E>;
+    inspectErr(f: (err: E) => void): Result<T, E> {
+        if (this.isErr()) f(this.error);
+        return this as Result<T, E>;
     }
 
-    *iter(): Iterable<T> {
-        if (this.isOk()) yield this.value as T;
+    *iter(): IterableIterator<T> {
+        if (this.isOk()) yield this.value;
     }
 
     expect(msg: string): T {
@@ -277,9 +294,9 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     andThen<U, F extends ResultError>(
-        fn: (val: T) => Result<U, F>
+        f: (val: T) => Result<U, F>
     ): Result<U, E | F> {
-        if (this.isOk()) return fn(this.value as T);
+        if (this.isOk()) return f(this.value);
         return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
     }
 
@@ -289,9 +306,9 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     orElse<T2, F extends ResultError>(
-        fn: (err: E) => Result<T2, F>
+        f: (err: E) => Result<T2, F>
     ): Result<T | T2, F> {
-        if (this.isErr()) return fn(this.error as E);
+        if (this.isErr()) return f(this.error);
         return new ResultImpl<T | T2, F>(this.value, null) as Result<T | T2, F>;
     }
 
@@ -300,8 +317,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.value as T;
     }
 
-    unwrapOrElse<T2>(fn: (err: E) => T2): T | T2 {
-        if (this.isErr()) return fn(this.error as E);
+    unwrapOrElse<T2>(f: (err: E) => T2): T | T2 {
+        if (this.isErr()) return f(this.error);
         return this.value as T;
     }
 }
