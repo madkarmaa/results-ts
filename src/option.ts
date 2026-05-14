@@ -116,17 +116,17 @@ interface OptionMethods<T> {
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
      */
-    or(optb: Option<T>): Option<T>;
+    or<T2>(optb: Option<T2>): Option<T | T2>;
 
     /**
      * Returns the option if it contains a value, otherwise calls `f` and returns the result.
      */
-    orElse(f: () => Option<T>): Option<T>;
+    orElse<T2>(f: () => Option<T2>): Option<T | T2>;
 
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
      */
-    xor(optb: Option<T>): Option<T>;
+    xor<T2>(optb: Option<T2>): Option<T | T2>;
 
     /**
      * Inserts `value` into the option, then returns a reference to it.
@@ -253,25 +253,24 @@ class OptionImpl<T> implements OptionMethods<T> {
         return None<T>();
     }
 
-    or(optb: Option<T>): Option<T> {
+    or<T2>(optb: Option<T2>): Option<T | T2> {
         if (this.isSome()) return this as Option<T>;
         return optb;
     }
 
-    orElse(f: () => Option<T>): Option<T> {
+    orElse<T2>(f: () => Option<T2>): Option<T | T2> {
         if (this.isSome()) return this as Option<T>;
         return f();
     }
 
-    xor(optb: Option<T>): Option<T> {
+    xor<T2>(optb: Option<T2>): Option<T | T2> {
         const thisIsSome = this.isSome();
         const optbIsSome = optb.isSome();
 
         if (thisIsSome && !optbIsSome) return this as Option<T>;
-
         if (!thisIsSome && optbIsSome) return optb;
 
-        return None<T>();
+        return None<T | T2>();
     }
 
     insert(value: T): T {
