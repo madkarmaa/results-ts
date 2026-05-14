@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { Ok, Err, Result } from '../src/result';
+import { Ok, Err } from '../src/result';
 
 describe('Result', () => {
     test('isOk', () => {
