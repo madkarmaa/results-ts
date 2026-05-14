@@ -245,6 +245,18 @@ describe('Option', () => {
         expect(optNone.unwrap()).toBe(20);
     });
 
+    test('flatten', () => {
+        expect(Some(Some(42)).flatten().unwrap()).toBe(42);
+        expect(Some(None<number>()).flatten().isNone()).toBe(true);
+        expect(None<Option<number>>().flatten().isNone()).toBe(true);
+        expect(
+            Some(Some(Some(42)))
+                .flatten()
+                .flatten()
+                .unwrap()
+        ).toBe(42);
+    });
+
     describe('Complex usage tests', () => {
         test('Scenario 1: Parsing HTTP query configurations with safe fallbacks', () => {
             interface AppConfig {

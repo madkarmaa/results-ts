@@ -184,6 +184,10 @@ interface ResultMethods<T, E extends ResultError> {
      * Returns the contained `Ok` value or computes it from a closure.
      */
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2;
+
+    flatten<U, F extends ResultError>(
+        this: Result<Result<U, F>, E>
+    ): Result<U, E | F>;
 }
 
 class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
@@ -320,6 +324,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2 {
         if (this.isErr()) return f(this.error);
         return this.value as T;
+    }
+
+    /**
+     * Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
+     */
+    flatten<U, F extends ResultError>(
+        this: Result<Result<U, F>, E>
+    ): Result<U, E | F> {
+        if (this.isOk()) return this.value as Result<U, E | F>;
+        return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
     }
 }
 

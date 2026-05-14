@@ -167,6 +167,24 @@ describe('Result', () => {
         ).toBe(3);
     });
 
+    test('flatten', () => {
+        expect(Ok(Ok(42)).flatten().unwrap()).toBe(42);
+        expect(
+            Ok(Err({ code: 'ERR' }))
+                .flatten()
+                .unwrapErr()
+        ).toEqual({ code: 'ERR' });
+        expect(Err({ code: 'ERR' }).flatten().unwrapErr()).toEqual({
+            code: 'ERR'
+        });
+        expect(
+            Ok(Ok(Ok(42)))
+                .flatten()
+                .flatten()
+                .unwrap()
+        ).toBe(42);
+    });
+
     describe('Complex usage tests', () => {
         test('Chaining multiple transformations', () => {
             const result = Ok(5)
