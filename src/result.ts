@@ -119,7 +119,7 @@ interface ResultMethods<T, E extends ResultError> {
     /**
      * Returns an iterator over the possibly contained value.
      *
-     * The iterator yields one value if the result is `Result::Ok`, otherwise none.
+     * The iterator yields one value if the result is `Ok`, otherwise none.
      */
     iter(): Iterable<T>;
     /**
@@ -264,8 +264,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this as Result<T, E>;
     }
 
-    // FIXME: it should return an Option type, but that is not implemented yet
-    *iter(): Iterable<T> {
+    *iter(): IterableIterator<T> {
         if (this.isOk()) yield this.value;
     }
 
