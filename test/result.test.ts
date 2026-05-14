@@ -99,9 +99,7 @@ describe('Result', () => {
 
     test('unwrap', () => {
         expect(Ok(5).unwrap()).toBe(5);
-        expect(() => Err({ code: 'ERR' }).unwrap()).toThrow(
-            'Tried to unwrap an error with code: ERR'
-        );
+        expect(() => Err({ code: 'ERR' }).unwrap()).toThrow({ code: 'ERR' });
     });
 
     test('expectErr', () => {
@@ -113,7 +111,7 @@ describe('Result', () => {
 
     test('unwrapErr', () => {
         expect(Err({ code: 'ERR' }).unwrapErr().code).toBe('ERR');
-        expect(() => Ok(5).unwrapErr()).toThrow();
+        expect(() => Ok(5).unwrapErr()).toThrow('5');
     });
 
     test('and', () => {
