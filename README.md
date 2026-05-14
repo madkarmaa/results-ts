@@ -2,9 +2,9 @@
 
 Rust's `Result` and `Option` types, for TypeScript.
 
-Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified and [vultix/ts-results](https://github.com/vultix/ts-results).
+This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
 
-This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript. For full documentation on the usage of the available methods, please refer to the [official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html) and the [official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html) (or read the JSDocs directly in your editor).
+> Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by **Web Dev Simplified** and [vultix/ts-results](https://github.com/vultix/ts-results).
 
 ## Installation
 
@@ -21,6 +21,8 @@ yarn add @madkarma/result
 ## Usage
 
 ### Result
+
+[Official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html)
 
 ```typescript
 import { Ok, Err } from '@madkarma/result';
@@ -64,6 +66,8 @@ if (error) {
 ```
 
 ### Option
+
+[Official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
 
 ```typescript
 import { Some, None } from '@madkarma/result';
