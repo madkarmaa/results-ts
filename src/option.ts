@@ -1,9 +1,15 @@
 import { type Result, type ResultError, Ok, Err } from './result';
 
+/**
+ * Represents some value of type `T`.
+ */
 export type SomeOption<T> = {
     readonly value: T;
 } & OptionMethods<T>;
 
+/**
+ * Represents the absence of a value of type `T`.
+ */
 export type NoneOption<T> = {
     readonly value: null;
 } & OptionMethods<T>;
@@ -309,10 +315,19 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 }
 
+/**
+ * Some value of type `T`.
+ * @param value The value to be wrapped in a `Some`.
+ * @returns An `Option` representing the presence of a value.
+ */
 export const Some = <T>(value: T): Option<T> => {
     return new OptionImpl<T>(value) as Option<T>;
 };
 
+/**
+ * No value.
+ * @returns An `Option` representing the absence of a value.
+ */
 export const None = <T = never>(): Option<T> => {
     return new OptionImpl<T>(null) as Option<T>;
 };
