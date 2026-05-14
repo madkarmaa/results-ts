@@ -158,6 +158,11 @@ interface OptionMethods<T> {
      * leaving a `Some` in its place.
      */
     replace(value: T): Option<T>;
+
+    /**
+     * Converts from `Option<Option<T>>` to `Option<T>`.
+     */
+    flatten<U>(this: Option<Option<U>>): Option<U>;
 }
 
 class OptionImpl<T> implements OptionMethods<T> {
@@ -311,6 +316,11 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#value = value;
         if (old !== null) return Some(old);
         return None<T>();
+    }
+
+    flatten<U>(this: Option<Option<U>>): Option<U> {
+        if (this.isSome()) return this.value as Option<U>;
+        return None<U>();
     }
 }
 
