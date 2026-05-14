@@ -1,10 +1,10 @@
 # @madkarma/result
 
-Rust's Result type, for TypeScript.
+Rust's Result and Option types, for TypeScript.
 
 Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by Web Dev Simplified and [vultix/ts-results](https://github.com/vultix/ts-results).
 
-This library mimics the Rust `Result` enum and includes its chainable methods adapted for TypeScript. For full documentation on the available methods, please refer to the [official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html) (or read the JSDocs directly in your editor).
+This library mimics the Rust `Result` and `Option` enums and includes their chainable methods adapted for TypeScript. For full documentation on the available methods, please refer to the [official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html) and the [official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html) (or read the JSDocs directly in your editor).
 
 ## Installation
 
@@ -19,6 +19,8 @@ yarn add @madkarma/result
 ```
 
 ## Usage
+
+### Result
 
 ```typescript
 import { Ok, Err } from '@madkarma/result';
@@ -63,9 +65,28 @@ if (error) {
 }
 ```
 
+### Option
+
+```typescript
+import { Some, None } from '@madkarma/result';
+
+const parseNickname = (nickname?: string) => {
+    if (!nickname) return None();
+
+    const trimmed = nickname.trim();
+    return trimmed.length > 0 ? Some(trimmed) : None();
+};
+
+const displayName = parseNickname('  Ada  ')
+    .map((name) => name.toUpperCase())
+    .unwrapOr('ANONYMOUS');
+
+console.log(displayName);
+```
+
 ## How this differs from Rust
 
-Instead of Rust's `match` expressions, check `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching.
+Instead of Rust's `match` expressions, check `Result` values as `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching. `Option` values are handled directly with `isSome()` / `isNone()` checks.
 
 ## Contributing
 
