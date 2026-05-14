@@ -67,6 +67,8 @@ interface ResultMethods<T, E extends ResultError> {
      * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
      */
     isErrAnd(fn: (err: E) => boolean): this is ErrResult<T, E>;
+    // TODO: ok(): missing Option type
+    // TODO: err(): missing Option type
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
      *
@@ -121,6 +123,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws Throws if the value is an `Err`, with an error message provided by the `Err`'s value.
      */
     unwrap(): T;
+    // TODO: unwrapOrDefault(): missing Default interface
     /**
      * Returns the contained `Err` value, consuming the `self` value.
      *
