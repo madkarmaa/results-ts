@@ -138,7 +138,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * Arguments passed to `and` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `andThen`, which is lazily evaluated.
      */
-    and<U>(res: Result<U, E>): Result<U, E>;
+    and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2>;
     /**
      * Calls `fn` if the result is `Ok`, otherwise returns the `Err` value of `self`.
      *
@@ -152,23 +152,25 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
      */
-    or<F extends ResultError>(res: Result<T, F>): Result<T, F>;
+    or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F>;
     /**
      * Calls `fn` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
      * This function can be used for control flow based on result values.
      */
-    orElse<F extends ResultError>(fn: (err: E) => Result<T, F>): Result<T, F>;
+    orElse<T2, F extends ResultError>(
+        fn: (err: E) => Result<T2, F>
+    ): Result<T | T2, F>;
     /**
      * Returns the contained `Ok` value or a provided default.
      *
      * Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
      */
-    unwrapOr(fallback: T): T;
+    unwrapOr<T2>(fallback: T2): T | T2;
     /**
      * Returns the contained `Ok` value or computes it from a closure.
      */
-    unwrapOrElse(fn: (err: E) => T): T;
+    unwrapOrElse<T2>(fn: (err: E) => T2): T | T2;
 }
 
 class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
@@ -272,9 +274,9 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.error as E;
     }
 
-    and<U>(res: Result<U, E>): Result<U, E> {
+    and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2> {
         if (this.isOk()) return res;
-        return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
+        return new ResultImpl<U, E | E2>(null, this.error) as Result<U, E | E2>;
     }
 
     andThen<U, F extends ResultError>(
@@ -284,22 +286,24 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
     }
 
-    or<F extends ResultError>(res: Result<T, F>): Result<T, F> {
+    or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F> {
         if (this.isErr()) return res;
-        return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
+        return new ResultImpl<T | T2, F>(this.value, null) as Result<T | T2, F>;
     }
 
-    orElse<F extends ResultError>(fn: (err: E) => Result<T, F>): Result<T, F> {
+    orElse<T2, F extends ResultError>(
+        fn: (err: E) => Result<T2, F>
+    ): Result<T | T2, F> {
         if (this.isErr()) return fn(this.error as E);
-        return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
+        return new ResultImpl<T | T2, F>(this.value, null) as Result<T | T2, F>;
     }
 
-    unwrapOr(fallback: T): T {
+    unwrapOr<T2>(fallback: T2): T | T2 {
         if (this.isErr()) return fallback;
         return this.value as T;
     }
 
-    unwrapOrElse(fn: (err: E) => T): T {
+    unwrapOrElse<T2>(fn: (err: E) => T2): T | T2 {
         if (this.isErr()) return fn(this.error as E);
         return this.value as T;
     }
