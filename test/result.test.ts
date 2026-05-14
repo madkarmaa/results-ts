@@ -65,8 +65,6 @@ describe('Result', () => {
     test('mapErr', () => {
         expect(
             Err({ code: 'ERR' })
-                // TODO: if you add `as const` here, the error code becomes a literal string
-                // TODO: maybe the code should do this automatically?
                 .mapErr((err) => ({ code: `${err.code}_NEW` as const }))
                 .unwrapErr().code
         ).toBe('ERR_NEW');
