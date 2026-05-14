@@ -1,3 +1,5 @@
+import { type Option, Some, None } from './option';
+
 /**
  * The base interface for all errors returned by a `Result`.
  * It requires a `code` property which can be used to identify the error type.
@@ -66,8 +68,18 @@ interface ResultMethods<T, E extends ResultError> {
      * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
      */
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E>;
-    // TODO: ok(): missing Option type
-    // TODO: err(): missing Option type
+    /**
+     * Converts from `Result<T, E>` to `Option<T>`.
+     *
+     * Converts self into an `Option<T>`, consuming self, and converting the error to `None`, if any.
+     */
+    ok(): Option<T>;
+    /**
+     * Converts from `Result<T, E>` to `Option<E>`.
+     *
+     * Converts self into an `Option<E>`, consuming self, and discarding the success value, if any.
+     */
+    err(): Option<E>;
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
      *
@@ -208,6 +220,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E> {
         return this.isErr() && f(this.error);
+    }
+
+    ok(): Option<T> {
+        if (this.isOk()) return Some(this.value);
+        return None();
+    }
+
+    err(): Option<E> {
+        if (this.isErr()) return Some(this.error);
+        return None();
     }
 
     map<U>(f: (val: T) => U): Result<U, E> {
