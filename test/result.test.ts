@@ -183,6 +183,9 @@ describe('Result', () => {
                 .flatten()
                 .unwrap()
         ).toBe(42);
+        expect(Err({ code: 'ERR' }).flatten().unwrapErr()).toEqual({
+            code: 'ERR'
+        });
         // @ts-expect-error - flatten should only be called on Result<Result<T, E>, E>
         expect(() => Ok(42).flatten()).toThrow(
             'flatten can only be called on Result<Result<T, E>, E>'

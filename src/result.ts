@@ -391,13 +391,18 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     flatten<U, F extends ResultError>(
         this: Result<Result<U, F>, E>
     ): Result<U, E | F> {
+        if (this.isErr())
+            return new ResultImpl<U, E | F>(null, this.error) as Result<
+                U,
+                E | F
+            >;
+
         if (!(this.value instanceof ResultImpl))
             throw new FlattenError(
                 'flatten can only be called on Result<Result<T, E>, E>'
             );
 
-        if (this.isOk()) return this.value as Result<U, E | F>;
-        return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
+        return this.value as Result<U, E | F>;
     }
 }
 
