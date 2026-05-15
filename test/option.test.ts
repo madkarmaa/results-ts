@@ -254,6 +254,7 @@ describe('Option', () => {
                 .flatten()
                 .unwrap()
         ).toBe(42);
+        expect(None<Option<string>>().flatten().isNone()).toBe(true);
         // @ts-expect-error - flatten should only be called on Option<Option<T>>
         expect(() => Some(42).flatten()).toThrow(
             'flatten can only be called on Option<Option<T>>'
