@@ -185,6 +185,9 @@ interface ResultMethods<T, E extends ResultError> {
      */
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2;
 
+    /**
+     * Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
+     */
     flatten<U, F extends ResultError>(
         this: Result<Result<U, F>, E>
     ): Result<U, E | F>;
@@ -326,9 +329,6 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.value as T;
     }
 
-    /**
-     * Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
-     */
     flatten<U, F extends ResultError>(
         this: Result<Result<U, F>, E>
     ): Result<U, E | F> {
