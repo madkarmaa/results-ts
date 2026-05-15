@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Ok, Err } from '../src/result';
+import { PanicError } from '../src/errors';
 
 describe('Result', () => {
     test('isOk', () => {
@@ -99,7 +100,9 @@ describe('Result', () => {
 
     test('unwrap', () => {
         expect(Ok(5).unwrap()).toBe(5);
-        expect(() => Err({ code: 'ERR' }).unwrap()).toThrow({ code: 'ERR' });
+        expect(() => Err({ code: 'ERR' }).unwrap()).toThrow(
+            new PanicError('ERR')
+        );
     });
 
     test('expectErr', () => {
