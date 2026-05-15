@@ -47,6 +47,8 @@ interface OptionMethods<T> {
 
     /**
      * Returns `true` if the option is a `Some` and the value inside of it matches a predicate.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     isSomeAnd(f: (val: T) => boolean): boolean;
 
@@ -57,60 +59,79 @@ interface OptionMethods<T> {
 
     /**
      * Returns `true` if the option is a `None` or the value inside of it matches a predicate.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     isNoneOr(f: (val: T) => boolean): boolean;
 
     /**
      * Returns the contained `Some` value.
      *
-     * @throws Error if the value is a `None` with a custom error message provided by `msg`.
+     * @throws Panics if the value is a `None` with a custom panic message provided by `msg`.
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     expect(msg: string): T;
 
     /**
      * Returns the contained `Some` value.
      *
-     * @throws Error if the value is a `None`.
+     * @throws Panics if the self value equals `None`.
      */
     unwrap(): T;
 
     /**
      * Returns the contained `Some` value or a provided default.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     unwrapOr(defaultVal: T): T;
 
     /**
      * Returns the contained `Some` value or computes it from a closure.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     unwrapOrElse(f: () => T): T;
 
     /**
      * Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     map<U>(f: (val: T) => U): Option<U>;
 
     /**
      * Calls the provided closure with a reference to the contained value (if `Some`).
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspect(f: (val: T) => void): Option<T>;
 
     /**
      * Returns the provided default result (if none), or applies a function to the contained value (if any).
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapOr<U>(defaultVal: U, f: (val: T) => U): U;
 
     /**
      * Computes a default function result (if none), or applies a different function to the contained value (if any).
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U;
 
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     okOr<E extends ResultError>(err: E): Result<T, E>;
 
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     okOrElse<E extends ResultError>(errF: () => E): Result<T, E>;
 
@@ -121,11 +142,15 @@ interface OptionMethods<T> {
 
     /**
      * Returns `None` if the option is `None`, otherwise returns `optb`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     and<U>(optb: Option<U>): Option<U>;
 
     /**
      * Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     andThen<U>(f: (val: T) => Option<U>): Option<U>;
 
@@ -133,36 +158,50 @@ interface OptionMethods<T> {
      * Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
      * - `Some(t)` if `predicate` returns `true` (where `t` is the wrapped value), and
      * - `None` if `predicate` returns `false`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     filter(predicate: (val: T) => boolean): Option<T>;
 
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     or<T2>(optb: Option<T2>): Option<T | T2>;
 
     /**
      * Returns the option if it contains a value, otherwise calls `f` and returns the result.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     orElse<T2>(f: () => Option<T2>): Option<T | T2>;
 
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     xor<T2>(optb: Option<T2>): Option<T | T2>;
 
     /**
      * Inserts `value` into the option, then returns a reference to it.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     insert(value: T): T;
 
     /**
      * Inserts `value` into the option if it is `None`, then returns a reference to the contained value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     getOrInsert(value: T): T;
 
     /**
      * Inserts a value computed from `f` into the option if it is `None`, then returns a reference to the contained value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     getOrInsertWith(f: () => T): T;
 
@@ -173,17 +212,23 @@ interface OptionMethods<T> {
 
     /**
      * Takes the value out of the option, but only if the predicate evaluates to `true` on the value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     takeIf(predicate: (val: T) => boolean): Option<T>;
 
     /**
      * Replaces the actual value in the option by the value given in parameter, returning the old value if present,
      * leaving a `Some` in its place.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     replace(value: T): Option<T>;
 
     /**
      * Converts from `Option<Option<T>>` to `Option<T>`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     flatten<U>(this: Option<Option<U>>): Option<U>;
 }
