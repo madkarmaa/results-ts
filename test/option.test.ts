@@ -261,7 +261,7 @@ describe('Option', () => {
     });
 
     describe('Complex usage tests', () => {
-        test('Scenario 1: Parsing HTTP query configurations with safe fallbacks', () => {
+        test('Parsing HTTP query configurations with safe fallbacks', () => {
             interface AppConfig {
                 port: number;
                 debug: boolean;
@@ -287,7 +287,7 @@ describe('Option', () => {
             expect(config.debug).toBe(false);
         });
 
-        test('Scenario 2: Hierarchical configuration lookups with fallbacks', () => {
+        test('Hierarchical configuration lookups with fallbacks', () => {
             const envOverride: Record<string, string> = {};
             const userConfig: Record<string, string> = { theme: 'dark' };
             const defaultConfig: Record<string, string> = {
@@ -313,7 +313,7 @@ describe('Option', () => {
             );
         });
 
-        test('Scenario 3: Tracking state mutations', () => {
+        test('Tracking state mutations', () => {
             class CacheBuffer<T> {
                 #slot: Option<T> = None();
 
