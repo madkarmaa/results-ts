@@ -90,6 +90,14 @@ console.log(displayName);
 
 Instead of Rust's `match` expressions, check `Result` values as `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching. `Option` values are handled directly with `isSome()` / `isNone()` checks.
 
+## Error philosophy
+
+Some methods (for example `expect`, `unwrap`, `expectErr`, and `unwrapErr`) intentionally panic to mirror Rust behavior.
+
+If you ever get a non-panic JavaScript error from this library, that usually means invalid runtime data was passed in (library misuse, type-system bypass, or garbage input), and the call site should be fixed.
+
+Error classes are intentionally not exported, this encourages treating thrown JavaScript errors as unexpected behavior rather than a normal control-flow path handled with `try/catch`.
+
 ## Contributing
 
 Contributions are welcome! Feel free to [open an issue](https://github.com/madkarmaa/result-ts/issues/new) or submit a pull request if you'd like to improve the library or fix any bugs.
