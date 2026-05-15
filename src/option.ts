@@ -345,14 +345,14 @@ class OptionImpl<T> implements OptionMethods<T> {
  * @param value The value to be wrapped in a `Some`.
  * @returns An `Option` representing the presence of a value.
  */
-export const Some = <T>(value: T): Option<T> => {
+export function Some<T>(value: T): Option<T> {
     return new OptionImpl<T>(value) as Option<T>;
-};
+}
 
 /**
  * No value.
  * @returns An `Option` representing the absence of a value.
  */
-export const None = <T = never>(): Option<T> => {
+export function None<T = never>(): Option<T> {
     return new OptionImpl<T>(null) as Option<T>;
-};
+}

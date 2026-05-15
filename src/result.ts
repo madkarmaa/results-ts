@@ -348,11 +348,9 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
-export const Ok = <T, E extends ResultError = never>(
-    value: T
-): Result<T, E> => {
+export function Ok<T, E extends ResultError = never>(value: T): Result<T, E> {
     return new ResultImpl<T, E>(value, null) as Result<T, E>;
-};
+}
 
 /**
  * Contains the error value.
@@ -365,11 +363,9 @@ export const Ok = <T, E extends ResultError = never>(
  * @param error - The error to wrap in a failed result. Must have a `code` property of type `string`.
  * @returns A `Result` representing a failed outcome.
  */
-export const Err = <
+export function Err<
     const C extends string,
     E extends ResultError & { code: C }
->(
-    error: E
-): Result<never, E> => {
+>(error: E): Result<never, E> {
     return new ResultImpl<never, E>(null, error) as Result<never, E>;
-};
+}
