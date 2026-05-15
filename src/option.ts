@@ -14,6 +14,22 @@ export type NoneOption<T> = {
     readonly value: null;
 } & OptionMethods<T>;
 
+/**
+ * Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
+ *
+ * `Option`s are commonly paired with pattern matching to query the presence of a value and take action, always accounting for the `None` case.
+ *
+ * @example
+ * ```typescript
+ * const x: Option<number> = Some(5);
+ * const y: Option<number> = None();
+ *
+ * if (x.isSome() && y.isSome()) console.log(x.value + y.value);
+ * else console.log('One of the options is None');
+ * ```
+ *
+ * @template T Contains the type of the value that may be present in the `Option`.
+ */
 export type Option<T> = SomeOption<T> | NoneOption<T>;
 
 interface OptionMethods<T> {
