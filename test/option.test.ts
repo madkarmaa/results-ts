@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
+import { FlattenError, PanicError } from '../src/errors';
 
 describe('Option', () => {
     test('isSome', () => {
@@ -27,14 +28,14 @@ describe('Option', () => {
     test('expect', () => {
         expect(Some(5).expect('Should not fail')).toBe(5);
         expect(() => None().expect('Value is missing')).toThrow(
-            'Value is missing'
+            new PanicError('Value is missing')
         );
     });
 
     test('unwrap', () => {
         expect(Some(5).unwrap()).toBe(5);
         expect(() => None().unwrap()).toThrow(
-            'called `Option.unwrap()` on a `None` value'
+            new PanicError('called `Option.unwrap()` on a `None` value')
         );
     });
 
@@ -256,9 +257,7 @@ describe('Option', () => {
         ).toBe(42);
         expect(None<Option<string>>().flatten().isNone()).toBe(true);
         // @ts-expect-error - flatten should only be called on Option<Option<T>>
-        expect(() => Some(42).flatten()).toThrow(
-            'flatten can only be called on Option<Option<T>>'
-        );
+        expect(() => Some(42).flatten()).toThrow(FlattenError);
     });
 
     describe('Complex usage tests', () => {

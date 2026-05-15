@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Ok, Err } from '../src/result';
-import { PanicError } from '../src/errors';
+import { FlattenError, PanicError } from '../src/errors';
 
 describe('Result', () => {
     test('isOk', () => {
@@ -105,7 +105,9 @@ describe('Result', () => {
 
     test('expect', () => {
         expect(Ok(5).expect('Should not fail')).toBe(5);
-        expect(() => Err({ code: 'ERR' }).expect('Failed')).toThrow('Failed');
+        expect(() => Err({ code: 'ERR' }).expect('Failed')).toThrow(
+            new PanicError('Failed')
+        );
     });
 
     test('unwrap', () => {
@@ -119,12 +121,14 @@ describe('Result', () => {
         expect(Err({ code: 'ERR' }).expectErr('Should not fail').code).toBe(
             'ERR'
         );
-        expect(() => Ok(5).expectErr('Failed')).toThrow('Failed');
+        expect(() => Ok(5).expectErr('Failed')).toThrow(
+            new PanicError('Failed')
+        );
     });
 
     test('unwrapErr', () => {
         expect(Err({ code: 'ERR' }).unwrapErr().code).toBe('ERR');
-        expect(() => Ok(5).unwrapErr()).toThrow('5');
+        expect(() => Ok(5).unwrapErr()).toThrow(new PanicError('5'));
     });
 
     test('and', () => {
@@ -197,9 +201,7 @@ describe('Result', () => {
             code: 'ERR'
         });
         // @ts-expect-error - flatten should only be called on Result<Result<T, E>, E>
-        expect(() => Ok(42).flatten()).toThrow(
-            'flatten can only be called on Result<Result<T, E>, E>'
-        );
+        expect(() => Ok(42).flatten()).toThrow(FlattenError);
     });
 
     describe('Complex usage tests', () => {
