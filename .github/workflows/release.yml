@@ -14,11 +14,20 @@ jobs:
     build-and-publish:
         name: Build and Publish
         runs-on: ubuntu-latest
-        if: github.event.base_ref == 'refs/heads/main'
 
         steps:
             - name: Checkout
               uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Verify tag is from main
+              run: |
+                  git fetch origin main
+                  if ! git merge-base --is-ancestor ${{ github.sha }} origin/main; then
+                    echo "Tag was not created from main branch. Aborting."
+                    exit 1
+                  fi
 
             - name: Cache dependencies
               uses: actions/cache@v5
