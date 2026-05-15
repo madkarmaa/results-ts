@@ -315,12 +315,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         if (typeof msg !== 'string')
             throw new InvalidArgumentError('Argument must be a string');
 
-        if (this.isErr()) throw new PanicError(msg);
+        if (this.isErr())
+            throw new PanicError(`${msg}: code "${this.error.code}"`);
         return this.value as T;
     }
 
     unwrap(): T {
-        if (this.isErr()) throw new PanicError(this.error.code);
+        if (this.isErr())
+            throw new PanicError(
+                `called \`Result.unwrap()\` on an \`Err\` value: code "${this.error.code}"`
+            );
         return this.value as T;
     }
 
@@ -328,12 +332,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         if (typeof msg !== 'string')
             throw new InvalidArgumentError('Argument must be a string');
 
-        if (this.isOk()) throw new PanicError(msg);
+        if (this.isOk())
+            throw new PanicError(`${msg}: "${String(this.value)}"`);
         return this.error as E;
     }
 
     unwrapErr(): E {
-        if (this.isOk()) throw new PanicError(String(this.value));
+        if (this.isOk())
+            throw new PanicError(
+                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(this.value)}"`
+            );
         return this.error as E;
     }
 

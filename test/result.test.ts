@@ -106,14 +106,16 @@ describe('Result', () => {
     test('expect', () => {
         expect(Ok(5).expect('Should not fail')).toBe(5);
         expect(() => Err({ code: 'ERR' }).expect('Failed')).toThrow(
-            new PanicError('Failed')
+            new PanicError('Failed: code "ERR"')
         );
     });
 
     test('unwrap', () => {
         expect(Ok(5).unwrap()).toBe(5);
         expect(() => Err({ code: 'ERR' }).unwrap()).toThrow(
-            new PanicError('ERR')
+            new PanicError(
+                'called `Result.unwrap()` on an `Err` value: code "ERR"'
+            )
         );
     });
 
@@ -122,13 +124,15 @@ describe('Result', () => {
             'ERR'
         );
         expect(() => Ok(5).expectErr('Failed')).toThrow(
-            new PanicError('Failed')
+            new PanicError('Failed: "5"')
         );
     });
 
     test('unwrapErr', () => {
         expect(Err({ code: 'ERR' }).unwrapErr().code).toBe('ERR');
-        expect(() => Ok(5).unwrapErr()).toThrow(new PanicError('5'));
+        expect(() => Ok(5).unwrapErr()).toThrow(
+            new PanicError('called `Result.unwrapErr()` on an `Ok` value: "5"')
+        );
     });
 
     test('and', () => {
