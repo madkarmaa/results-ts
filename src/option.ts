@@ -245,11 +245,17 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     map<U>(f: (val: T) => U): Option<U> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
         if (this.isSome()) return Some(f(this.value));
         return None<U>();
     }
 
     inspect(f: (val: T) => void): Option<T> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
         if (this.isSome()) f(this.value);
         return this as Option<T>;
     }
@@ -404,7 +410,9 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     flatten<U>(this: Option<Option<U>>): Option<U> {
         if (!(this.value instanceof OptionImpl))
-            throw new Error('flatten can only be called on Option<Option<T>>');
+            throw new FlattenError(
+                'flatten can only be called on Option<Option<T>>'
+            );
 
         if (this.isSome()) return this.value as Option<U>;
         return None();
