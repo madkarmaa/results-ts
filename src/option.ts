@@ -335,6 +335,9 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     flatten<U>(this: Option<Option<U>>): Option<U> {
+        if (!(this.value instanceof OptionImpl))
+            throw new Error('flatten can only be called on Option<Option<T>>');
+
         if (this.isSome()) return this.value as Option<U>;
         return None<U>();
     }

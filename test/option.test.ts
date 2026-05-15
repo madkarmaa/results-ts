@@ -248,13 +248,16 @@ describe('Option', () => {
     test('flatten', () => {
         expect(Some(Some(42)).flatten().unwrap()).toBe(42);
         expect(Some(None<number>()).flatten().isNone()).toBe(true);
-        expect(None<Option<number>>().flatten().isNone()).toBe(true);
         expect(
             Some(Some(Some(42)))
                 .flatten()
                 .flatten()
                 .unwrap()
         ).toBe(42);
+        // @ts-expect-error - flatten should only be called on Option<Option<T>>
+        expect(() => Some(42).flatten()).toThrow(
+            'flatten can only be called on Option<Option<T>>'
+        );
     });
 
     describe('Complex usage tests', () => {

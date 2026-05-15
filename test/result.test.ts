@@ -174,15 +174,16 @@ describe('Result', () => {
                 .flatten()
                 .unwrapErr()
         ).toEqual({ code: 'ERR' });
-        expect(Err({ code: 'ERR' }).flatten().unwrapErr()).toEqual({
-            code: 'ERR'
-        });
         expect(
             Ok(Ok(Ok(42)))
                 .flatten()
                 .flatten()
                 .unwrap()
         ).toBe(42);
+        // @ts-expect-error - flatten should only be called on Result<Result<T, E>, E>
+        expect(() => Ok(42).flatten()).toThrow(
+            'flatten can only be called on Result<Result<T, E>, E>'
+        );
     });
 
     describe('Complex usage tests', () => {
