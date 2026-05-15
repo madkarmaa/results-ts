@@ -35,5 +35,21 @@
         "type": "git",
         "url": "https://github.com/madkarmaa/result-ts.git"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "keywords": [
+        "javascript",
+        "javascript-library",
+        "js",
+        "js-lib",
+        "library",
+        "rust",
+        "rust-option",
+        "rust-result",
+        "rust-typescript",
+        "ts",
+        "ts-lib",
+        "typescript",
+        "typescript-library",
+        "typescript-rust"
+    ]
 }
