@@ -30,6 +30,16 @@ describe('Result', () => {
         expect(Ok(5).isErrAnd((_) => true)).toBe(false);
     });
 
+    test('ok', () => {
+        expect(Ok(5).ok().unwrap()).toBe(5);
+        expect(Err({ code: 'ERR' }).ok().isNone()).toBe(true);
+    });
+
+    test('err', () => {
+        expect(Err({ code: 'ERR' }).err().unwrap()).toEqual({ code: 'ERR' });
+        expect(Ok(5).err().isNone()).toBe(true);
+    });
+
     test('map', () => {
         expect(
             Ok(5)
@@ -50,11 +60,11 @@ describe('Result', () => {
 
     test('mapOrElse', () => {
         expect(
-            Ok(5).mapOrElse(
+            Ok(7).mapOrElse(
                 () => 10,
                 (x) => x * 2
             )
-        ).toBe(10);
+        ).toBe(14);
         expect(
             Err({ code: 'ERR' }).mapOrElse(
                 (err) => err.code.length,

@@ -72,8 +72,8 @@ describe('Option', () => {
     });
 
     test('mapOr', () => {
-        expect(Some(5).mapOr(10, (x) => x * 2)).toBe(10);
-        expect(None<number>().mapOr(10, (x) => x * 2)).toBe(10);
+        expect(Some(5).mapOr(0, (x) => x * 2)).toBe(10);
+        expect(None<number>().mapOr(0, (x) => x * 2)).toBe(0);
     });
 
     test('mapOrElse', () => {
