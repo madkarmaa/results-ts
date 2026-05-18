@@ -8,7 +8,7 @@ Only the latest version of `results-ts` receives security fixes.
 
 Please **do not** open a public GitHub issue for security vulnerabilities.
 
-Instead, report them via [GitHub's private vulnerability reporting](https://github.com/madkarmaa/result-ts/security/advisories/new).
+Instead, report them via [GitHub's private vulnerability reporting](https://github.com/madkarmaa/results-ts/security/advisories/new).
 
 Include as much detail as possible:
 
