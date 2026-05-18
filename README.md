@@ -100,7 +100,7 @@ Error classes are intentionally not exported, this encourages treating thrown Ja
 
 ## Contributing
 
-Contributions are welcome! Feel free to [open an issue](https://github.com/madkarmaa/result-ts/issues/new) or submit a pull request if you'd like to improve the library or fix any bugs.
+Interested in contributing? See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, development guidelines, and pull request expectations.
 
 ## License
 
