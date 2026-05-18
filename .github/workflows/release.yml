@@ -36,6 +36,11 @@ jobs:
                   key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
                   restore-keys: ${{ runner.os }}-bun-
 
+            - name: Install Node.js # required for tsdown, see https://github.com/rolldown/tsdown/releases/tag/v0.22.0
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+
             - name: Install Bun
               uses: oven-sh/setup-bun@v2
               with:
