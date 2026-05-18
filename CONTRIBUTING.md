@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in improving `@madkarma/result`.
+Thanks for your interest in improving `results-ts`.
 
 ## Prerequisites
 

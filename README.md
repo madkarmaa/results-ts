@@ -1,4 +1,4 @@
-# @madkarma/result
+# results-ts
 
 Rust's `Result` and `Option` types, for TypeScript.
 
@@ -9,13 +9,13 @@ This library mimics the Rust `Result` and `Option` enums and includes some of th
 ## Installation
 
 ```bash
-npm install @madkarma/result
+npm install results-ts
 # or
-bun add @madkarma/result
+bun add results-ts
 # or
-pnpm add @madkarma/result
+pnpm add results-ts
 # or
-yarn add @madkarma/result
+yarn add results-ts
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ yarn add @madkarma/result
 [Official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html)
 
 ```typescript
-import { Ok, Err } from '@madkarma/result';
+import { Ok, Err } from 'results-ts';
 
 const parseUserId = (id: string) => {
     const parsed = parseInt(id, 10);
@@ -70,7 +70,7 @@ if (error) {
 [Official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
 
 ```typescript
-import { Some, None } from '@madkarma/result';
+import { Some, None } from 'results-ts';
 
 const parseNickname = (nickname?: string) => {
     if (!nickname) return None();

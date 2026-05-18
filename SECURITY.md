@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Only the latest version of `@madkarma/result` receives security fixes.
+Only the latest version of `results-ts` receives security fixes.
 
 ## Reporting a Vulnerability
 
