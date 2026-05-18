@@ -21,16 +21,18 @@
         "dist"
     ],
     "scripts": {
-        "test:dev": "vitest watch",
-        "test": "vitest run",
+        "prepare": "git config core.hooksPath .githooks",
         "build": "tsdown",
         "dev": "tsdown --watch",
+        "test": "vitest run",
+        "test:dev": "vitest watch",
+        "typecheck": "tsc --noEmit",
+        "typecheck:dev": "tsc --noEmit --watch",
         "format": "prettier --write --ignore-unknown .",
         "tags": "git push origin --tags && git push",
         "patch": "bun pm version patch && bun run tags",
         "minor": "bun pm version minor && bun run tags",
-        "major": "bun pm version major && bun run tags",
-        "prepare": "git config core.hooksPath .githooks"
+        "major": "bun pm version major && bun run tags"
     },
     "repository": {
         "type": "git",
