@@ -7,14 +7,10 @@
         "moduleDetection": "force",
         "jsx": "react-jsx",
 
-        // Output configuration
+        // Module resolution
         "moduleResolution": "bundler",
         "verbatimModuleSyntax": true,
-        "outDir": "dist",
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
-        "rootDir": "src",
+        "noEmit": true,
 
         // Best practices
         "strict": true,
