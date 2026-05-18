@@ -5,6 +5,7 @@
     "devDependencies": {
         "@types/bun": "^1.3.14",
         "prettier": "3.8.3",
+        "tsdown": "^0.22.0",
         "typescript": "^6.0.3",
         "vitest": "^4.1.6"
     },
@@ -22,8 +23,8 @@
     "scripts": {
         "test:dev": "vitest watch",
         "test": "vitest run",
-        "build": "tsc",
-        "dev": "tsc --watch",
+        "build": "tsdown",
+        "dev": "tsdown --watch",
         "format": "prettier --write --ignore-unknown .",
         "tags": "git push origin --tags && git push",
         "patch": "bun pm version patch && bun run tags",
