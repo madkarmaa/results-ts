@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a new method or behavior
+title: 'feat: '
+labels:
+    - feat
+
+body:
+    - type: textarea
+      id: feature_description
+      attributes:
+          label: What would you like added?
+          description: Describe the method or behavior you'd like to see.
+          placeholder: Describe the method or behavior you'd like to see.
+      validations:
+          required: true
+
+    - type: textarea
+      id: rust_equivalent
+      attributes:
+          label: Rust equivalent
+          description: Link or describe the Rust Result/Option method this maps to, if applicable.
+          placeholder: |
+              Link or describe the Rust Result/Option method this maps to, if applicable.
+
+              https://doc.rust-lang.org/std/result/enum.Result.html
+              https://doc.rust-lang.org/std/option/enum.Option.html
+
+    - type: textarea
+      id: proposed_api
+      attributes:
+          label: Proposed API usage
+          description: Provide a short code snippet that demonstrates the proposed API usage.
+          render: typescript
+      validations:
+          required: true
+
+    - type: textarea
+      id: rationale
+      attributes:
+          label: Why?
+          description: Explain why this method or behavior is needed and how it would benefit users.
+          placeholder: Explain why this method or behavior is needed and how it would benefit users.
+      validations:
+          required: true
