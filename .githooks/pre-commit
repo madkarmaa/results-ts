@@ -1,10 +1,8 @@
 #!/bin/sh
-set -e
 
-git diff --cached --quiet && exit 0
+bun run format
 
-git diff --cached --name-only --diff-filter=ACM -z |
-  xargs -0 bunx prettier --write --ignore-unknown
-
-git diff --cached --name-only --diff-filter=ACM -z |
-  xargs -0 git add --
+if ! git diff --quiet; then
+    echo "Formatter made changes. Stage them and re-commit."
+    exit 1
+fi
