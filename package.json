@@ -1,6 +1,6 @@
 {
     "name": "@madkarma/result",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "description": "Rust's Result and Option types, for TypeScript",
     "engines": {
         "node": ">=22.18.0"
