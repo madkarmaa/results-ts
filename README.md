@@ -1,6 +1,9 @@
-# results-ts
+<p align="center">
+    <img src="./assets/logo.png" alt="result-ts logo" width="400" height="auto" />
+    <p align="center">Rust's <code>Result</code> and <code>Option</code> types, for TypeScript.</p>
+</p>
 
-Rust's `Result` and `Option` types, for TypeScript.
+---
 
 This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
 
