@@ -237,10 +237,7 @@ interface OptionMethods<T> {
      *
      * @param handlers The functions to handle each variant.
      */
-    match<TSome, TNone = TSome>(handlers: {
-        Some: (val: T) => TSome;
-        None: () => TNone;
-    }): TSome | TNone;
+    match<U>(handlers: { Some: (val: T) => U; None: () => U }): U;
 }
 
 class OptionImpl<T> implements OptionMethods<T> {
@@ -474,10 +471,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         return this.value as Option<U>;
     }
 
-    match<TSome, TNone = TSome>(handlers: {
-        Some: (val: T) => TSome;
-        None: () => TNone;
-    }): TSome | TNone {
+    match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {
         if (typeof handlers !== 'object' || handlers === null)
             throw new InvalidArgumentError('Argument must be an object');
 

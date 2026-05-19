@@ -236,10 +236,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @param handlers The functions to handle each variant.
      */
-    match<TOk, TErr = TOk>(handlers: {
-        Ok: (val: T) => TOk;
-        Err: (err: E) => TErr;
-    }): TOk | TErr;
+    match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U;
 }
 
 class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
@@ -455,10 +452,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.value as Result<U, E | F>;
     }
 
-    match<TOk, TErr = TOk>(handlers: {
-        Ok: (val: T) => TOk;
-        Err: (err: E) => TErr;
-    }): TOk | TErr {
+    match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U {
         if (typeof handlers !== 'object' || handlers === null)
             throw new InvalidArgumentError('Argument must be an object');
 
