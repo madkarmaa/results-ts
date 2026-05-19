@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 STAGED_FILES_FILE="$(mktemp)"
 trap 'rm -f "$STAGED_FILES_FILE"' EXIT
 
