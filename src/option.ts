@@ -231,6 +231,13 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     flatten<U>(this: Option<Option<U>>): Option<U>;
+
+    /**
+     * Matches the `Option` with two functions, one for each variant.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    match<U>(handlers: { Some: (val: T) => U; None: () => U }): U;
 }
 
 class OptionImpl<T> implements OptionMethods<T> {
@@ -462,6 +469,24 @@ class OptionImpl<T> implements OptionMethods<T> {
             );
 
         return this.value as Option<U>;
+    }
+
+    match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {
+        if (typeof handlers !== 'object' || handlers === null)
+            throw new InvalidArgumentError('Argument must be an object');
+
+        const { Some: someHandler, None: noneHandler } = handlers;
+
+        if (typeof someHandler !== 'function')
+            throw new InvalidArgumentError(
+                'Handler for Some must be a function'
+            );
+        if (typeof noneHandler !== 'function')
+            throw new InvalidArgumentError(
+                'Handler for None must be a function'
+            );
+
+        return this.isSome() ? someHandler(this.value) : noneHandler();
     }
 }
 

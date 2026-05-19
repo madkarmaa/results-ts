@@ -1,8 +1,15 @@
 #!/bin/sh
 
-bun run format
+set -e
 
-if ! git diff --quiet; then
-    echo "Formatter made changes. Stage them and re-commit."
-    exit 1
+STAGED_FILES_FILE="$(mktemp)"
+trap 'rm -f "$STAGED_FILES_FILE"' EXIT
+
+git diff --cached --name-only -z --diff-filter=ACMR > "$STAGED_FILES_FILE"
+
+if [ ! -s "$STAGED_FILES_FILE" ]; then
+    exit 0
 fi
+
+xargs -0 bunx prettier --write --ignore-unknown -- < "$STAGED_FILES_FILE"
+xargs -0 git add -- < "$STAGED_FILES_FILE"

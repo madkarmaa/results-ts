@@ -230,6 +230,13 @@ interface ResultMethods<T, E extends ResultError> {
     flatten<U, F extends ResultError>(
         this: Result<Result<U, F>, E>
     ): Result<U, E | F>;
+
+    /**
+     * Matches the `Result` with two functions, one for each variant.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U;
 }
 
 class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
@@ -443,6 +450,24 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             );
 
         return this.value as Result<U, E | F>;
+    }
+
+    match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U {
+        if (typeof handlers !== 'object' || handlers === null)
+            throw new InvalidArgumentError('Argument must be an object');
+
+        const { Ok: okHandler, Err: errHandler } = handlers;
+
+        if (typeof okHandler !== 'function')
+            throw new InvalidArgumentError('Handler for Ok must be a function');
+        if (typeof errHandler !== 'function')
+            throw new InvalidArgumentError(
+                'Handler for Err must be a function'
+            );
+
+        return this.isOk()
+            ? okHandler(this.value)
+            : errHandler(this.error as E);
     }
 }
 

@@ -49,23 +49,19 @@ const fetchUser = (id: number) => {
     return Ok({ id, name: 'Alice', role: 'admin' });
 };
 
-const { value: user, error } = parseUserId('10')
+const message = parseUserId('10')
     .map((id) => id + 3)
-    .andThen(fetchUser);
+    .andThen(fetchUser)
+    .match({
+        Ok: (user) => `Welcome, ${user.role} ${user.name}!`,
+        Err: (error) => {
+            if (error.code === 'NOT_FOUND')
+                return `Database Error: ${error.message}`;
+            return `Validation Error: ${error.message}`;
+        }
+    });
 
-if (error) {
-    switch (error.code) {
-        case 'INVALID_INPUT':
-        case 'INVALID_ID':
-            console.error(`Validation Error: ${error.message}`);
-            break;
-        case 'NOT_FOUND':
-            console.error(`Database Error: ${error.message}`);
-            break;
-    }
-} else {
-    console.log(`Welcome, ${user.role} ${user.name}!`);
-}
+console.log(message);
 ```
 
 ### Option
@@ -84,14 +80,17 @@ const parseNickname = (nickname?: string) => {
 
 const displayName = parseNickname('  Ada  ')
     .map((name) => name.toUpperCase())
-    .unwrapOr('ANONYMOUS');
+    .match({
+        Some: (name) => name,
+        None: () => 'ANONYMOUS'
+    });
 
 console.log(displayName);
 ```
 
 ## How this differs from Rust
 
-Instead of Rust's `match` expressions, check `Result` values as `{ value, error }` directly and use a `switch` on `error.code` to emulate pattern matching. `Option` values are handled directly with `isSome()` / `isNone()` checks.
+Rust uses the `match` keyword syntax; this library provides a `.match()` method on both `Result` and `Option` to achieve the same branching style in TypeScript.
 
 ## Error philosophy
 

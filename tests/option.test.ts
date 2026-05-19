@@ -260,6 +260,22 @@ describe('Option', () => {
         expect(() => Some(42).flatten()).toThrow(FlattenError);
     });
 
+    test('match', () => {
+        expect(
+            Some(5).match({
+                Some: (val) => `Value is ${val}`,
+                None: () => 'No value'
+            })
+        ).toBe('Value is 5');
+
+        expect(
+            None<number>().match({
+                Some: (val) => `Value is ${val}`,
+                None: () => 'No value'
+            })
+        ).toBe('No value');
+    });
+
     describe('Complex usage tests', () => {
         test('Parsing HTTP query configurations with safe fallbacks', () => {
             interface AppConfig {
