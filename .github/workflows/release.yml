@@ -11,8 +11,8 @@ permissions:
     contents: write
 
 jobs:
-    build-and-publish:
-        name: Build and Publish
+    release:
+        name: Release ${{ github.ref_name }}
         runs-on: ubuntu-latest
 
         steps:
@@ -53,13 +53,12 @@ jobs:
               run: bun run test
 
             - name: Build
-              id: build
               run: bun run build
 
-            - name: Publish to NPM
+            - name: Publish to npm registry
               run: bunx npm@latest publish --access public
 
-            - name: Release
+            - name: Publish GitHub release
               run: gh release create ${{ github.ref_name }} --generate-notes
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
