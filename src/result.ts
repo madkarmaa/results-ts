@@ -230,6 +230,16 @@ interface ResultMethods<T, E extends ResultError> {
     flatten<U, F extends ResultError>(
         this: Result<Result<U, F>, E>
     ): Result<U, E | F>;
+
+    /**
+     * Matches the `Result` with two functions, one for each variant.
+     *
+     * @param handlers The functions to handle each variant.
+     */
+    match<TOk, TErr = TOk>(handlers: {
+        Ok: (val: T) => TOk;
+        Err: (err: E) => TErr;
+    }): TOk | TErr;
 }
 
 class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
@@ -443,6 +453,27 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             );
 
         return this.value as Result<U, E | F>;
+    }
+
+    match<TOk, TErr = TOk>(handlers: {
+        Ok: (val: T) => TOk;
+        Err: (err: E) => TErr;
+    }): TOk | TErr {
+        if (typeof handlers !== 'object' || handlers === null)
+            throw new InvalidArgumentError('Argument must be an object');
+
+        const { Ok: okHandler, Err: errHandler } = handlers;
+
+        if (typeof okHandler !== 'function')
+            throw new InvalidArgumentError('Handler for Ok must be a function');
+        if (typeof errHandler !== 'function')
+            throw new InvalidArgumentError(
+                'Handler for Err must be a function'
+            );
+
+        return this.isOk()
+            ? okHandler(this.value)
+            : errHandler(this.error as E);
     }
 }
 
