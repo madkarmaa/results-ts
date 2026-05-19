@@ -1,10 +1,13 @@
 #!/bin/sh
 
-STAGED_FILES=$(git diff --cached --name-only)
+STAGED_FILES_FILE="$(mktemp)"
+trap 'rm -f "$STAGED_FILES_FILE"' EXIT
 
-if [ -z "$STAGED_FILES" ]; then
+git diff --cached --name-only -z --diff-filter=ACMR > "$STAGED_FILES_FILE"
+
+if [ ! -s "$STAGED_FILES_FILE" ]; then
     exit 0
 fi
 
-echo "$STAGED_FILES" | xargs bun run format --
-echo "$STAGED_FILES" | xargs git add
+xargs -0 bunx prettier --write --ignore-unknown -- < "$STAGED_FILES_FILE"
+xargs -0 git add -- < "$STAGED_FILES_FILE"
