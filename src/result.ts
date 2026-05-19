@@ -241,11 +241,12 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     // will error at runtime if trying to access # fields
     #value: T | null;
     #error: E | null;
-    readonly _isOk!: boolean;
+    readonly _isOk: boolean;
 
     constructor(value: T | null, error: E | null) {
         this.#value = value;
         this.#error = error;
+        this._isOk = error === null;
     }
 
     isOk(): this is OkResult<T, E> {
