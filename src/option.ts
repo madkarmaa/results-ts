@@ -235,7 +235,7 @@ interface OptionMethods<T> {
     /**
      * Matches the `Option` with two functions, one for each variant.
      *
-     * @param handlers The functions to handle each variant.
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U;
 }
