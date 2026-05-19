@@ -24,7 +24,7 @@ describe('Result', () => {
             true
         );
         expect(
-            // @ts-expect-error - Testing invalid error code
+            // @ts-expect-error - err.code is typed as literal "ERR"
             Err({ code: 'ERR' }).isErrAnd((err) => err.code === 'OTHER')
         ).toBe(false);
         expect(Ok(5).isErrAnd((_) => true)).toBe(false);
@@ -206,6 +206,23 @@ describe('Result', () => {
         });
         // @ts-expect-error - flatten should only be called on Result<Result<T, E>, E>
         expect(() => Ok(42).flatten()).toThrow(FlattenError);
+    });
+
+    test('match', () => {
+        expect(
+            Ok(5).match({
+                Ok: (val) => `Value is ${val}`,
+                // @ts-expect-error - Result is Ok, err type is never
+                Err: (err) => `Error code is ${err.code}`
+            })
+        ).toBe('Value is 5');
+
+        expect(
+            Err({ code: 'ERR' }).match({
+                Ok: (val) => `Value is ${val}`,
+                Err: (err) => `Error code is ${err.code}`
+            })
+        ).toBe('Error code is ERR');
     });
 
     describe('Complex usage tests', () => {
