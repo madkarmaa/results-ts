@@ -238,10 +238,11 @@ interface OptionMethods<T> {
 
 class OptionImpl<T> implements OptionMethods<T> {
     #value: T | null;
-    readonly _isSome!: boolean;
+    readonly _isSome: boolean;
 
     constructor(value: T | null) {
         this.#value = value;
+        this._isSome = value !== null;
     }
 
     isSome(): this is SomeOption<T> {
