@@ -1,8 +1,10 @@
 #!/bin/sh
 
-bun run format
+STAGED_FILES=$(git diff --cached --name-only)
 
-if ! git diff --quiet; then
-    echo "Formatter made changes. Stage them and re-commit."
-    exit 1
+if [ -z "$STAGED_FILES" ]; then
+    exit 0
 fi
+
+echo "$STAGED_FILES" | xargs bun run format --
+echo "$STAGED_FILES" | xargs git add
