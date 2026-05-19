@@ -39,13 +39,6 @@ export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
  *
  * The error type `E` must extend `ResultError` which contains a `code` property of type `string`.
  *
- * @example
- * ```typescript
- * const divide = (a: number, b: number) => {
- *   if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
- *   return Ok(a / b);
- * }
- *
  * const { value, error } = divide(10, 2);
  * if (error) console.error(error.code);
  * else console.log(value);
@@ -480,11 +473,6 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 /**
  * Contains the success value.
  *
- * @example
- * ```typescript
- * const { value } = Ok(42);
- * ```
- *
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
@@ -495,11 +483,6 @@ export function Ok<T, E extends ResultError = never>(value: T): Result<T, E> {
 
 /**
  * Contains the error value.
- *
- * @example
- * ```typescript
- * const { error } = Err({ code: 'NOT_FOUND' });
- * ```
  *
  * @param error - The error to wrap in a failed result. Must have a `code` property of type `string`.
  * @returns A `Result` representing a failed outcome.
