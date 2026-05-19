@@ -10,16 +10,12 @@ import { type Result, type ResultError, Ok, Err } from './result';
 /**
  * Represents some value of type `T`.
  */
-export type SomeOption<T> = {
-    readonly value: T;
-} & OptionMethods<T>;
+export type SomeOption<T> = OptionMethods<T> & { readonly _isSome: true };
 
 /**
  * Represents the absence of a value of type `T`.
  */
-export type NoneOption<T> = {
-    readonly value: null;
-} & OptionMethods<T>;
+export type NoneOption<T> = OptionMethods<T> & { readonly _isSome: false };
 
 /**
  * Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
@@ -242,33 +238,30 @@ interface OptionMethods<T> {
 
 class OptionImpl<T> implements OptionMethods<T> {
     #value: T | null;
+    readonly _isSome!: boolean;
 
     constructor(value: T | null) {
         this.#value = value;
     }
 
-    get value(): T | null {
-        return this.#value;
-    }
-
     isSome(): this is SomeOption<T> {
-        return this.value !== null;
+        return this.#value !== null;
     }
 
     isSomeAnd(f: (val: T) => boolean): boolean {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.isSome() && f(this.value);
+        return this.isSome() && f(this.#value as T);
     }
 
     isNone(): this is NoneOption<T> {
-        return this.value === null;
+        return this.#value === null;
     }
 
     isNoneOr(f: (val: T) => boolean): boolean {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.value === null || f(this.value);
+        return this.#value === null || f(this.#value);
     }
 
     expect(msg: string): T {
@@ -276,31 +269,31 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a string');
 
         if (this.isNone()) throw new PanicError(msg);
-        return this.value as T;
+        return this.#value as T;
     }
 
     unwrap(): T {
         if (this.isNone())
             throw new PanicError('called `Option.unwrap()` on a `None` value');
-        return this.value as T;
+        return this.#value as T;
     }
 
     unwrapOr(defaultVal: T): T {
         assertValueIsNotMissing(defaultVal);
-        return this.isSome() ? this.value : defaultVal;
+        return this.isSome() ? (this.#value as T) : defaultVal;
     }
 
     unwrapOrElse(f: () => T): T {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.isSome() ? this.value : f();
+        return this.isSome() ? (this.#value as T) : f();
     }
 
     map<U>(f: (val: T) => U): Option<U> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return Some(f(this.value));
+        if (this.isSome()) return Some(f(this.#value as T));
         return None<U>();
     }
 
@@ -308,7 +301,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) f(this.value);
+        if (this.isSome()) f(this.#value as T);
         return this as Option<T>;
     }
 
@@ -318,7 +311,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        return this.isSome() ? f(this.value) : defaultVal;
+        return this.isSome() ? f(this.#value as T) : defaultVal;
     }
 
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U {
@@ -330,13 +323,13 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
-        return this.isSome() ? f(this.value) : defaultF();
+        return this.isSome() ? f(this.#value as T) : defaultF();
     }
 
     okOr<E extends ResultError>(err: E): Result<T, E> {
         assertIsResultError(err);
 
-        if (this.isSome()) return Ok(this.value);
+        if (this.isSome()) return Ok(this.#value as T);
         return Err(err);
     }
 
@@ -344,12 +337,12 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof errF !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return Ok(this.value);
+        if (this.isSome()) return Ok(this.#value as T);
         return Err(errF());
     }
 
     *iter(): IterableIterator<T> {
-        if (this.isSome()) yield this.value;
+        if (this.isSome()) yield this.#value as T;
     }
 
     and<U>(optb: Option<U>): Option<U> {
@@ -364,7 +357,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return f(this.value);
+        if (this.isSome()) return f(this.#value as T);
         return None();
     }
 
@@ -372,7 +365,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome() && predicate(this.value)) return this as Option<T>;
+        if (this.isSome() && predicate(this.#value as T))
+            return this as Option<T>;
         return None();
     }
 
@@ -429,9 +423,9 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     take(): Option<T> {
         if (this.isSome()) {
-            const val = this.value;
+            const val = this.#value;
             this.#value = null;
-            return Some(val);
+            return Some(val!);
         }
 
         return None();
@@ -441,10 +435,10 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome() && predicate(this.value)) {
-            const val = this.value;
+        if (this.isSome() && predicate(this.#value as T)) {
+            const val = this.#value;
             this.#value = null;
-            return Some(val);
+            return Some(val!);
         }
 
         return None();
@@ -463,12 +457,14 @@ class OptionImpl<T> implements OptionMethods<T> {
     flatten<U>(this: Option<Option<U>>): Option<U> {
         if (this.isNone()) return None();
 
-        if (!(this.value instanceof OptionImpl))
+        const _this = this as OptionImpl<OptionImpl<U>>;
+
+        if (!(_this.#value instanceof OptionImpl))
             throw new FlattenError(
                 'flatten can only be called on Option<Option<T>>'
             );
 
-        return this.value as Option<U>;
+        return _this.#value as Option<U>;
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {
@@ -486,7 +482,7 @@ class OptionImpl<T> implements OptionMethods<T> {
                 'Handler for None must be a function'
             );
 
-        return this.isSome() ? someHandler(this.value) : noneHandler();
+        return this.isSome() ? someHandler(this.#value!) : noneHandler();
     }
 }
 
