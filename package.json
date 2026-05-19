@@ -1,6 +1,6 @@
 {
     "name": "results-ts",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Rust's Result and Option types, for TypeScript",
     "devDependencies": {
         "@commitlint/cli": "^21.0.1",
