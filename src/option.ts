@@ -552,5 +552,3 @@ export function Some<T extends NonNullable<unknown>>(value: T): Option<T> {
 export function None<T = never>(): Option<T> {
     return new OptionImpl<T>(Left(noneValue)) as Option<T>;
 }
-
-Some(5).getOrInsertWith(() => null as any);
