@@ -18,7 +18,7 @@ jobs:
             - name: Fetch upstream file
               run: |
                   mkdir -p .github
-                  curl -fsSL --fail-with-body "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/skills/caveman-review/SKILL.md" -o .github/copilot-instructions.md
+                  curl -fsSL "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/skills/caveman-review/SKILL.md" -o .github/copilot-instructions.md
 
             - name: Commit and push
               run: |
