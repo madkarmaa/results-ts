@@ -1,0 +1,34 @@
+name: Sync Caveman Review skill
+
+on:
+    schedule:
+        - cron: '0 0 1 * *'
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    sync-file:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v6
+
+            - name: Fetch Upstream File
+              run: |
+                  mkdir -p .github
+                  curl -sSL "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/skills/caveman-review/SKILL.md" -o .github/copilot-instructions.md
+
+            - name: Commit and Push Changes
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  git add .github/copilot-instructions.md
+
+                  if git diff --staged --quiet; then
+                    echo "No changes detected in upstream SKILL.md"
+                  else
+                    git commit -m "chore: automatically sync Caveman Review skill from upstream"
+                    git push
+                  fi
