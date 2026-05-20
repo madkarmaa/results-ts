@@ -18,18 +18,16 @@ export interface ResultError {
 /**
  * Represents a successful `Result` containing a value of type `T`.
  */
-export type OkResult<T, E extends ResultError> = {
-    readonly value: T;
-    readonly error: null;
-} & ResultMethods<T, E>;
+export type OkResult<T, E extends ResultError> = ResultMethods<T, E> & {
+    readonly _isOk: true;
+};
 
 /**
  * Represents a failed `Result` containing an error of type `E`.
  */
-export type ErrResult<T, E extends ResultError> = {
-    readonly value: null;
-    readonly error: E;
-} & ResultMethods<T, E>;
+export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
+    readonly _isOk: false;
+};
 
 /**
  * `Result<T, E>` is the type used for returning and propagating errors.
@@ -40,18 +38,6 @@ export type ErrResult<T, E extends ResultError> = {
  * Functions return `Result` whenever errors are expected and recoverable.
  *
  * The error type `E` must extend `ResultError` which contains a `code` property of type `string`.
- *
- * @example
- * ```typescript
- * const divide = (a: number, b: number) => {
- *   if (b === 0) return Err({ code: 'DIVIDE_BY_ZERO' });
- *   return Ok(a / b);
- * }
- *
- * const { value, error } = divide(10, 2);
- * if (error) console.error(error.code);
- * else console.log(value);
- * ```
  *
  * @template T - Contains the success value.
  * @template E - Contains the error value. Must have a `code` property of type `string`.
@@ -98,7 +84,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    map<U>(f: (val: T) => U): Result<U, E>;
+    map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E>;
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
@@ -244,58 +230,59 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     #value: T | null;
     #error: E | null;
 
+    get _isOk(): boolean {
+        return this.#error === null;
+    }
+
     constructor(value: T | null, error: E | null) {
         this.#value = value;
         this.#error = error;
     }
 
-    // will prevent mutation at runtime
-    get value(): T | null {
-        return this.#value;
-    }
-
-    // will prevent mutation at runtime
-    get error(): E | null {
-        return this.#error;
-    }
-
     isOk(): this is OkResult<T, E> {
-        return this.error === null;
+        return this.#error === null;
     }
 
     isOkAnd(f: (val: T) => boolean): this is OkResult<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.isOk() && f(this.value);
+        return this.isOk() && f(this.#value as T);
     }
 
     isErr(): this is ErrResult<T, E> {
-        return this.value === null;
+        return this.#value === null;
     }
 
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.isErr() && f(this.error);
+        return this.isErr() && f(this.#error as E);
     }
 
     ok(): Option<T> {
-        if (this.isOk()) return Some(this.value);
+        if (this.isOk()) return Some(this.#value!);
         return None();
     }
 
     err(): Option<E> {
-        if (this.isErr()) return Some(this.error);
+        if (this.isErr()) return Some(this.#error!);
         return None();
     }
 
-    map<U>(f: (val: T) => U): Result<U, E> {
+    map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         if (this.isErr())
-            return new ResultImpl<U, E>(null, this.error) as Result<U, E>;
-        return new ResultImpl<U, E>(f(this.value as T), null) as Result<U, E>;
+            return new ResultImpl<U, E>(null, this.#error) as Result<U, E>;
+
+        const mappedValue = f(this.#value as T);
+        if (mappedValue === null || mappedValue === undefined)
+            throw new InvalidArgumentError(
+                'map function cannot return null or undefined'
+            );
+
+        return new ResultImpl<U, E>(mappedValue, null) as Result<U, E>;
     }
 
     mapOr<U>(fallback: U, f: (val: T) => U): U {
@@ -305,7 +292,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
         if (this.isErr()) return fallback;
-        return f(this.value as T);
+        return f(this.#value as T);
     }
 
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U {
@@ -317,8 +304,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
-        if (this.isErr()) return fallbackFn(this.error);
-        return f(this.value as T);
+        if (this.isErr()) return fallbackFn(this.#error as E);
+        return f(this.#value as T);
     }
 
     mapErr<F extends ResultError>(f: (err: E) => F): Result<T, F> {
@@ -326,15 +313,18 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError('Argument must be a function');
 
         if (this.isErr())
-            return new ResultImpl<T, F>(null, f(this.error)) as Result<T, F>;
-        return new ResultImpl<T, F>(this.value, null) as Result<T, F>;
+            return new ResultImpl<T, F>(null, f(this.#error as E)) as Result<
+                T,
+                F
+            >;
+        return new ResultImpl<T, F>(this.#value, null) as Result<T, F>;
     }
 
     inspect(f: (val: T) => void): Result<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isOk()) f(this.value);
+        if (this.isOk()) f(this.#value as T);
         return this as Result<T, E>;
     }
 
@@ -342,12 +332,12 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isErr()) f(this.error);
+        if (this.isErr()) f(this.#error as E);
         return this as Result<T, E>;
     }
 
     *iter(): IterableIterator<T> {
-        if (this.isOk()) yield this.value;
+        if (this.isOk()) yield this.#value as T;
     }
 
     expect(msg: string): T {
@@ -355,16 +345,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError('Argument must be a string');
 
         if (this.isErr())
-            throw new PanicError(`${msg}: code "${this.error.code}"`);
-        return this.value as T;
+            throw new PanicError(`${msg}: code "${this.#error!.code}"`);
+        return this.#value as T;
     }
 
     unwrap(): T {
         if (this.isErr())
             throw new PanicError(
-                `called \`Result.unwrap()\` on an \`Err\` value: code "${this.error.code}"`
+                `called \`Result.unwrap()\` on an \`Err\` value: code "${this.#error!.code}"`
             );
-        return this.value as T;
+        return this.#value as T;
     }
 
     expectErr(msg: string): E {
@@ -372,16 +362,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError('Argument must be a string');
 
         if (this.isOk())
-            throw new PanicError(`${msg}: "${String(this.value)}"`);
-        return this.error as E;
+            throw new PanicError(`${msg}: "${String(this.#value)}"`);
+        return this.#error as E;
     }
 
     unwrapErr(): E {
         if (this.isOk())
             throw new PanicError(
-                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(this.value)}"`
+                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(this.#value)}"`
             );
-        return this.error as E;
+        return this.#error as E;
     }
 
     and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2> {
@@ -389,7 +379,10 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError('Argument must be a Result');
 
         if (this.isOk()) return res;
-        return new ResultImpl<U, E | E2>(null, this.error) as Result<U, E | E2>;
+        return new ResultImpl<U, E | E2>(null, this.#error as E) as Result<
+            U,
+            E | E2
+        >;
     }
 
     andThen<U, F extends ResultError>(
@@ -398,8 +391,11 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isOk()) return f(this.value);
-        return new ResultImpl<U, E | F>(null, this.error) as Result<U, E | F>;
+        if (this.isOk()) return f(this.#value!);
+        return new ResultImpl<U, E | F>(null, this.#error as E) as Result<
+            U,
+            E | F
+        >;
     }
 
     or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F> {
@@ -407,7 +403,10 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError('Argument must be a Result');
 
         if (this.isErr()) return res;
-        return new ResultImpl<T | T2, F>(this.value, null) as Result<T | T2, F>;
+        return new ResultImpl<T | T2, F>(this.#value, null) as Result<
+            T | T2,
+            F
+        >;
     }
 
     orElse<T2, F extends ResultError>(
@@ -416,40 +415,45 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isErr()) return f(this.error);
-        return new ResultImpl<T | T2, F>(this.value, null) as Result<T | T2, F>;
+        if (this.isErr()) return f(this.#error as E);
+        return new ResultImpl<T | T2, F>(this.#value, null) as Result<
+            T | T2,
+            F
+        >;
     }
 
     unwrapOr<T2>(fallback: T2): T | T2 {
         assertValueIsNotMissing(fallback);
 
         if (this.isErr()) return fallback;
-        return this.value as T;
+        return this.#value as T;
     }
 
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2 {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isErr()) return f(this.error);
-        return this.value as T;
+        if (this.isErr()) return f(this.#error as E);
+        return this.#value as T;
     }
 
     flatten<U, F extends ResultError>(
         this: Result<Result<U, F>, E>
     ): Result<U, E | F> {
-        if (this.isErr())
-            return new ResultImpl<U, E | F>(null, this.error) as Result<
+        const _this = this as ResultImpl<ResultImpl<U, F>, E>;
+
+        if (_this.isErr())
+            return new ResultImpl<U, E | F>(null, _this.#error as E) as Result<
                 U,
                 E | F
             >;
 
-        if (!(this.value instanceof ResultImpl))
+        if (!(_this.#value instanceof ResultImpl))
             throw new FlattenError(
                 'flatten can only be called on Result<Result<T, E>, E>'
             );
 
-        return this.value as Result<U, E | F>;
+        return _this.#value as Result<U, E | F>;
     }
 
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U {
@@ -466,18 +470,13 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             );
 
         return this.isOk()
-            ? okHandler(this.value)
-            : errHandler(this.error as E);
+            ? okHandler(this.#value as T)
+            : errHandler(this.#error as E);
     }
 }
 
 /**
  * Contains the success value.
- *
- * @example
- * ```typescript
- * const { value } = Ok(42);
- * ```
  *
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
@@ -489,11 +488,6 @@ export function Ok<T, E extends ResultError = never>(value: T): Result<T, E> {
 
 /**
  * Contains the error value.
- *
- * @example
- * ```typescript
- * const { error } = Err({ code: 'NOT_FOUND' });
- * ```
  *
  * @param error - The error to wrap in a failed result. Must have a `code` property of type `string`.
  * @returns A `Result` representing a failed outcome.
