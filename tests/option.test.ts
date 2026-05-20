@@ -1,8 +1,21 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, PanicError } from '../src/errors';
+import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
 
 describe('Option', () => {
+    test('construction', () => {
+        expect(Some(5)).toBeInstanceOf(Object);
+        expect(None()).toBeInstanceOf(Object);
+        // @ts-expect-error - Some should not accept null or undefined
+        expect(() => Some(null)).toThrow(
+            new InvalidArgumentError('Value cannot be null or undefined')
+        );
+        // @ts-expect-error - Some should not accept null or undefined
+        expect(() => Some(undefined)).toThrow(
+            new InvalidArgumentError('Value cannot be null or undefined')
+        );
+    });
+
     test('isSome', () => {
         expect(Some(5).isSome()).toBe(true);
         expect(None().isSome()).toBe(false);
@@ -216,6 +229,13 @@ describe('Option', () => {
         const optSome = Some(10);
         expect(optSome.getOrInsertWith(() => 5)).toBe(10);
         expect(optSome.unwrap()).toBe(10);
+
+        // @ts-expect-error - getOrInsertWith should not accept a function that returns null or undefined
+        expect(() => None<number>().getOrInsertWith(() => null)).toThrow(
+            new InvalidArgumentError(
+                'Returned value cannot be null or undefined'
+            )
+        );
     });
 
     test('take', () => {

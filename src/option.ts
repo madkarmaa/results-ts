@@ -5,6 +5,7 @@ import {
     InvalidArgumentError,
     PanicError
 } from './errors';
+import { type Either, Left, Right, isLeft, isRight } from './either';
 import { type Result, type ResultError, Ok, Err } from './result';
 
 /**
@@ -86,7 +87,7 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    map<U>(f: (val: T) => U): Option<U>;
+    map<U extends NonNullable<unknown>>(f: (val: T) => U): Option<U>;
 
     /**
      * Calls the provided closure with a reference to the contained value (if `Some`).
@@ -228,20 +229,23 @@ interface OptionMethods<T> {
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U;
 }
 
+const noneValue = { _tag: 'NoneValue' } as const;
+type NoneValue = typeof noneValue;
+
 class OptionImpl<T> implements OptionMethods<T> {
     // will error at runtime if trying to access # fields
-    #value: T | null;
+    #state: Either<NoneValue, T>;
 
     get _isSome(): boolean {
-        return this.#value !== null;
+        return isRight(this.#state);
     }
 
-    constructor(value: T | null) {
-        this.#value = value;
+    constructor(state: Either<NoneValue, T>) {
+        this.#state = state;
     }
 
     isSome(): this is SomeOption<T> {
-        return this.#value !== null;
+        return isRight(this.#state);
     }
 
     isSomeAnd<U extends T>(f: (val: T) => val is U): this is SomeOption<U>;
@@ -249,31 +253,38 @@ class OptionImpl<T> implements OptionMethods<T> {
     isSomeAnd(f: (val: T) => boolean): this is SomeOption<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.isSome() && f(this.#value as T);
+
+        const state = this.#state;
+        return isRight(state) && f(state.right);
     }
 
     isNone(): this is NoneOption<T> {
-        return this.#value === null;
+        return isLeft(this.#state);
     }
 
     isNoneOr(f: (val: T) => boolean): boolean {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.#value === null || f(this.#value);
+
+        const state = this.#state;
+        if (isLeft(state)) return true;
+        return f(state.right);
     }
 
     expect(msg: string): T {
         if (typeof msg !== 'string')
             throw new InvalidArgumentError('Argument must be a string');
 
-        if (this.isNone()) throw new PanicError(msg);
-        return this.#value as T;
+        const state = this.#state;
+        if (isLeft(state)) throw new PanicError(msg);
+        return state.right;
     }
 
     unwrap(): T {
-        if (this.isNone())
+        const state = this.#state;
+        if (isLeft(state))
             throw new PanicError('called `Option.unwrap()` on a `None` value');
-        return this.#value as T;
+        return state.right;
     }
 
     unwrapOr(defaultVal: T): T {
@@ -281,20 +292,25 @@ class OptionImpl<T> implements OptionMethods<T> {
             defaultVal,
             'Default value cannot be null or undefined'
         );
-        return this.isSome() ? (this.#value as T) : defaultVal;
+
+        const state = this.#state;
+        return isRight(state) ? state.right : defaultVal;
     }
 
     unwrapOrElse(f: () => T): T {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
-        return this.isSome() ? (this.#value as T) : f();
+
+        const state = this.#state;
+        return isRight(state) ? state.right : f();
     }
 
-    map<U>(f: (val: T) => U): Option<U> {
+    map<U extends NonNullable<unknown>>(f: (val: T) => U): Option<U> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return Some(f(this.#value as T));
+        const state = this.#state;
+        if (isRight(state)) return Some(f(state.right));
         return None<U>();
     }
 
@@ -302,7 +318,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) f(this.#value as T);
+        const state = this.#state;
+        if (isRight(state)) f(state.right);
         return this as Option<T>;
     }
 
@@ -315,7 +332,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        return this.isSome() ? f(this.#value as T) : defaultVal;
+        const state = this.#state;
+        return isRight(state) ? f(state.right) : defaultVal;
     }
 
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U {
@@ -327,13 +345,16 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
-        return this.isSome() ? f(this.#value as T) : defaultF();
+        const state = this.#state;
+        return isRight(state) ? f(state.right) : defaultF();
     }
 
     okOr<E extends ResultError>(err: E): Result<T, E> {
         assertIsResultError(err);
 
-        if (this.isSome()) return Ok(this.#value as T);
+        const state = this.#state;
+        if (isRight(state))
+            return Ok(state.right as NonNullable<T>) as Result<T, E>;
         return Err(err);
     }
 
@@ -341,19 +362,23 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof errF !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return Ok(this.#value as T);
+        const state = this.#state;
+        if (isRight(state))
+            return Ok(state.right as NonNullable<T>) as Result<T, E>;
         return Err(errF());
     }
 
     *iter(): IterableIterator<T> {
-        if (this.isSome()) yield this.#value as T;
+        const state = this.#state;
+        if (isRight(state)) yield state.right;
     }
 
     and<U>(optb: Option<U>): Option<U> {
         if (!(optb instanceof OptionImpl))
             throw new InvalidArgumentError('Argument must be an Option');
 
-        if (this.isSome()) return optb;
+        const state = this.#state;
+        if (isRight(state)) return optb;
         return None();
     }
 
@@ -361,7 +386,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return f(this.#value as T);
+        const state = this.#state;
+        if (isRight(state)) return f(state.right);
         return None();
     }
 
@@ -369,8 +395,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome() && predicate(this.#value as T))
-            return this as Option<T>;
+        const state = this.#state;
+        if (isRight(state) && predicate(state.right)) return this as Option<T>;
         return None();
     }
 
@@ -378,7 +404,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (!(optb instanceof OptionImpl))
             throw new InvalidArgumentError('Argument must be an Option');
 
-        if (this.isSome()) return this as Option<T>;
+        const state = this.#state;
+        if (isRight(state)) return this as Option<T>;
         return optb;
     }
 
@@ -386,7 +413,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome()) return this as Option<T>;
+        const state = this.#state;
+        if (isRight(state)) return this as Option<T>;
         return f();
     }
 
@@ -394,7 +422,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (!(optb instanceof OptionImpl))
             throw new InvalidArgumentError('Argument must be an Option');
 
-        const thisIsSome = this.isSome();
+        const thisIsSome = isRight(this.#state);
         const optbIsSome = optb.isSome();
 
         if (thisIsSome && !optbIsSome) return this as Option<T>;
@@ -406,30 +434,44 @@ class OptionImpl<T> implements OptionMethods<T> {
     insert(value: T): T {
         assertValueIsNotMissing(value, 'Value cannot be null or undefined');
 
-        this.#value = value;
-        return this.#value;
+        this.#state = Right(value);
+        return value;
     }
 
     getOrInsert(value: T): T {
         assertValueIsNotMissing(value, 'Value cannot be null or undefined');
 
-        if (this.isNone()) this.#value = value;
-        return this.#value as T;
+        const state = this.#state;
+        if (isLeft(state)) {
+            this.#state = Right(value);
+            return value;
+        }
+        return state.right;
     }
 
     getOrInsertWith(f: () => T): T {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isNone()) this.#value = f();
-        return this.#value as T;
+        const state = this.#state;
+        if (isLeft(state)) {
+            const value = f();
+            assertValueIsNotMissing(
+                value,
+                'Returned value cannot be null or undefined'
+            );
+
+            this.#state = Right(value);
+            return value;
+        }
+        return state.right;
     }
 
     take(): Option<T> {
-        if (this.isSome()) {
-            const val = this.#value;
-            this.#value = null;
-            return Some(val!);
+        const state = this.#state;
+        if (isRight(state)) {
+            this.#state = Left(noneValue);
+            return Some(state.right as NonNullable<T>) as Option<T>;
         }
 
         return None();
@@ -439,10 +481,10 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
-        if (this.isSome() && predicate(this.#value as T)) {
-            const val = this.#value;
-            this.#value = null;
-            return Some(val!);
+        const state = this.#state;
+        if (isRight(state) && predicate(state.right)) {
+            this.#state = Left(noneValue);
+            return Some(state.right as NonNullable<T>) as Option<T>;
         }
 
         return None();
@@ -451,24 +493,26 @@ class OptionImpl<T> implements OptionMethods<T> {
     replace(value: T): Option<T> {
         assertValueIsNotMissing(value, 'Value cannot be null or undefined');
 
-        const old = this.#value;
-        this.#value = value;
+        const state = this.#state;
+        this.#state = Right(value);
 
-        if (old !== null) return Some(old);
+        if (isRight(state))
+            return Some(state.right as NonNullable<T>) as Option<T>;
         return None();
     }
 
     flatten<U>(this: Option<Option<U>>): Option<U> {
         if (this.isNone()) return None();
 
-        const _this = this as OptionImpl<OptionImpl<U>>;
+        const _this = this as OptionImpl<Option<U>>;
+        const state = _this.#state;
 
-        if (!(_this.#value instanceof OptionImpl))
+        if (!isRight(state) || !(state.right instanceof OptionImpl))
             throw new FlattenError(
                 'flatten can only be called on Option<Option<T>>'
             );
 
-        return _this.#value as Option<U>;
+        return state.right as Option<U>;
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {
@@ -486,7 +530,8 @@ class OptionImpl<T> implements OptionMethods<T> {
                 'Handler for None must be a function'
             );
 
-        return this.isSome() ? someHandler(this.#value!) : noneHandler();
+        const state = this.#state;
+        return isRight(state) ? someHandler(state.right) : noneHandler();
     }
 }
 
@@ -495,9 +540,9 @@ class OptionImpl<T> implements OptionMethods<T> {
  * @param value The value to be wrapped in a `Some`.
  * @returns An `Option` representing the presence of a value.
  */
-export function Some<T>(value: T): Option<T> {
+export function Some<T extends NonNullable<unknown>>(value: T): Option<T> {
     assertValueIsNotMissing(value, 'Value cannot be null or undefined');
-    return new OptionImpl<T>(value) as Option<T>;
+    return new OptionImpl<T>(Right(value)) as Option<T>;
 }
 
 /**
@@ -505,5 +550,5 @@ export function Some<T>(value: T): Option<T> {
  * @returns An `Option` representing the absence of a value.
  */
 export function None<T = never>(): Option<T> {
-    return new OptionImpl<T>(null) as Option<T>;
+    return new OptionImpl<T>(Left(noneValue)) as Option<T>;
 }
