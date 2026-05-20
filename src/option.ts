@@ -320,7 +320,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isRight(state)) f(state.right);
-        return this as Option<T>;
+        return this;
     }
 
     mapOr<U>(defaultVal: U, f: (val: T) => U): U {
@@ -353,8 +353,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         assertIsResultError(err);
 
         const state = this.#state;
-        if (isRight(state))
-            return Ok(state.right as NonNullable<T>) as Result<T, E>;
+        if (isRight(state)) return Ok(state.right as NonNullable<T>);
         return Err(err);
     }
 
@@ -363,8 +362,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state))
-            return Ok(state.right as NonNullable<T>) as Result<T, E>;
+        if (isRight(state)) return Ok(state.right as NonNullable<T>);
         return Err(errF());
     }
 
@@ -396,7 +394,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state) && predicate(state.right)) return this as Option<T>;
+        if (isRight(state) && predicate(state.right)) return this;
         return None();
     }
 
@@ -405,7 +403,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
-        if (isRight(state)) return this as Option<T>;
+        if (isRight(state)) return this;
         return optb;
     }
 
@@ -414,7 +412,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return this as Option<T>;
+        if (isRight(state)) return this;
         return f();
     }
 
@@ -425,10 +423,10 @@ class OptionImpl<T> implements OptionMethods<T> {
         const thisIsSome = isRight(this.#state);
         const optbIsSome = optb.isSome();
 
-        if (thisIsSome && !optbIsSome) return this as Option<T>;
+        if (thisIsSome && !optbIsSome) return this;
         if (!thisIsSome && optbIsSome) return optb;
 
-        return None<T | T2>();
+        return None();
     }
 
     insert(value: T): T {
@@ -471,7 +469,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state)) {
             this.#state = Left(noneValue);
-            return Some(state.right as NonNullable<T>) as Option<T>;
+            return Some(state.right as NonNullable<T>);
         }
 
         return None();
@@ -484,7 +482,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state) && predicate(state.right)) {
             this.#state = Left(noneValue);
-            return Some(state.right as NonNullable<T>) as Option<T>;
+            return Some(state.right as NonNullable<T>);
         }
 
         return None();
@@ -496,8 +494,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         this.#state = Right(value);
 
-        if (isRight(state))
-            return Some(state.right as NonNullable<T>) as Option<T>;
+        if (isRight(state)) return Some(state.right as NonNullable<T>);
         return None();
     }
 
@@ -512,7 +509,7 @@ class OptionImpl<T> implements OptionMethods<T> {
                 'flatten can only be called on Option<Option<T>>'
             );
 
-        return state.right as Option<U>;
+        return state.right;
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {
@@ -542,7 +539,7 @@ class OptionImpl<T> implements OptionMethods<T> {
  */
 export function Some<T extends NonNullable<unknown>>(value: T): Option<T> {
     assertValueIsNotMissing(value, 'Value cannot be null or undefined');
-    return new OptionImpl<T>(Right(value)) as Option<T>;
+    return new OptionImpl(Right(value));
 }
 
 /**
@@ -550,5 +547,5 @@ export function Some<T extends NonNullable<unknown>>(value: T): Option<T> {
  * @returns An `Option` representing the absence of a value.
  */
 export function None<T = never>(): Option<T> {
-    return new OptionImpl<T>(Left(noneValue)) as Option<T>;
+    return new OptionImpl(Left(noneValue));
 }
