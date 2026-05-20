@@ -12,23 +12,21 @@ jobs:
     sync-file:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout Repository
+            - name: Checkout
               uses: actions/checkout@v6
 
-            - name: Fetch Upstream File
+            - name: Fetch upstream file
               run: |
                   mkdir -p .github
-                  curl -sSL "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/skills/caveman-review/SKILL.md" -o .github/copilot-instructions.md
+                  curl -fsSL --fail-with-body "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/skills/caveman-review/SKILL.md" -o .github/copilot-instructions.md
 
-            - name: Commit and Push Changes
+            - name: Commit and push
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
                   git add .github/copilot-instructions.md
 
-                  if git diff --staged --quiet; then
-                    echo "No changes detected in upstream SKILL.md"
-                  else
+                  if ! git diff --staged --quiet; then
                     git commit -m "chore: automatically sync Caveman Review skill from upstream"
                     git push
                   fi
