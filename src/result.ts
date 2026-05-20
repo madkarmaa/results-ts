@@ -84,7 +84,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    map<U>(f: (val: T) => U): Result<U, E>;
+    map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E>;
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
@@ -269,13 +269,20 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return None();
     }
 
-    map<U>(f: (val: T) => U): Result<U, E> {
+    map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         if (this.isErr())
             return new ResultImpl<U, E>(null, this.#error) as Result<U, E>;
-        return new ResultImpl<U, E>(f(this.#value as T), null) as Result<U, E>;
+
+        const mappedValue = f(this.#value as T);
+        if (mappedValue === null || mappedValue === undefined)
+            throw new InvalidArgumentError(
+                'map function cannot return null or undefined'
+            );
+
+        return new ResultImpl<U, E>(mappedValue, null) as Result<U, E>;
     }
 
     mapOr<U>(fallback: U, f: (val: T) => U): U {

@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Ok, Err } from '../src/result';
-import { FlattenError, PanicError } from '../src/errors';
+import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
 
 describe('Result', () => {
     test('isOk', () => {
@@ -51,6 +51,12 @@ describe('Result', () => {
                 .map((x) => x * 2)
                 .isErr()
         ).toBe(true);
+        // @ts-expect-error - map function cannot return null or undefined
+        expect(() => Ok(5).map((_) => null)).toThrow(
+            new InvalidArgumentError(
+                'map function cannot return null or undefined'
+            )
+        );
     });
 
     test('mapOr', () => {
