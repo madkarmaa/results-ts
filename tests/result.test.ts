@@ -12,6 +12,10 @@ describe('Result', () => {
         expect(Ok(5).isOkAnd((val) => val === 5)).toBe(true);
         expect(Ok(5).isOkAnd((val) => val === 10)).toBe(false);
         expect(Err({ code: 'ERR' }).isOkAnd((_) => true)).toBe(false);
+        const result = Ok(Math.random());
+        if (result.isOkAnd((val) => val === 0.5)) {
+            result.unwrap() satisfies 0.5;
+        }
     });
 
     test('isErr', () => {
@@ -28,6 +32,12 @@ describe('Result', () => {
             Err({ code: 'ERR' }).isErrAnd((err) => err.code === 'OTHER')
         ).toBe(false);
         expect(Ok(5).isErrAnd((_) => true)).toBe(false);
+        const result = Err(
+            Math.random() > 0.5 ? { code: 'ERR' } : { code: 'OTHER' }
+        );
+        if (result.isErrAnd((err) => err.code === 'ERR')) {
+            result.unwrapErr() satisfies { code: 'ERR' };
+        }
     });
 
     test('ok', () => {

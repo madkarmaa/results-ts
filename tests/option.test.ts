@@ -12,6 +12,10 @@ describe('Option', () => {
         expect(Some(5).isSomeAnd((val) => val === 5)).toBe(true);
         expect(Some(5).isSomeAnd((val) => val === 10)).toBe(false);
         expect(None<number>().isSomeAnd((val) => val === 5)).toBe(false);
+        const option = Some(Math.random());
+        if (option.isSomeAnd((val) => val === 0.5)) {
+            option.unwrap() satisfies 0.5;
+        }
     });
 
     test('isNone', () => {
