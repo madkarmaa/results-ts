@@ -456,6 +456,11 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isLeft(state)) {
             const value = f();
+            assertValueIsNotMissing(
+                value,
+                'Returned value cannot be null or undefined'
+            );
+
             this.#state = Right(value);
             return value;
         }
@@ -547,3 +552,5 @@ export function Some<T extends NonNullable<unknown>>(value: T): Option<T> {
 export function None<T = never>(): Option<T> {
     return new OptionImpl<T>(Left(noneValue)) as Option<T>;
 }
+
+Some(5).getOrInsertWith(() => null as any);

@@ -229,6 +229,13 @@ describe('Option', () => {
         const optSome = Some(10);
         expect(optSome.getOrInsertWith(() => 5)).toBe(10);
         expect(optSome.unwrap()).toBe(10);
+
+        // @ts-expect-error - getOrInsertWith should not accept a function that returns null or undefined
+        expect(() => None<number>().getOrInsertWith(() => null)).toThrow(
+            new InvalidArgumentError(
+                'Returned value cannot be null or undefined'
+            )
+        );
     });
 
     test('take', () => {
