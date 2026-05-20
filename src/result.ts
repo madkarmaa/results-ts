@@ -55,6 +55,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
+    isOkAnd<U extends T>(f: (val: T) => val is U): this is OkResult<U, E>;
     isOkAnd(f: (val: T) => boolean): this is OkResult<T, E>;
 
     /**
@@ -67,6 +68,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
+    isErrAnd<F extends E>(f: (err: E) => err is F): this is ErrResult<T, F>;
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E>;
 
     /**
@@ -265,6 +267,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.#error === null;
     }
 
+    isOkAnd<U extends T>(f: (val: T) => val is U): this is OkResult<U, E>;
+    isOkAnd(f: (val: T) => boolean): this is OkResult<T, E>;
     isOkAnd(f: (val: T) => boolean): this is OkResult<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
@@ -275,6 +279,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return this.#value === null;
     }
 
+    isErrAnd<F extends E>(f: (err: E) => err is F): this is ErrResult<T, F>;
+    isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E>;
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
