@@ -22,18 +22,19 @@ export class FlattenError extends InvalidArgumentError {
 }
 
 export function assertValueIsNotMissing<T>(
-    value: T | null | undefined
+    value: T | null | undefined,
+    message?: string
 ): asserts value is T {
     if (value === null || value === undefined)
         throw new InvalidArgumentError(
-            'Expected a non-null, non-undefined value'
+            message || 'Expected a non-null, non-undefined value'
         );
 }
 
 export function assertIsResultError(
     error: unknown
 ): asserts error is ResultError {
-    assertValueIsNotMissing(error);
+    assertValueIsNotMissing(error, 'Expected an error object');
 
     if (
         typeof error !== 'object' ||
