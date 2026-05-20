@@ -3,6 +3,38 @@ import { Ok, Err } from '../src/result';
 import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
 
 describe('Result', () => {
+    test('construction', () => {
+        expect(Ok(5)).toBeInstanceOf(Object);
+        expect(Err({ code: 'ERR' })).toBeInstanceOf(Object);
+        // @ts-expect-error - Ok should not accept null or undefined
+        expect(() => Ok(null)).toThrow(
+            new InvalidArgumentError('Value cannot be null or undefined')
+        );
+        // @ts-expect-error - Ok should not accept null or undefined
+        expect(() => Ok(undefined)).toThrow(
+            new InvalidArgumentError('Value cannot be null or undefined')
+        );
+        // @ts-expect-error - error object must be passed
+        expect(() => Err(null)).toThrow(
+            new InvalidArgumentError('Expected an error object')
+        );
+        // @ts-expect-error - error object must be passed
+        expect(() => Err(undefined)).toThrow(
+            new InvalidArgumentError('Expected an error object')
+        );
+        // @ts-expect-error - code property must be a string
+        expect(() => Err({ code: null })).toThrow(
+            new InvalidArgumentError(
+                "Expected an object with a string 'code' property"
+            )
+        );
+        // @ts-expect-error - code property must be a string
+        expect(() => Err({ code: undefined })).toThrow(
+            new InvalidArgumentError(
+                "Expected an object with a string 'code' property"
+            )
+        );
+    });
     test('isOk', () => {
         expect(Ok(5).isOk()).toBe(true);
         expect(Err({ code: 'ERR' }).isOk()).toBe(false);
