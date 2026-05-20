@@ -37,7 +37,7 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    isSomeAnd(f: (val: T) => boolean): boolean;
+    isSomeAnd(f: (val: T) => boolean): this is SomeOption<T>;
 
     /**
      * Returns `true` if the option is a `None` value.
@@ -243,7 +243,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         return this.#value !== null;
     }
 
-    isSomeAnd(f: (val: T) => boolean): boolean {
+    isSomeAnd(f: (val: T) => boolean): this is SomeOption<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
         return this.isSome() && f(this.#value as T);
