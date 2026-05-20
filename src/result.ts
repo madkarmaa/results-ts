@@ -49,34 +49,40 @@ interface ResultMethods<T, E extends ResultError> {
      * Returns `true` if the result is `Ok`.
      */
     isOk(): this is OkResult<T, E>;
+
     /**
      * Returns `true` if the result is `Ok` and the value inside of it matches a predicate.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     isOkAnd(f: (val: T) => boolean): this is OkResult<T, E>;
+
     /**
      * Returns `true` if the result is `Err`.
      */
     isErr(): this is ErrResult<T, E>;
+
     /**
      * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E>;
+
     /**
      * Converts from `Result<T, E>` to `Option<T>`.
      *
      * Converts self into an `Option<T>`, consuming self, and converting the error to `None`, if any.
      */
     ok(): Option<T>;
+
     /**
      * Converts from `Result<T, E>` to `Option<E>`.
      *
      * Converts self into an `Option<E>`, consuming self, and discarding the success value, if any.
      */
     err(): Option<E>;
+
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
      *
@@ -85,6 +91,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E>;
+
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
@@ -93,6 +100,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapOr<U>(fallback: U, f: (val: T) => U): U;
+
     /**
      * Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
      *
@@ -101,6 +109,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U;
+
     /**
      * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
      *
@@ -109,6 +118,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapErr<F extends ResultError>(f: (err: E) => F): Result<T, F>;
+
     /**
      * Calls a function with a reference to the contained value if `Ok`.
      *
@@ -117,6 +127,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspect(f: (val: T) => void): Result<T, E>;
+
     /**
      * Calls a function with a reference to the contained value if `Err`.
      *
@@ -125,12 +136,14 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspectErr(f: (err: E) => void): Result<T, E>;
+
     /**
      * Returns an iterator over the possibly contained value.
      *
      * The iterator yields one value if the result is `Ok`, otherwise none.
      */
     iter(): Iterable<T>;
+
     /**
      * Returns the contained `Ok` value, consuming the `self` value.
      *
@@ -138,12 +151,14 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     expect(msg: string): T;
+
     /**
      * Returns the contained `Ok` value, consuming the `self` value.
      *
      * @throws Panics if the value is an `Err`, with a panic message provided by the `Err`'s value.
      */
     unwrap(): T;
+
     /**
      * Returns the contained `Err` value, consuming the `self` value.
      *
@@ -151,12 +166,14 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     expectErr(msg: string): E;
+
     /**
      * Returns the contained `Err` value, consuming the `self` value.
      *
      * @throws Panics if the value is an `Ok`, with a custom panic message provided by the `Ok`'s value.
      */
     unwrapErr(): E;
+
     /**
      * Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
      *
@@ -165,6 +182,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2>;
+
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
      *
@@ -175,6 +193,7 @@ interface ResultMethods<T, E extends ResultError> {
     andThen<U, F extends ResultError>(
         f: (val: T) => Result<U, F>
     ): Result<U, E | F>;
+
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
@@ -183,6 +202,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F>;
+
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
@@ -193,6 +213,7 @@ interface ResultMethods<T, E extends ResultError> {
     orElse<T2, F extends ResultError>(
         f: (err: E) => Result<T2, F>
     ): Result<T | T2, F>;
+
     /**
      * Returns the contained `Ok` value or a provided default.
      *
@@ -201,6 +222,7 @@ interface ResultMethods<T, E extends ResultError> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     unwrapOr<T2>(fallback: T2): T | T2;
+
     /**
      * Returns the contained `Ok` value or computes it from a closure.
      *
