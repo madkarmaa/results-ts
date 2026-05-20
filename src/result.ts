@@ -39,11 +39,6 @@ export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
  *
  * The error type `E` must extend `ResultError` which contains a `code` property of type `string`.
  *
- * const { value, error } = divide(10, 2);
- * if (error) console.error(error.code);
- * else console.log(value);
- * ```
- *
  * @template T - Contains the success value.
  * @template E - Contains the error value. Must have a `code` property of type `string`.
  */
