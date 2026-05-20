@@ -274,7 +274,10 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     unwrapOr(defaultVal: T): T {
-        assertValueIsNotMissing(defaultVal);
+        assertValueIsNotMissing(
+            defaultVal,
+            'Default value cannot be null or undefined'
+        );
         return this.isSome() ? (this.#value as T) : defaultVal;
     }
 
@@ -301,7 +304,10 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     mapOr<U>(defaultVal: U, f: (val: T) => U): U {
-        assertValueIsNotMissing(defaultVal);
+        assertValueIsNotMissing(
+            defaultVal,
+            'Default value cannot be null or undefined'
+        );
 
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
@@ -395,14 +401,14 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     insert(value: T): T {
-        assertValueIsNotMissing(value);
+        assertValueIsNotMissing(value, 'Value cannot be null or undefined');
 
         this.#value = value;
         return this.#value;
     }
 
     getOrInsert(value: T): T {
-        assertValueIsNotMissing(value);
+        assertValueIsNotMissing(value, 'Value cannot be null or undefined');
 
         if (this.isNone()) this.#value = value;
         return this.#value as T;
@@ -440,7 +446,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     replace(value: T): Option<T> {
-        assertValueIsNotMissing(value);
+        assertValueIsNotMissing(value, 'Value cannot be null or undefined');
 
         const old = this.#value;
         this.#value = value;
@@ -487,7 +493,7 @@ class OptionImpl<T> implements OptionMethods<T> {
  * @returns An `Option` representing the presence of a value.
  */
 export function Some<T>(value: T): Option<T> {
-    assertValueIsNotMissing(value);
+    assertValueIsNotMissing(value, 'Value cannot be null or undefined');
     return new OptionImpl<T>(value) as Option<T>;
 }
 

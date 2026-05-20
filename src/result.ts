@@ -277,16 +277,19 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             return new ResultImpl<U, E>(null, this.#error) as Result<U, E>;
 
         const mappedValue = f(this.#value as T);
-        if (mappedValue === null || mappedValue === undefined)
-            throw new InvalidArgumentError(
-                'map function cannot return null or undefined'
-            );
+        assertValueIsNotMissing(
+            mappedValue,
+            'map function cannot return null or undefined'
+        );
 
         return new ResultImpl<U, E>(mappedValue, null) as Result<U, E>;
     }
 
     mapOr<U>(fallback: U, f: (val: T) => U): U {
-        assertValueIsNotMissing(fallback);
+        assertValueIsNotMissing(
+            fallback,
+            'Fallback value cannot be null or undefined'
+        );
 
         if (typeof f !== 'function')
             throw new InvalidArgumentError("Argument 'f' must be a function");
@@ -423,7 +426,10 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     }
 
     unwrapOr<T2>(fallback: T2): T | T2 {
-        assertValueIsNotMissing(fallback);
+        assertValueIsNotMissing(
+            fallback,
+            'Fallback value cannot be null or undefined'
+        );
 
         if (this.isErr()) return fallback;
         return this.#value as T;
@@ -482,7 +488,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
  * @returns A `Result` representing a successful outcome.
  */
 export function Ok<T, E extends ResultError = never>(value: T): Result<T, E> {
-    assertValueIsNotMissing(value);
+    assertValueIsNotMissing(value, 'Value cannot be null or undefined');
     return new ResultImpl<T, E>(value, null) as Result<T, E>;
 }
 
