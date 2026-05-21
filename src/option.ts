@@ -235,12 +235,16 @@ class OptionImpl<T> implements OptionMethods<T> {
     // will error at runtime if trying to access # fields
     #state: Either<NoneValue, T>;
 
+    constructor(state: Either<NoneValue, T>) {
+        this.#state = state;
+    }
+
     get _isSome(): boolean {
         return isRight(this.#state);
     }
 
-    constructor(state: Either<NoneValue, T>) {
-        this.#state = state;
+    get [Symbol.toStringTag]() {
+        return isRight(this.#state) ? `Option Some` : `Option None`;
     }
 
     isSome(): this is SomeOption<T> {

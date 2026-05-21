@@ -253,12 +253,18 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     // will error at runtime if trying to access # fields
     #state: Either<E, T>;
 
+    constructor(state: Either<E, T>) {
+        this.#state = state;
+    }
+
     get _isOk(): boolean {
         return isRight(this.#state);
     }
 
-    constructor(state: Either<E, T>) {
-        this.#state = state;
+    get [Symbol.toStringTag]() {
+        const state = this.#state;
+        if (isRight(state)) return `Result Ok`;
+        return `Result Err(${state.left.code})`;
     }
 
     isOk(): this is OkResult<T, E> {
