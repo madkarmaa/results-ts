@@ -74,14 +74,14 @@ interface ResultMethods<T, E extends ResultError> {
     /**
      * Converts from `Result<T, E>` to `Option<T>`.
      *
-     * Converts self into an `Option<T>`, consuming self, and converting the error to `None`, if any.
+     * Returns `Some` for `Ok` and `None` for `Err`.
      */
     ok(): Option<T>;
 
     /**
      * Converts from `Result<T, E>` to `Option<E>`.
      *
-     * Converts self into an `Option<E>`, consuming self, and discarding the success value, if any.
+     * Returns `Some` for `Err` and `None` for `Ok`.
      */
     err(): Option<E>;
 
