@@ -6,14 +6,11 @@ describe('Result', () => {
     test('construction', () => {
         expect(Ok(5)).toBeInstanceOf(Object);
         expect(Err({ code: 'ERR' })).toBeInstanceOf(Object);
-        // @ts-expect-error - Ok should not accept null or undefined
-        expect(() => Ok(null)).toThrow(
-            new InvalidArgumentError('Value cannot be null or undefined')
-        );
-        // @ts-expect-error - Ok should not accept null or undefined
-        expect(() => Ok(undefined)).toThrow(
-            new InvalidArgumentError('Value cannot be null or undefined')
-        );
+        const okNull = Ok(null);
+        expect(okNull.unwrap()).toBeNull();
+
+        const okUndefined = Ok(undefined);
+        expect(okUndefined.unwrap()).toBeUndefined();
         // @ts-expect-error - error object must be passed
         expect(() => Err(null)).toThrow(
             new InvalidArgumentError('Expected an error object')
@@ -93,12 +90,16 @@ describe('Result', () => {
                 .map((x) => x * 2)
                 .isErr()
         ).toBe(true);
-        // @ts-expect-error - map function cannot return null or undefined
-        expect(() => Ok(5).map((_) => null)).toThrow(
-            new InvalidArgumentError(
-                'map function cannot return null or undefined'
-            )
-        );
+        expect(
+            Ok(5)
+                .map(() => null)
+                .unwrap()
+        ).toBeNull();
+        expect(
+            Ok(5)
+                .map(() => undefined)
+                .unwrap()
+        ).toBeUndefined();
     });
 
     test('mapOr', () => {
