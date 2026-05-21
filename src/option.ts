@@ -27,6 +27,8 @@ export type NoneOption<T> = OptionMethods<T> & { readonly _isSome: false };
 export type Option<T> = SomeOption<T> | NoneOption<T>;
 
 interface OptionMethods<T> {
+    toString(): string;
+
     /**
      * Returns `true` if the option is a `Some` value.
      */
@@ -235,12 +237,23 @@ class OptionImpl<T> implements OptionMethods<T> {
     // will error at runtime if trying to access # fields
     #state: Either<NoneValue, T>;
 
+    static name = 'Option';
+    constructor(state: Either<NoneValue, T>) {
+        this.#state = state;
+    }
+
     get _isSome(): boolean {
         return isRight(this.#state);
     }
 
-    constructor(state: Either<NoneValue, T>) {
-        this.#state = state;
+    get [Symbol.toStringTag]() {
+        return isRight(this.#state) ? `Option Some` : `Option None`;
+    }
+
+    toString(): string {
+        const state = this.#state;
+        if (isRight(state)) return `Some(${state.right})`;
+        return `None`;
     }
 
     isSome(): this is SomeOption<T> {

@@ -45,6 +45,8 @@ export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
 export type Result<T, E extends ResultError> = OkResult<T, E> | ErrResult<T, E>;
 
 interface ResultMethods<T, E extends ResultError> {
+    toString(): string;
+
     /**
      * Returns `true` if the result is `Ok`.
      */
@@ -253,12 +255,25 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     // will error at runtime if trying to access # fields
     #state: Either<E, T>;
 
+    static name = 'Result';
+    constructor(state: Either<E, T>) {
+        this.#state = state;
+    }
+
     get _isOk(): boolean {
         return isRight(this.#state);
     }
 
-    constructor(state: Either<E, T>) {
-        this.#state = state;
+    get [Symbol.toStringTag]() {
+        const state = this.#state;
+        if (isRight(state)) return `Result Ok`;
+        return `Result Err(${state.left.code})`;
+    }
+
+    toString(): string {
+        const state = this.#state;
+        if (isRight(state)) return `Ok(${state.right})`;
+        return `Err(${state.left.code})`;
     }
 
     isOk(): this is OkResult<T, E> {
