@@ -247,6 +247,12 @@ class OptionImpl<T> implements OptionMethods<T> {
         return isRight(this.#state) ? `Option Some` : `Option None`;
     }
 
+    toString() {
+        const state = this.#state;
+        if (isRight(state)) return `Some(${String(state.right)})`;
+        return `None`;
+    }
+
     isSome(): this is SomeOption<T> {
         return isRight(this.#state);
     }

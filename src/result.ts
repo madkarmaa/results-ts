@@ -267,6 +267,12 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return `Result Err(${state.left.code})`;
     }
 
+    toString() {
+        const state = this.#state;
+        if (isRight(state)) return `Ok(${String(state.right)})`;
+        return `Err(${state.left.code})`;
+    }
+
     isOk(): this is OkResult<T, E> {
         return isRight(this.#state);
     }
