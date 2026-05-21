@@ -255,6 +255,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     // will error at runtime if trying to access # fields
     #state: Either<E, T>;
 
+    static name = 'Result';
     constructor(state: Either<E, T>) {
         this.#state = state;
     }

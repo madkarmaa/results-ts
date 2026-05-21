@@ -237,6 +237,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     // will error at runtime if trying to access # fields
     #state: Either<NoneValue, T>;
 
+    static name = 'Option';
     constructor(state: Either<NoneValue, T>) {
         this.#state = state;
     }
