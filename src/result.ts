@@ -45,6 +45,8 @@ export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
 export type Result<T, E extends ResultError> = OkResult<T, E> | ErrResult<T, E>;
 
 interface ResultMethods<T, E extends ResultError> {
+    toString(): string;
+
     /**
      * Returns `true` if the result is `Ok`.
      */
@@ -267,7 +269,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return `Result Err(${state.left.code})`;
     }
 
-    toString() {
+    toString(): string {
         const state = this.#state;
         if (isRight(state)) return `Ok(${String(state.right)})`;
         return `Err(${state.left.code})`;

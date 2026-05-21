@@ -27,6 +27,8 @@ export type NoneOption<T> = OptionMethods<T> & { readonly _isSome: false };
 export type Option<T> = SomeOption<T> | NoneOption<T>;
 
 interface OptionMethods<T> {
+    toString(): string;
+
     /**
      * Returns `true` if the option is a `Some` value.
      */
@@ -247,7 +249,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         return isRight(this.#state) ? `Option Some` : `Option None`;
     }
 
-    toString() {
+    toString(): string {
         const state = this.#state;
         if (isRight(state)) return `Some(${String(state.right)})`;
         return `None`;
