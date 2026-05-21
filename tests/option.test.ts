@@ -1,19 +1,18 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
+import { FlattenError, PanicError } from '../src/errors';
 
 describe('Option', () => {
     test('construction', () => {
         expect(Some(5)).toBeInstanceOf(Object);
         expect(None()).toBeInstanceOf(Object);
-        // @ts-expect-error - Some should not accept null or undefined
-        expect(() => Some(null)).toThrow(
-            new InvalidArgumentError('Value cannot be null or undefined')
-        );
-        // @ts-expect-error - Some should not accept null or undefined
-        expect(() => Some(undefined)).toThrow(
-            new InvalidArgumentError('Value cannot be null or undefined')
-        );
+        const someNull = Some(null);
+        expect(someNull.isSome()).toBe(true);
+        expect(someNull.unwrap()).toBeNull();
+
+        const someUndefined = Some(undefined);
+        expect(someUndefined.isSome()).toBe(true);
+        expect(someUndefined.unwrap()).toBeUndefined();
     });
 
     test('isSome', () => {
@@ -230,12 +229,9 @@ describe('Option', () => {
         expect(optSome.getOrInsertWith(() => 5)).toBe(10);
         expect(optSome.unwrap()).toBe(10);
 
-        // @ts-expect-error - getOrInsertWith should not accept a function that returns null or undefined
-        expect(() => None<number>().getOrInsertWith(() => null)).toThrow(
-            new InvalidArgumentError(
-                'Returned value cannot be null or undefined'
-            )
-        );
+        const optNull = None<number | null>();
+        expect(optNull.getOrInsertWith(() => null)).toBeNull();
+        expect(optNull.unwrap()).toBeNull();
     });
 
     test('take', () => {

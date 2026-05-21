@@ -1,6 +1,5 @@
 import {
     assertIsResultError,
-    assertValueIsNotMissing,
     FlattenError,
     InvalidArgumentError,
     PanicError
@@ -93,7 +92,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E>;
+    map<U>(f: (val: T) => U): Result<U, E>;
 
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
@@ -292,8 +291,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
     ok(): Option<T> {
         const state = this.#state;
-        if (isRight(state))
-            return Some(state.right as NonNullable<T>) as Option<T>;
+        if (isRight(state)) return Some(state.right);
         return None();
     }
 
@@ -303,29 +301,19 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return None();
     }
 
-    map<U extends NonNullable<unknown>>(f: (val: T) => U): Result<U, E> {
+    map<U>(f: (val: T) => U): Result<U, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
 
-        if (isLeft(state)) return new ResultImpl<U, E>(state) as Result<U, E>;
+        if (isLeft(state)) return new ResultImpl(state);
 
         const mappedValue = f(state.right);
-        assertValueIsNotMissing(
-            mappedValue,
-            'map function cannot return null or undefined'
-        );
-
-        return new ResultImpl<U, E>(Right(mappedValue)) as Result<U, E>;
+        return new ResultImpl(Right(mappedValue));
     }
 
     mapOr<U>(fallback: U, f: (val: T) => U): U {
-        assertValueIsNotMissing(
-            fallback,
-            'Fallback value cannot be null or undefined'
-        );
-
         if (typeof f !== 'function')
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
@@ -352,9 +340,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
 
-        if (isLeft(state))
-            return new ResultImpl<T, F>(Left(f(state.left))) as Result<T, F>;
-        return new ResultImpl<T, F>(Right(state.right)) as Result<T, F>;
+        if (isLeft(state)) return new ResultImpl(Left(f(state.left)));
+        return new ResultImpl(Right(state.right));
     }
 
     inspect(f: (val: T) => void): Result<T, E> {
@@ -363,7 +350,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state)) f(state.right);
-        return this as Result<T, E>;
+        return this;
     }
 
     inspectErr(f: (err: E) => void): Result<T, E> {
@@ -372,7 +359,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state)) f(state.left);
-        return this as Result<T, E>;
+        return this;
     }
 
     *iter(): IterableIterator<T> {
@@ -424,10 +411,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state)) return res;
-        return new ResultImpl<U, E | E2>(Left(state.left as E | E2)) as Result<
-            U,
-            E | E2
-        >;
+        return new ResultImpl(Left(state.left));
     }
 
     andThen<U, F extends ResultError>(
@@ -438,10 +422,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state)) return f(state.right);
-        return new ResultImpl<U, E | F>(Left(state.left as E | F)) as Result<
-            U,
-            E | F
-        >;
+        return new ResultImpl(Left(state.left));
     }
 
     or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F> {
@@ -450,10 +431,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state)) return res;
-        return new ResultImpl<T | T2, F>(Right(state.right)) as Result<
-            T | T2,
-            F
-        >;
+        return new ResultImpl(Right(state.right));
     }
 
     orElse<T2, F extends ResultError>(
@@ -464,18 +442,10 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state)) return f(state.left);
-        return new ResultImpl<T | T2, F>(Right(state.right)) as Result<
-            T | T2,
-            F
-        >;
+        return new ResultImpl(Right(state.right));
     }
 
     unwrapOr<T2>(fallback: T2): T | T2 {
-        assertValueIsNotMissing(
-            fallback,
-            'Fallback value cannot be null or undefined'
-        );
-
         const state = this.#state;
         return isLeft(state) ? fallback : state.right;
     }
@@ -494,18 +464,14 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         const _this = this as ResultImpl<Result<U, F>, E>;
         const state = _this.#state;
 
-        if (isLeft(state))
-            return new ResultImpl<U, E | F>(Left(state.left as E)) as Result<
-                U,
-                E | F
-            >;
+        if (isLeft(state)) return new ResultImpl(Left(state.left));
 
         if (!(state.right instanceof ResultImpl))
             throw new FlattenError(
                 'flatten can only be called on Result<Result<T, E>, E>'
             );
 
-        return state.right as Result<U, E | F>;
+        return state.right;
     }
 
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U {
@@ -532,12 +498,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
-export function Ok<
-    T extends NonNullable<unknown>,
-    E extends ResultError = never
->(value: T): Result<T, E> {
-    assertValueIsNotMissing(value, 'Value cannot be null or undefined');
-    return new ResultImpl<T, E>(Right(value)) as Result<T, E>;
+export function Ok<T, E extends ResultError = never>(value: T): Result<T, E> {
+    return new ResultImpl(Right(value));
 }
 
 /**
@@ -551,5 +513,5 @@ export function Err<
     E extends ResultError & { code: C }
 >(error: E): Result<never, E> {
     assertIsResultError(error);
-    return new ResultImpl<never, E>(Left(error)) as Result<never, E>;
+    return new ResultImpl(Left(error));
 }

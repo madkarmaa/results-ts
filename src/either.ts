@@ -10,10 +10,10 @@ export function Right<R>(value: R): Right<R> {
     return { _tag: 'Right', right: value };
 }
 
-export function isLeft<L, R>(either: Either<L, R>): either is Left<L> {
+export function isLeft<L, R>(either: Either<L, R>) {
     return either._tag === 'Left';
 }
 
-export function isRight<L, R>(either: Either<L, R>): either is Right<R> {
+export function isRight<L, R>(either: Either<L, R>) {
     return either._tag === 'Right';
 }
