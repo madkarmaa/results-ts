@@ -251,7 +251,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     toString(): string {
         const state = this.#state;
-        if (isRight(state)) return `Some(${String(state.right)})`;
+        if (isRight(state)) return `Some(${state.right})`;
         return `None`;
     }
 
