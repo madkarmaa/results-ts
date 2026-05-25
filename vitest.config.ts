@@ -5,6 +5,10 @@ export default defineConfig({
         reporters:
             process.env.GITHUB_ACTIONS === 'true'
                 ? ['default', 'github-actions']
-                : ['default']
+                : ['default'],
+        typecheck: {
+            enabled: true,
+            tsconfig: 'tsconfig.json'
+        }
     }
 });
