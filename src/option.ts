@@ -1,11 +1,6 @@
-import {
-    assertIsResultError,
-    FlattenError,
-    InvalidArgumentError,
-    PanicError
-} from './errors';
+import { FlattenError, InvalidArgumentError, PanicError } from './errors';
 import { type Either, Left, Right, isLeft, isRight } from './either';
-import { type Result, type ResultError, Ok, Err } from './result';
+import { type Result, Ok, Err } from './result';
 
 /**
  * Represents some value of type `T`.
@@ -116,14 +111,14 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    okOr<E extends ResultError>(err: E): Result<T, E>;
+    okOr<E>(err: E): Result<T, E>;
 
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    okOrElse<E extends ResultError>(errF: () => E): Result<T, E>;
+    okOrElse<E>(errF: () => E): Result<T, E>;
 
     /**
      * Returns an iterator over the possibly contained value.
@@ -351,15 +346,13 @@ class OptionImpl<T> implements OptionMethods<T> {
         return isRight(state) ? f(state.right) : defaultF();
     }
 
-    okOr<E extends ResultError>(err: E): Result<T, E> {
-        assertIsResultError(err);
-
+    okOr<E>(err: E): Result<T, E> {
         const state = this.#state;
         if (isRight(state)) return Ok(state.right);
         return Err(err);
     }
 
-    okOrElse<E extends ResultError>(errF: () => E): Result<T, E> {
+    okOrElse<E>(errF: () => E): Result<T, E> {
         if (typeof errF !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
