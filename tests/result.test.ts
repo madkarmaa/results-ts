@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Ok, Err } from '../src/result';
-import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
+import { FlattenError, PanicError } from '../src/errors';
 
 describe('Result', () => {
     test('construction', () => {
@@ -11,26 +11,6 @@ describe('Result', () => {
 
         const okUndefined = Ok(undefined);
         expect(okUndefined.unwrap()).toBeUndefined();
-        // @ts-expect-error - error object must be passed
-        expect(() => Err(null)).toThrow(
-            new InvalidArgumentError('Expected an error object')
-        );
-        // @ts-expect-error - error object must be passed
-        expect(() => Err(undefined)).toThrow(
-            new InvalidArgumentError('Expected an error object')
-        );
-        // @ts-expect-error - code property must be a string
-        expect(() => Err({ code: null })).toThrow(
-            new InvalidArgumentError(
-                "Expected an object with a string 'code' property"
-            )
-        );
-        // @ts-expect-error - code property must be a string
-        expect(() => Err({ code: undefined })).toThrow(
-            new InvalidArgumentError(
-                "Expected an object with a string 'code' property"
-            )
-        );
     });
     test('isOk', () => {
         expect(Ok(5).isOk()).toBe(true);
@@ -155,16 +135,16 @@ describe('Result', () => {
     test('expect', () => {
         expect(Ok(5).expect('Should not fail')).toBe(5);
         expect(() => Err({ code: 'ERR' }).expect('Failed')).toThrow(
-            new PanicError('Failed: code "ERR"')
+            new PanicError('Failed', { cause: { code: 'ERR' } })
         );
     });
 
     test('unwrap', () => {
         expect(Ok(5).unwrap()).toBe(5);
         expect(() => Err({ code: 'ERR' }).unwrap()).toThrow(
-            new PanicError(
-                'called `Result.unwrap()` on an `Err` value: code "ERR"'
-            )
+            new PanicError('called `Result.unwrap()` on an `Err` value', {
+                cause: { code: 'ERR' }
+            })
         );
     });
 

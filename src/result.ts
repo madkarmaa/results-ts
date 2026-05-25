@@ -1,31 +1,18 @@
-import {
-    assertIsResultError,
-    FlattenError,
-    InvalidArgumentError,
-    PanicError
-} from './errors';
+import { FlattenError, InvalidArgumentError, PanicError } from './errors';
 import { type Either, Left, Right, isLeft, isRight } from './either';
 import { type Option, Some, None } from './option';
 
 /**
- * The base interface for all errors returned by a `Result`.
- * It requires a `code` property which can be used to identify the error type.
- */
-export interface ResultError {
-    code: string;
-}
-
-/**
  * Represents a successful `Result` containing a value of type `T`.
  */
-export type OkResult<T, E extends ResultError> = ResultMethods<T, E> & {
+export type OkResult<T, E> = ResultMethods<T, E> & {
     readonly _isOk: true;
 };
 
 /**
  * Represents a failed `Result` containing an error of type `E`.
  */
-export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
+export type ErrResult<T, E> = ResultMethods<T, E> & {
     readonly _isOk: false;
 };
 
@@ -37,14 +24,12 @@ export type ErrResult<T, E extends ResultError> = ResultMethods<T, E> & {
  *
  * Functions return `Result` whenever errors are expected and recoverable.
  *
- * The error type `E` must extend `ResultError` which contains a `code` property of type `string`.
- *
  * @template T - Contains the success value.
- * @template E - Contains the error value. Must have a `code` property of type `string`.
+ * @template E - Contains the error value.
  */
-export type Result<T, E extends ResultError> = OkResult<T, E> | ErrResult<T, E>;
+export type Result<T, E> = OkResult<T, E> | ErrResult<T, E>;
 
-interface ResultMethods<T, E extends ResultError> {
+interface ResultMethods<T, E> {
     toString(): string;
 
     /**
@@ -121,7 +106,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    mapErr<F extends ResultError>(f: (err: E) => F): Result<T, F>;
+    mapErr<F>(f: (err: E) => F): Result<T, F>;
 
     /**
      * Calls a function with a reference to the contained value if `Ok`.
@@ -185,7 +170,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2>;
+    and<U, E2>(res: Result<U, E2>): Result<U, E | E2>;
 
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
@@ -194,9 +179,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    andThen<U, F extends ResultError>(
-        f: (val: T) => Result<U, F>
-    ): Result<U, E | F>;
+    andThen<U, F>(f: (val: T) => Result<U, F>): Result<U, E | F>;
 
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
@@ -205,7 +188,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F>;
+    or<T2, F>(res: Result<T2, F>): Result<T | T2, F>;
 
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
@@ -214,9 +197,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    orElse<T2, F extends ResultError>(
-        f: (err: E) => Result<T2, F>
-    ): Result<T | T2, F>;
+    orElse<T2, F>(f: (err: E) => Result<T2, F>): Result<T | T2, F>;
 
     /**
      * Returns the contained `Ok` value or a provided default.
@@ -239,9 +220,7 @@ interface ResultMethods<T, E extends ResultError> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    flatten<U, F extends ResultError>(
-        this: Result<Result<U, F>, E>
-    ): Result<U, E | F>;
+    flatten<U, F>(this: Result<Result<U, F>, E>): Result<U, E | F>;
 
     /**
      * Matches the `Result` with two functions, one for each variant.
@@ -251,7 +230,7 @@ interface ResultMethods<T, E extends ResultError> {
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U;
 }
 
-class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
+class ResultImpl<T, E> implements ResultMethods<T, E> {
     // will error at runtime if trying to access # fields
     #state: Either<E, T>;
 
@@ -267,13 +246,13 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
     get [Symbol.toStringTag]() {
         const state = this.#state;
         if (isRight(state)) return `Result Ok`;
-        return `Result Err(${state.left.code})`;
+        return `Result Err`;
     }
 
     toString(): string {
         const state = this.#state;
         if (isRight(state)) return `Ok(${state.right})`;
-        return `Err(${state.left.code})`;
+        return `Err(${state.left})`;
     }
 
     isOk(): this is OkResult<T, E> {
@@ -349,7 +328,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return isLeft(state) ? fallbackFn(state.left) : f(state.right);
     }
 
-    mapErr<F extends ResultError>(f: (err: E) => F): Result<T, F> {
+    mapErr<F>(f: (err: E) => F): Result<T, F> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
@@ -387,8 +366,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
             throw new InvalidArgumentError('Argument must be a string');
 
         const state = this.#state;
-        if (isLeft(state))
-            throw new PanicError(`${msg}: code "${state.left.code}"`);
+        if (isLeft(state)) throw new PanicError(msg, { cause: state.left });
         return state.right;
     }
 
@@ -396,7 +374,8 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isLeft(state))
             throw new PanicError(
-                `called \`Result.unwrap()\` on an \`Err\` value: code "${state.left.code}"`
+                `called \`Result.unwrap()\` on an \`Err\` value`,
+                { cause: state.left }
             );
         return state.right;
     }
@@ -420,7 +399,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return state.left;
     }
 
-    and<U, E2 extends ResultError>(res: Result<U, E2>): Result<U, E | E2> {
+    and<U, E2>(res: Result<U, E2>): Result<U, E | E2> {
         if (!(res instanceof ResultImpl))
             throw new InvalidArgumentError('Argument must be a Result');
 
@@ -429,9 +408,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return new ResultImpl(Left(state.left));
     }
 
-    andThen<U, F extends ResultError>(
-        f: (val: T) => Result<U, F>
-    ): Result<U, E | F> {
+    andThen<U, F>(f: (val: T) => Result<U, F>): Result<U, E | F> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
@@ -440,7 +417,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return new ResultImpl(Left(state.left));
     }
 
-    or<T2, F extends ResultError>(res: Result<T2, F>): Result<T | T2, F> {
+    or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
         if (!(res instanceof ResultImpl))
             throw new InvalidArgumentError('Argument must be a Result');
 
@@ -449,9 +426,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return new ResultImpl(Right(state.right));
     }
 
-    orElse<T2, F extends ResultError>(
-        f: (err: E) => Result<T2, F>
-    ): Result<T | T2, F> {
+    orElse<T2, F>(f: (err: E) => Result<T2, F>): Result<T | T2, F> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
@@ -473,9 +448,7 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
         return isLeft(state) ? f(state.left) : state.right;
     }
 
-    flatten<U, F extends ResultError>(
-        this: Result<Result<U, F>, E>
-    ): Result<U, E | F> {
+    flatten<U, F>(this: Result<Result<U, F>, E>): Result<U, E | F> {
         const _this = this as ResultImpl<Result<U, F>, E>;
         const state = _this.#state;
 
@@ -513,20 +486,16 @@ class ResultImpl<T, E extends ResultError> implements ResultMethods<T, E> {
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
-export function Ok<T, E extends ResultError = never>(value: T): Result<T, E> {
+export function Ok<T, E = never>(value: T): Result<T, E> {
     return new ResultImpl(Right(value));
 }
 
 /**
  * Contains the error value.
  *
- * @param error - The error to wrap in a failed result. Must have a `code` property of type `string`.
+ * @param error - The error to wrap in a failed result.
  * @returns A `Result` representing a failed outcome.
  */
-export function Err<
-    const C extends string,
-    E extends ResultError & { code: C }
->(error: E): Result<never, E> {
-    assertIsResultError(error);
+export function Err<const E>(error: E): Result<never, E> {
     return new ResultImpl(Left(error));
 }
