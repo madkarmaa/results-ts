@@ -82,6 +82,13 @@ interface ResultMethods<T, E> {
     map<U>(f: (val: T) => U): Result<U, E>;
 
     /**
+     * Async version of `map`. Maps a `Result<T, E>` to `Promise<Result<U, E>>` by applying an async function to a contained `Ok` value, leaving an `Err` value untouched.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    mapAsync<U>(f: (val: T) => PromiseLike<U>): Promise<Result<U, E>>;
+
+    /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
      *
      * Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `mapOrElse`, which is lazily evaluated.
@@ -100,6 +107,16 @@ interface ResultMethods<T, E> {
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U;
 
     /**
+     * Async version of `mapOrElse`. Maps a `Result<T, E>` to `Promise<U>` by applying async fallback function `fallbackFn` to a contained `Err` value, or async function `f` to a contained `Ok` value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    mapOrElseAsync<U>(
+        fallbackFn: (err: E) => PromiseLike<U>,
+        f: (val: T) => PromiseLike<U>
+    ): Promise<U>;
+
+    /**
      * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
      *
      * This function can be used to pass through a successful result while handling an error.
@@ -107,6 +124,13 @@ interface ResultMethods<T, E> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapErr<F>(f: (err: E) => F): Result<T, F>;
+
+    /**
+     * Async version of `mapErr`. Maps a `Result<T, E>` to `Promise<Result<T, F>>` by applying an async function to a contained `Err` value, leaving an `Ok` value untouched.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    mapErrAsync<F>(f: (err: E) => PromiseLike<F>): Promise<Result<T, F>>;
 
     /**
      * Calls a function with a reference to the contained value if `Ok`.
@@ -118,6 +142,13 @@ interface ResultMethods<T, E> {
     inspect(f: (val: T) => void): Result<T, E>;
 
     /**
+     * Async version of `inspect`. Calls an async function with a reference to the contained value if `Ok`, then returns the original result.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    inspectAsync(f: (val: T) => PromiseLike<void>): Promise<Result<T, E>>;
+
+    /**
      * Calls a function with a reference to the contained value if `Err`.
      *
      * Returns the original result.
@@ -125,6 +156,13 @@ interface ResultMethods<T, E> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspectErr(f: (err: E) => void): Result<T, E>;
+
+    /**
+     * Async version of `inspectErr`. Calls an async function with a reference to the contained value if `Err`, then returns the original result.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    inspectErrAsync(f: (err: E) => PromiseLike<void>): Promise<Result<T, E>>;
 
     /**
      * Returns an iterator over the possibly contained value.
@@ -182,6 +220,15 @@ interface ResultMethods<T, E> {
     andThen<U, F>(f: (val: T) => Result<U, F>): Result<U, E | F>;
 
     /**
+     * Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    andThenAsync<U, F>(
+        f: (val: T) => PromiseLike<Result<U, F>>
+    ): Promise<Result<U, E | F>>;
+
+    /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
      * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
@@ -200,6 +247,15 @@ interface ResultMethods<T, E> {
     orElse<T2, F>(f: (err: E) => Result<T2, F>): Result<T | T2, F>;
 
     /**
+     * Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    orElseAsync<T2, F>(
+        f: (err: E) => PromiseLike<Result<T2, F>>
+    ): Promise<Result<T | T2, F>>;
+
+    /**
      * Returns the contained `Ok` value or a provided default.
      *
      * Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
@@ -214,6 +270,13 @@ interface ResultMethods<T, E> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2;
+
+    /**
+     * Async version of `unwrapOrElse`. Returns the contained `Ok` value or computes it from an async closure.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    unwrapOrElseAsync<T2>(f: (err: E) => PromiseLike<T2>): Promise<T | T2>;
 
     /**
      * Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
@@ -307,6 +370,18 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return new ResultImpl(Right(mappedValue));
     }
 
+    async mapAsync<U>(f: (val: T) => PromiseLike<U>): Promise<Result<U, E>> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+
+        if (isLeft(state)) return new ResultImpl(state);
+
+        const mappedValue = await f(state.right);
+        return new ResultImpl(Right(mappedValue));
+    }
+
     mapOr<U>(fallback: U, f: (val: T) => U): U {
         if (typeof f !== 'function')
             throw new InvalidArgumentError("Argument 'f' must be a function");
@@ -316,6 +391,22 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U {
+        if (typeof fallbackFn !== 'function')
+            throw new InvalidArgumentError(
+                "Argument 'fallbackFn' must be a function"
+            );
+
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError("Argument 'f' must be a function");
+
+        const state = this.#state;
+        return isLeft(state) ? fallbackFn(state.left) : f(state.right);
+    }
+
+    async mapOrElseAsync<U>(
+        fallbackFn: (err: E) => PromiseLike<U>,
+        f: (val: T) => PromiseLike<U>
+    ): Promise<U> {
         if (typeof fallbackFn !== 'function')
             throw new InvalidArgumentError(
                 "Argument 'fallbackFn' must be a function"
@@ -338,6 +429,16 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return new ResultImpl(Right(state.right));
     }
 
+    async mapErrAsync<F>(f: (err: E) => PromiseLike<F>): Promise<Result<T, F>> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+
+        if (isLeft(state)) return new ResultImpl(Left(await f(state.left)));
+        return new ResultImpl(Right(state.right));
+    }
+
     inspect(f: (val: T) => void): Result<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
@@ -347,12 +448,34 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return this;
     }
 
+    async inspectAsync(
+        f: (val: T) => PromiseLike<void>
+    ): Promise<Result<T, E>> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state)) await f(state.right);
+        return this;
+    }
+
     inspectErr(f: (err: E) => void): Result<T, E> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
         if (isLeft(state)) f(state.left);
+        return this;
+    }
+
+    async inspectErrAsync(
+        f: (err: E) => PromiseLike<void>
+    ): Promise<Result<T, E>> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isLeft(state)) await f(state.left);
         return this;
     }
 
@@ -417,6 +540,17 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return new ResultImpl(Left(state.left));
     }
 
+    async andThenAsync<U, F>(
+        f: (val: T) => PromiseLike<Result<U, F>>
+    ): Promise<Result<U, E | F>> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state)) return f(state.right);
+        return new ResultImpl(Left(state.left));
+    }
+
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
         if (!(res instanceof ResultImpl))
             throw new InvalidArgumentError('Argument must be a Result');
@@ -435,12 +569,33 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return new ResultImpl(Right(state.right));
     }
 
+    async orElseAsync<T2, F>(
+        f: (err: E) => PromiseLike<Result<T2, F>>
+    ): Promise<Result<T | T2, F>> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isLeft(state)) return f(state.left);
+        return new ResultImpl(Right(state.right));
+    }
+
     unwrapOr<T2>(fallback: T2): T | T2 {
         const state = this.#state;
         return isLeft(state) ? fallback : state.right;
     }
 
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2 {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        return isLeft(state) ? f(state.left) : state.right;
+    }
+
+    async unwrapOrElseAsync<T2>(
+        f: (err: E) => PromiseLike<T2>
+    ): Promise<T | T2> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
