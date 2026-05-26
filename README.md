@@ -18,6 +18,8 @@ bun add results-ts
 # or
 pnpm add results-ts
 # or
+deno add results-ts
+# or
 yarn add results-ts
 ```
 
