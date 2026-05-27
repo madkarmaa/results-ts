@@ -401,7 +401,9 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state))
             return new AsyncOptionImpl(
-                Promise.resolve(f(state.right)).then(Some)
+                Promise.resolve()
+                    .then(() => f(state.right))
+                    .then(Some)
             );
 
         return new AsyncOptionImpl(Promise.resolve(None()));
@@ -423,7 +425,9 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state))
             return new AsyncOptionImpl(
-                Promise.resolve(f(state.right)).then(() => this)
+                Promise.resolve()
+                    .then(() => f(state.right))
+                    .then(() => this)
             );
 
         return new AsyncOptionImpl(Promise.resolve(this));
@@ -489,7 +493,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (isRight(state))
             return new AsyncResultImpl(Promise.resolve(Ok(state.right)));
 
-        return new AsyncResultImpl(Promise.resolve(errF()).then(Err));
+        return new AsyncResultImpl(Promise.resolve().then(errF).then(Err));
     }
 
     *iter(): IterableIterator<T> {
@@ -521,7 +525,9 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isRight(state))
-            return new AsyncOptionImpl(Promise.resolve(f(state.right)));
+            return new AsyncOptionImpl(
+                Promise.resolve().then(() => f(state.right))
+            );
 
         return new AsyncOptionImpl(Promise.resolve(None()));
     }
@@ -542,9 +548,9 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state))
             return new AsyncOptionImpl(
-                Promise.resolve(predicate(state.right)).then((pass) =>
-                    pass ? this : None()
-                )
+                Promise.resolve()
+                    .then(() => predicate(state.right))
+                    .then((pass) => (pass ? this : None()))
             );
 
         return new AsyncOptionImpl(Promise.resolve(None()));
@@ -575,7 +581,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state)) return new AsyncOptionImpl(Promise.resolve(this));
 
-        return new AsyncOptionImpl(Promise.resolve(f()));
+        return new AsyncOptionImpl(Promise.resolve().then(f));
     }
 
     xor<T2>(optb: Option<T2>): Option<T | T2> {
