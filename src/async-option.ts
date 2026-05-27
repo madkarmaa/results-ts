@@ -1,6 +1,5 @@
-import { type Option, Some, None } from './option';
+import { type Option } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
-import { Ok } from './result';
 
 /**
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
@@ -248,11 +247,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
-        return new AsyncOptionImpl(
-            this.then((opt) =>
-                opt.isSome() ? f(opt.unwrap()).then(Some) : None()
-            )
-        );
+        return new AsyncOptionImpl(this.then((opt) => opt.mapAsync(f)));
     }
 
     inspect(f: (val: T) => void): AsyncOption<T> {
@@ -260,11 +255,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T> {
-        return new AsyncOptionImpl(
-            this.then((opt) =>
-                opt.isSome() ? f(opt.unwrap()).then(() => opt) : opt
-            )
-        );
+        return new AsyncOptionImpl(this.then((opt) => opt.inspectAsync(f)));
     }
 
     async mapOr<U>(defaultVal: U, f: (val: T) => U): Promise<U> {
@@ -294,13 +285,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E> {
-        return new AsyncResultImpl(
-            this.then((opt) =>
-                opt.isSome()
-                    ? Ok(opt.unwrap())
-                    : errF().then((e) => opt.okOr(e))
-            )
-        );
+        return new AsyncResultImpl(this.then((opt) => opt.okOrElseAsync(errF)));
     }
 
     and<U>(optb: Option<U>): AsyncOption<U> {
@@ -312,9 +297,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U> {
-        return new AsyncOptionImpl(
-            this.then((opt) => (opt.isSome() ? f(opt.unwrap()) : None()))
-        );
+        return new AsyncOptionImpl(this.then((opt) => opt.andThenAsync(f)));
     }
 
     filter(predicate: (val: T) => boolean): AsyncOption<T> {
@@ -323,13 +306,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
 
     filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T> {
         return new AsyncOptionImpl(
-            this.then((opt) =>
-                opt.isSome()
-                    ? predicate(opt.unwrap()).then((pass) =>
-                          pass ? opt : None()
-                      )
-                    : None()
-            )
+            this.then((opt) => opt.filterAsync(predicate))
         );
     }
 
@@ -342,9 +319,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2> {
-        return new AsyncOptionImpl(
-            this.then<Option<T | T2>>((opt) => (opt.isSome() ? opt : f()))
-        );
+        return new AsyncOptionImpl(this.then((opt) => opt.orElseAsync(f)));
     }
 
     xor<T2>(optb: Option<T2>): AsyncOption<T | T2> {

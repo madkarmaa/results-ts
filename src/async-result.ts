@@ -1,4 +1,4 @@
-import { type Result, Ok, Err } from './result';
+import { type Result } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 
 /**
@@ -245,9 +245,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     }
 
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncResult<U, E> {
-        return new AsyncResultImpl(
-            this.then((res) => (res.isErr() ? res : f(res.unwrap()).then(Ok)))
-        );
+        return new AsyncResultImpl(this.then((res) => res.mapAsync(f)));
     }
 
     async mapOr<U>(fallback: U, f: (val: T) => U): Promise<U> {
@@ -276,11 +274,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     }
 
     mapErrAsync<F>(f: (err: E) => PromiseLike<F>): AsyncResult<T, F> {
-        return new AsyncResultImpl(
-            this.then<Result<T, F>>((res) =>
-                res.isOk() ? res : f(res.unwrapErr()).then(Err)
-            )
-        );
+        return new AsyncResultImpl(this.then((res) => res.mapErrAsync(f)));
     }
 
     inspect(f: (val: T) => void): AsyncResult<T, E> {
@@ -288,11 +282,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     }
 
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncResult<T, E> {
-        return new AsyncResultImpl(
-            this.then((res) =>
-                res.isOk() ? f(res.unwrap()).then(() => res) : res
-            )
-        );
+        return new AsyncResultImpl(this.then((res) => res.inspectAsync(f)));
     }
 
     inspectErr(f: (err: E) => void): AsyncResult<T, E> {
@@ -300,11 +290,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     }
 
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E> {
-        return new AsyncResultImpl(
-            this.then((res) =>
-                res.isErr() ? f(res.unwrapErr()).then(() => res) : res
-            )
-        );
+        return new AsyncResultImpl(this.then((res) => res.inspectErrAsync(f)));
     }
 
     async expect(msg: string): Promise<T> {
@@ -338,11 +324,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     andThenAsync<U, F>(
         f: (val: T) => PromiseLike<Result<U, F>>
     ): AsyncResult<U, E | F> {
-        return new AsyncResultImpl(
-            this.then<Result<U, E | F>>((res) =>
-                res.isErr() ? res : f(res.unwrap())
-            )
-        );
+        return new AsyncResultImpl(this.then((res) => res.andThenAsync(f)));
     }
 
     or<T2, F>(res: Result<T2, F>): AsyncResult<T | T2, F> {
@@ -356,11 +338,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     orElseAsync<T2, F>(
         f: (err: E) => PromiseLike<Result<T2, F>>
     ): AsyncResult<T | T2, F> {
-        return new AsyncResultImpl(
-            this.then<Result<T | T2, F>>((res) =>
-                res.isOk() ? res : f(res.unwrapErr())
-            )
-        );
+        return new AsyncResultImpl(this.then((res) => res.orElseAsync(f)));
     }
 
     async unwrapOr<T2>(fallback: T2): Promise<T | T2> {
