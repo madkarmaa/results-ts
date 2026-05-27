@@ -116,11 +116,15 @@ describe('Result async methods', () => {
         test('Async pipeline with andThenAsync and mapAsync', async () => {
             const fetchMultiplier = async (id: number) => id * 10;
 
-            const step1 = await Ok(3).andThenAsync(async (x) =>
-                x > 0 ? Ok(x) : Err({ code: 'NON_POSITIVE' })
-            );
-            const step2 = await step1.mapAsync(fetchMultiplier);
-            expect(step2.map((x) => x + 1).unwrap()).toBe(31);
+            const result = await Ok(3)
+                .andThenAsync(async (x) =>
+                    x > 0 ? Ok(x) : Err({ code: 'NON_POSITIVE' })
+                )
+                .mapAsync(fetchMultiplier)
+                .map((x) => x + 1)
+                .unwrap();
+
+            expect(result).toBe(31);
         });
 
         test('Async error recovery with orElseAsync', async () => {
@@ -141,11 +145,14 @@ describe('Result async methods', () => {
         test('Inspect side effects do not alter result in pipeline', async () => {
             const log: number[] = [];
 
-            const inspected = await Ok(10).inspectAsync(async (x) => {
-                log.push(x);
-            });
-            const mapped = await inspected.mapAsync(async (x) => x * 2);
-            expect(mapped.unwrap()).toBe(20);
+            const result = await Ok(10)
+                .inspectAsync(async (x) => {
+                    log.push(x);
+                })
+                .mapAsync(async (x) => x * 2)
+                .unwrap();
+
+            expect(result).toBe(20);
             expect(log).toEqual([10]);
         });
 
@@ -154,14 +161,13 @@ describe('Result async methods', () => {
                 .andThenAsync(async (x) =>
                     x > 10 ? Ok(x) : Err({ code: 'TOO_SMALL' as const })
                 )
-                .then((r) =>
-                    r.mapErrAsync(async (err) => ({
-                        ...err,
-                        retryable: true as const
-                    }))
-                );
+                .mapErrAsync(async (err) => ({
+                    ...err,
+                    retryable: true as const
+                }))
+                .unwrapErr();
 
-            expect(result.unwrapErr()).toEqual({
+            expect(result).toEqual({
                 code: 'TOO_SMALL',
                 retryable: true
             });

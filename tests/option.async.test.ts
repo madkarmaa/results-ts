@@ -139,13 +139,17 @@ describe('Option async methods', () => {
             const isEvenAsync = async (x: number) => x % 2 === 0;
             const doubleAsync = async (x: number) => x * 2;
 
-            const filtered = await Some(4).filterAsync(isEvenAsync);
-            const doubled = await filtered.mapAsync(doubleAsync);
-            expect(doubled.unwrapOr(0)).toBe(8);
+            const doubled = await Some(4)
+                .filterAsync(isEvenAsync)
+                .mapAsync(doubleAsync)
+                .unwrapOr(0);
+            expect(doubled).toBe(8);
 
-            const filteredOdd = await Some(3).filterAsync(isEvenAsync);
-            const doubledOdd = await filteredOdd.mapAsync(doubleAsync);
-            expect(doubledOdd.unwrapOr(0)).toBe(0);
+            const doubledOdd = await Some(3)
+                .filterAsync(isEvenAsync)
+                .mapAsync(doubleAsync)
+                .unwrapOr(0);
+            expect(doubledOdd).toBe(0);
         });
 
         test('getOrInsertWithAsync only calls factory once on None', async () => {
@@ -167,11 +171,11 @@ describe('Option async methods', () => {
         });
 
         test('orElseAsync chains with mapAsync on recovered value', async () => {
-            const recovered = await None<number>().orElseAsync(async () =>
-                Some(5)
-            );
-            const mapped = await recovered.mapAsync(async (x) => x * 3);
-            expect(mapped.unwrap()).toBe(15);
+            const result = await None<number>()
+                .orElseAsync(async () => Some(5))
+                .mapAsync(async (x) => x * 3)
+                .unwrap();
+            expect(result).toBe(15);
         });
     });
 });

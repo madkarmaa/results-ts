@@ -1,6 +1,8 @@
 import { FlattenError, InvalidArgumentError, PanicError } from './errors';
 import { type Either, Left, Right, isLeft, isRight } from './either';
 import { type Result, Ok, Err } from './result';
+import { type AsyncOption, AsyncOptionImpl } from './async-option';
+import { type AsyncResult, AsyncResultImpl } from './async-result';
 
 /**
  * Represents some value of type `T`.
@@ -93,11 +95,11 @@ interface OptionMethods<T> {
     map<U>(f: (val: T) => U): Option<U>;
 
     /**
-     * Async version of `map`. Maps an `Option<T>` to `Promise<Option<U>>` by applying an async function to a contained value.
+     * Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an async function to a contained value.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    mapAsync<U>(f: (val: T) => PromiseLike<U>): Promise<Option<U>>;
+    mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U>;
 
     /**
      * Calls the provided closure with a reference to the contained value (if `Some`).
@@ -111,7 +113,7 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    inspectAsync(f: (val: T) => PromiseLike<void>): Promise<Option<T>>;
+    inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T>;
 
     /**
      * Returns the provided default result (if none), or applies a function to the contained value (if any).
@@ -152,11 +154,11 @@ interface OptionMethods<T> {
     okOrElse<E>(errF: () => E): Result<T, E>;
 
     /**
-     * Async version of `okOrElse`. Transforms the `Option<T>` into a `Promise<Result<T, E>>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
+     * Async version of `okOrElse`. Transforms the `Option<T>` into a `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    okOrElseAsync<E>(errF: () => PromiseLike<E>): Promise<Result<T, E>>;
+    okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E>;
 
     /**
      * Returns an iterator over the possibly contained value.
@@ -182,7 +184,7 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): Promise<Option<U>>;
+    andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U>;
 
     /**
      * Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
@@ -200,9 +202,7 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    filterAsync(
-        predicate: (val: T) => PromiseLike<boolean>
-    ): Promise<Option<T>>;
+    filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T>;
 
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
@@ -223,7 +223,7 @@ interface OptionMethods<T> {
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
-    orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): Promise<Option<T | T2>>;
+    orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
@@ -394,13 +394,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return None<U>();
     }
 
-    async mapAsync<U>(f: (val: T) => PromiseLike<U>): Promise<Option<U>> {
-        if (typeof f !== 'function')
-            throw new InvalidArgumentError('Argument must be a function');
+    mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
+        return new AsyncOptionImpl(
+            (async () => {
+                if (typeof f !== 'function')
+                    throw new InvalidArgumentError(
+                        'Argument must be a function'
+                    );
 
-        const state = this.#state;
-        if (isRight(state)) return Some(await f(state.right));
-        return None<U>();
+                const state = this.#state;
+                if (isRight(state)) return Some(await f(state.right));
+                return None<U>();
+            })()
+        );
     }
 
     inspect(f: (val: T) => void): Option<T> {
@@ -412,13 +418,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return this;
     }
 
-    async inspectAsync(f: (val: T) => PromiseLike<void>): Promise<Option<T>> {
-        if (typeof f !== 'function')
-            throw new InvalidArgumentError('Argument must be a function');
+    inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T> {
+        return new AsyncOptionImpl(
+            (async () => {
+                if (typeof f !== 'function')
+                    throw new InvalidArgumentError(
+                        'Argument must be a function'
+                    );
 
-        const state = this.#state;
-        if (isRight(state)) await f(state.right);
-        return this;
+                const state = this.#state;
+                if (isRight(state)) await f(state.right);
+                return this;
+            })()
+        );
     }
 
     mapOr<U>(defaultVal: U, f: (val: T) => U): U {
@@ -473,13 +485,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return Err(errF());
     }
 
-    async okOrElseAsync<E>(errF: () => PromiseLike<E>): Promise<Result<T, E>> {
-        if (typeof errF !== 'function')
-            throw new InvalidArgumentError('Argument must be a function');
+    okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E> {
+        return new AsyncResultImpl(
+            (async () => {
+                if (typeof errF !== 'function')
+                    throw new InvalidArgumentError(
+                        'Argument must be a function'
+                    );
 
-        const state = this.#state;
-        if (isRight(state)) return Ok(state.right);
-        return Err(await errF());
+                const state = this.#state;
+                if (isRight(state)) return Ok(state.right);
+                return Err(await errF());
+            })()
+        );
     }
 
     *iter(): IterableIterator<T> {
@@ -505,15 +523,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return None();
     }
 
-    async andThenAsync<U>(
-        f: (val: T) => PromiseLike<Option<U>>
-    ): Promise<Option<U>> {
-        if (typeof f !== 'function')
-            throw new InvalidArgumentError('Argument must be a function');
+    andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U> {
+        return new AsyncOptionImpl(
+            (async () => {
+                if (typeof f !== 'function')
+                    throw new InvalidArgumentError(
+                        'Argument must be a function'
+                    );
 
-        const state = this.#state;
-        if (isRight(state)) return f(state.right);
-        return None();
+                const state = this.#state;
+                if (isRight(state)) return f(state.right);
+                return None();
+            })() as Promise<Option<U>>
+        );
     }
 
     filter(predicate: (val: T) => boolean): Option<T> {
@@ -525,15 +547,20 @@ class OptionImpl<T> implements OptionMethods<T> {
         return None();
     }
 
-    async filterAsync(
-        predicate: (val: T) => PromiseLike<boolean>
-    ): Promise<Option<T>> {
-        if (typeof predicate !== 'function')
-            throw new InvalidArgumentError('Argument must be a function');
+    filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T> {
+        return new AsyncOptionImpl(
+            (async () => {
+                if (typeof predicate !== 'function')
+                    throw new InvalidArgumentError(
+                        'Argument must be a function'
+                    );
 
-        const state = this.#state;
-        if (isRight(state) && (await predicate(state.right))) return this;
-        return None();
+                const state = this.#state;
+                if (isRight(state) && (await predicate(state.right)))
+                    return this;
+                return None();
+            })() as Promise<Option<T>>
+        );
     }
 
     or<T2>(optb: Option<T2>): Option<T | T2> {
@@ -554,15 +581,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return f();
     }
 
-    async orElseAsync<T2>(
-        f: () => PromiseLike<Option<T2>>
-    ): Promise<Option<T | T2>> {
-        if (typeof f !== 'function')
-            throw new InvalidArgumentError('Argument must be a function');
+    orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2> {
+        return new AsyncOptionImpl(
+            (async () => {
+                if (typeof f !== 'function')
+                    throw new InvalidArgumentError(
+                        'Argument must be a function'
+                    );
 
-        const state = this.#state;
-        if (isRight(state)) return this;
-        return f();
+                const state = this.#state;
+                if (isRight(state)) return this;
+                return f();
+            })() as Promise<Option<T | T2>>
+        );
     }
 
     xor<T2>(optb: Option<T2>): Option<T | T2> {
