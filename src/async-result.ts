@@ -338,15 +338,17 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     }
 
     andThen<U, F>(f: (val: T) => Result<U, F>): AsyncResult<U, E | F> {
-        return new AsyncResultImpl(this.then((r) => r.andThen(f)));
+        return new AsyncResultImpl(this.then((res) => res.andThen(f)));
     }
 
     andThenAsync<U, F>(
         f: (val: T) => PromiseLike<Result<U, F>>
     ): AsyncResult<U, E | F> {
         return new AsyncResultImpl(
-            this.then((r) =>
-                r.isOk() ? f(r.unwrap()) : (r as unknown as Result<U, E | F>)
+            this.then((res) =>
+                res.isOk()
+                    ? f(res.unwrap())
+                    : (res as unknown as Result<U, E | F>)
             )
         );
     }
@@ -356,17 +358,17 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     }
 
     orElse<T2, F>(f: (err: E) => Result<T2, F>): AsyncResult<T | T2, F> {
-        return new AsyncResultImpl(this.then((r) => r.orElse(f)));
+        return new AsyncResultImpl(this.then((res) => res.orElse(f)));
     }
 
     orElseAsync<T2, F>(
         f: (err: E) => PromiseLike<Result<T2, F>>
     ): AsyncResult<T | T2, F> {
         return new AsyncResultImpl(
-            this.then((r) =>
-                r.isErr()
-                    ? f(r.unwrapErr())
-                    : (r as unknown as Result<T | T2, F>)
+            this.then((res) =>
+                res.isErr()
+                    ? f(res.unwrapErr())
+                    : (res as unknown as Result<T | T2, F>)
             )
         );
     }
