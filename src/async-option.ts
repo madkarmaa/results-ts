@@ -1,5 +1,6 @@
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
+import { Ok } from './result';
 
 /**
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
@@ -296,7 +297,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncResultImpl(
             this.then((opt) =>
                 opt.isSome()
-                    ? opt.okOr(null as never)
+                    ? Ok(opt.unwrap())
                     : errF().then((e) => opt.okOr(e))
             )
         );
@@ -342,7 +343,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
 
     orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2> {
         return new AsyncOptionImpl(
-            this.then((opt) => (opt.isSome() ? (opt as Option<T | T2>) : f()))
+            this.then<Option<T | T2>>((opt) => (opt.isSome() ? opt : f()))
         );
     }
 

@@ -36,7 +36,7 @@ interface ResultMethods<T, E> {
     /**
      * Returns `true` if the result is `Ok`.
      */
-    isOk(): this is OkResult<T, E>;
+    isOk(): this is OkResult<T, never>;
 
     /**
      * Returns `true` if the result is `Ok` and the value inside of it matches a predicate.
@@ -49,7 +49,7 @@ interface ResultMethods<T, E> {
     /**
      * Returns `true` if the result is `Err`.
      */
-    isErr(): this is ErrResult<T, E>;
+    isErr(): this is ErrResult<never, E>;
 
     /**
      * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
@@ -319,7 +319,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return `Err(${state.left})`;
     }
 
-    isOk(): this is OkResult<T, E> {
+    isOk(): this is OkResult<T, never> {
         return isRight(this.#state);
     }
 
@@ -333,7 +333,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return isRight(state) && f(state.right);
     }
 
-    isErr(): this is ErrResult<T, E> {
+    isErr(): this is ErrResult<never, E> {
         return isLeft(this.#state);
     }
 
