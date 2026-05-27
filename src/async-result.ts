@@ -45,6 +45,8 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Maps an `AsyncResult<T, E>` to `AsyncResult<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
+     *
+     * This function can be used to compose the results of two functions.
      */
     map<U>(f: (val: T) => U): AsyncResult<U, E>;
 
@@ -55,11 +57,15 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
+     *
+     * Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `mapOrElse`, which is lazily evaluated.
      */
     mapOr<U>(fallback: U, f: (val: T) => U): Promise<U>;
 
     /**
      * Maps an `AsyncResult<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
+     *
+     * This function can be used to unpack a successful result while handling an error.
      */
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): Promise<U>;
 
@@ -73,6 +79,8 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
+     *
+     * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(f: (err: E) => F): AsyncResult<T, F>;
 
@@ -135,11 +143,15 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
+     *
+     * Arguments passed to `and` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `andThen`, which is lazily evaluated.
      */
     and<U, E2>(res: Result<U, E2>): AsyncResult<U, E | E2>;
 
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
+     *
+     * This function can be used for control flow based on `Result` values.
      */
     andThen<U, F>(f: (val: T) => Result<U, F>): AsyncResult<U, E | F>;
 
@@ -152,11 +164,15 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
+     *
+     * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
      */
     or<T2, F>(res: Result<T2, F>): AsyncResult<T | T2, F>;
 
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
+     *
+     * This function can be used for control flow based on result values.
      */
     orElse<T2, F>(f: (err: E) => Result<T2, F>): AsyncResult<T | T2, F>;
 
@@ -169,6 +185,8 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Returns the contained `Ok` value or a provided default.
+     *
+     * Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
      */
     unwrapOr<T2>(fallback: T2): Promise<T | T2>;
 
