@@ -249,7 +249,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
         return new AsyncOptionImpl(
             this.then((opt) =>
-                opt.isSome() ? f(opt.unwrap()).then(Some) : None<U>()
+                opt.isSome() ? f(opt.unwrap()).then(Some) : None()
             )
         );
     }
@@ -312,7 +312,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
 
     andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U> {
         return new AsyncOptionImpl(
-            this.then((opt) => (opt.isSome() ? f(opt.unwrap()) : None<U>()))
+            this.then((opt) => (opt.isSome() ? f(opt.unwrap()) : None()))
         );
     }
 
@@ -325,9 +325,9 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
             this.then((opt) =>
                 opt.isSome()
                     ? predicate(opt.unwrap()).then((pass) =>
-                          pass ? opt : None<T>()
+                          pass ? opt : None()
                       )
-                    : None<T>()
+                    : None()
             )
         );
     }

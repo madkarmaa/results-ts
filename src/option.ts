@@ -391,7 +391,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isRight(state)) return Some(f(state.right));
-        return None<U>();
+        return None();
     }
 
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
@@ -404,7 +404,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
                 const state = this.#state;
                 if (isRight(state)) return Some(await f(state.right));
-                return None<U>();
+                return None();
             })()
         );
     }
