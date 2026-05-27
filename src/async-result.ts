@@ -1,5 +1,4 @@
 import { type Result, Ok, Err } from './result';
-
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 
 /**
@@ -249,7 +248,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(
             this.then((res) =>
                 res.isOk()
-                    ? Promise.resolve(f(res.unwrap())).then((v) => Ok(v))
+                    ? f(res.unwrap()).then((v) => Ok(v))
                     : (res as unknown as Result<U, E>)
             )
         );
@@ -284,7 +283,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(
             this.then((res) =>
                 res.isErr()
-                    ? Promise.resolve(f(res.unwrapErr())).then((e) => Err(e))
+                    ? f(res.unwrapErr()).then((e) => Err(e))
                     : (res as unknown as Result<T, F>)
             )
         );
@@ -297,9 +296,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncResult<T, E> {
         return new AsyncResultImpl(
             this.then((res) =>
-                res.isOk()
-                    ? Promise.resolve(f(res.unwrap())).then(() => res)
-                    : res
+                res.isOk() ? f(res.unwrap()).then(() => res) : res
             )
         );
     }
@@ -311,9 +308,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E> {
         return new AsyncResultImpl(
             this.then((res) =>
-                res.isErr()
-                    ? Promise.resolve(f(res.unwrapErr())).then(() => res)
-                    : res
+                res.isErr() ? f(res.unwrapErr()).then(() => res) : res
             )
         );
     }

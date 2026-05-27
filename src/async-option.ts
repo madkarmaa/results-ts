@@ -1,5 +1,4 @@
 import { type Option, Some, None } from './option';
-import { type Result } from './result';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
 
 /**
@@ -250,9 +249,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
         return new AsyncOptionImpl(
             this.then((opt) =>
-                opt.isSome()
-                    ? Promise.resolve(f(opt.unwrap())).then(Some)
-                    : None<U>()
+                opt.isSome() ? f(opt.unwrap()).then(Some) : None<U>()
             )
         );
     }
@@ -264,9 +261,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T> {
         return new AsyncOptionImpl(
             this.then((opt) =>
-                opt.isSome()
-                    ? Promise.resolve(f(opt.unwrap())).then(() => opt)
-                    : opt
+                opt.isSome() ? f(opt.unwrap()).then(() => opt) : opt
             )
         );
     }
@@ -301,10 +296,8 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncResultImpl(
             this.then((opt) =>
                 opt.isSome()
-                    ? opt.okOr(undefined as never)
-                    : Promise.resolve(errF()).then(
-                          (e) => opt.okOr(e) as Result<T, E>
-                      )
+                    ? opt.okOr(null as never)
+                    : errF().then((e) => opt.okOr(e))
             )
         );
     }
@@ -331,7 +324,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncOptionImpl(
             this.then((opt) =>
                 opt.isSome()
-                    ? Promise.resolve(predicate(opt.unwrap())).then((pass) =>
+                    ? predicate(opt.unwrap()).then((pass) =>
                           pass ? opt : None<T>()
                       )
                     : None<T>()
