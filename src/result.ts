@@ -372,21 +372,14 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncResult<U, E> {
-        return new AsyncResultImpl(
-            (async () => {
-                if (typeof f !== 'function')
-                    throw new InvalidArgumentError(
-                        'Argument must be a function'
-                    );
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
 
-                const state = this.#state;
+        const state = this.#state;
+        if (isLeft(state))
+            return new AsyncResultImpl(Promise.resolve(Err(state.left)));
 
-                if (isLeft(state)) return new ResultImpl(state);
-
-                const mappedValue = await f(state.right);
-                return new ResultImpl(Right(mappedValue));
-            })()
-        );
+        return new AsyncResultImpl(Promise.resolve(f(state.right)).then(Ok));
     }
 
     mapOr<U>(fallback: U, f: (val: T) => U): U {
@@ -437,20 +430,16 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     mapErrAsync<F>(f: (err: E) => PromiseLike<F>): AsyncResult<T, F> {
-        return new AsyncResultImpl(
-            (async () => {
-                if (typeof f !== 'function')
-                    throw new InvalidArgumentError(
-                        'Argument must be a function'
-                    );
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
 
-                const state = this.#state;
+        const state = this.#state;
+        if (isLeft(state))
+            return new AsyncResultImpl(
+                Promise.resolve(f(state.left)).then((err) => Err(err))
+            );
 
-                if (isLeft(state))
-                    return new ResultImpl(Left(await f(state.left)));
-                return new ResultImpl(Right(state.right));
-            })()
-        );
+        return new AsyncResultImpl(Promise.resolve(Ok(state.right)));
     }
 
     inspect(f: (val: T) => void): Result<T, E> {
@@ -463,18 +452,16 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncResult<T, E> {
-        return new AsyncResultImpl(
-            (async () => {
-                if (typeof f !== 'function')
-                    throw new InvalidArgumentError(
-                        'Argument must be a function'
-                    );
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
 
-                const state = this.#state;
-                if (isRight(state)) await f(state.right);
-                return this;
-            })()
-        );
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncResultImpl(
+                Promise.resolve(f(state.right)).then(() => this)
+            );
+
+        return new AsyncResultImpl(Promise.resolve(this));
     }
 
     inspectErr(f: (err: E) => void): Result<T, E> {
@@ -487,18 +474,16 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E> {
-        return new AsyncResultImpl(
-            (async () => {
-                if (typeof f !== 'function')
-                    throw new InvalidArgumentError(
-                        'Argument must be a function'
-                    );
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
 
-                const state = this.#state;
-                if (isLeft(state)) await f(state.left);
-                return this;
-            })()
-        );
+        const state = this.#state;
+        if (isLeft(state))
+            return new AsyncResultImpl(
+                Promise.resolve(f(state.left)).then(() => this)
+            );
+
+        return new AsyncResultImpl(Promise.resolve(this));
     }
 
     *iter(): IterableIterator<T> {
@@ -565,18 +550,14 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     andThenAsync<U, F>(
         f: (val: T) => PromiseLike<Result<U, F>>
     ): AsyncResult<U, E | F> {
-        return new AsyncResultImpl(
-            (async () => {
-                if (typeof f !== 'function')
-                    throw new InvalidArgumentError(
-                        'Argument must be a function'
-                    );
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
 
-                const state = this.#state;
-                if (isRight(state)) return f(state.right);
-                return new ResultImpl(Left(state.left));
-            })() as Promise<Result<U, E | F>>
-        );
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncResultImpl(Promise.resolve(f(state.right)));
+
+        return new AsyncResultImpl(Promise.resolve(Err(state.left)));
     }
 
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
@@ -600,18 +581,14 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     orElseAsync<T2, F>(
         f: (err: E) => PromiseLike<Result<T2, F>>
     ): AsyncResult<T | T2, F> {
-        return new AsyncResultImpl(
-            (async () => {
-                if (typeof f !== 'function')
-                    throw new InvalidArgumentError(
-                        'Argument must be a function'
-                    );
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
 
-                const state = this.#state;
-                if (isLeft(state)) return f(state.left);
-                return new ResultImpl(Right(state.right));
-            })() as Promise<Result<T | T2, F>>
-        );
+        const state = this.#state;
+        if (isLeft(state))
+            return new AsyncResultImpl(Promise.resolve(f(state.left)));
+
+        return new AsyncResultImpl(Promise.resolve(Ok<T | T2, F>(state.right)));
     }
 
     unwrapOr<T2>(fallback: T2): T | T2 {
