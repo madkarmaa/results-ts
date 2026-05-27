@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { Some, None } from '../src/option';
+import { Some, None, type Option } from '../src/option';
+import { FlattenError, PanicError } from '../src/errors';
 
 describe('Option async methods', () => {
     test('mapAsync', async () => {
@@ -115,6 +116,234 @@ describe('Option async methods', () => {
         expect(optNull.unwrap()).toBeNull();
     });
 
+    test('isSome', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.isSome()).toBe(true);
+        expect(await none.isSome()).toBe(false);
+    });
+
+    test('isSomeAnd', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.isSomeAnd((val) => val === 5)).toBe(true);
+        expect(await some.isSomeAnd((val) => val === 10)).toBe(false);
+        expect(await none.isSomeAnd((val) => val === 5)).toBe(false);
+    });
+
+    test('isNone', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await none.isNone()).toBe(true);
+        expect(await some.isNone()).toBe(false);
+    });
+
+    test('isNoneOr', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await none.isNoneOr((val) => val === 5)).toBe(true);
+        expect(await some.isNoneOr((val) => val === 5)).toBe(true);
+        expect(await some.isNoneOr((val) => val === 10)).toBe(false);
+    });
+
+    test('expect', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.expect('Should not fail')).toBe(5);
+        await expect(none.expect('Value is missing')).rejects.toThrow(
+            new PanicError('Value is missing')
+        );
+    });
+
+    test('unwrap', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.unwrap()).toBe(5);
+        await expect(none.unwrap()).rejects.toThrow(
+            new PanicError('called `Option.unwrap()` on a `None` value')
+        );
+    });
+
+    test('unwrapOr', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.unwrapOr(10)).toBe(5);
+        expect(await none.unwrapOr(10)).toBe(10);
+    });
+
+    test('unwrapOrElse', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.unwrapOrElse(() => 10)).toBe(5);
+        expect(await none.unwrapOrElse(() => 10)).toBe(10);
+    });
+
+    test('map', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.map((x) => x * 2).unwrap()).toBe(10);
+        expect(await none.map((x) => x * 2).isNone()).toBe(true);
+    });
+
+    test('inspect', async () => {
+        let val = 0;
+        const some = Some(5).mapAsync(async (x) => x);
+        const inspected = some.inspect((x) => {
+            val = x;
+        });
+        expect(await inspected.unwrap()).toBe(5);
+        expect(val).toBe(5);
+
+        let called = false;
+        const none = None<number>().mapAsync(async (x) => x);
+        await none
+            .inspect(() => {
+                called = true;
+            })
+            .isNone();
+        expect(called).toBe(false);
+    });
+
+    test('mapOr', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.mapOr(0, (x) => x * 2)).toBe(10);
+        expect(await none.mapOr(0, (x) => x * 2)).toBe(0);
+    });
+
+    test('mapOrElse', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(
+            await some.mapOrElse(
+                () => 10,
+                (x) => x * 2
+            )
+        ).toBe(10);
+        expect(
+            await none.mapOrElse(
+                () => 10,
+                (x) => x * 2
+            )
+        ).toBe(10);
+    });
+
+    test('okOr', async () => {
+        const errObj = { code: 'NOT_FOUND' as const };
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.okOr(errObj).unwrap()).toBe(5);
+        expect(await none.okOr(errObj).unwrapErr()).toEqual(errObj);
+    });
+
+    test('okOrElse', async () => {
+        const errObj = { code: 'NOT_FOUND' as const };
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.okOrElse(() => errObj).unwrap()).toBe(5);
+        expect(await none.okOrElse(() => errObj).unwrapErr()).toEqual(errObj);
+    });
+
+    test('and', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.and(Some(10)).unwrap()).toBe(10);
+        expect(await some.and(None()).isNone()).toBe(true);
+        expect(await none.and(Some(10)).isNone()).toBe(true);
+    });
+
+    test('andThen', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.andThen((x) => Some(x * 2)).unwrap()).toBe(10);
+        expect(await some.andThen(() => None()).isNone()).toBe(true);
+        expect(await none.andThen((x) => Some(x * 2)).isNone()).toBe(true);
+    });
+
+    test('filter', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.filter((x) => x > 3).unwrap()).toBe(5);
+        expect(await some.filter((x) => x > 10).isNone()).toBe(true);
+        expect(await none.filter((x) => x > 3).isNone()).toBe(true);
+    });
+
+    test('or', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.or(Some(10)).unwrap()).toBe(5);
+        expect(await none.or(Some(10)).unwrap()).toBe(10);
+    });
+
+    test('orElse', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.orElse(() => Some(10)).unwrap()).toBe(5);
+        expect(await none.orElse(() => Some(10)).unwrap()).toBe(10);
+    });
+
+    test('xor', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.xor(None()).unwrap()).toBe(5);
+        expect(await none.xor(Some(10)).unwrap()).toBe(10);
+        expect(await some.xor(Some(10)).isNone()).toBe(true);
+        expect(await none.xor(None()).isNone()).toBe(true);
+    });
+
+    test('flatten', async () => {
+        const nested = Some(Some(42)).mapAsync(async (x) => x);
+        expect(await nested.flatten().unwrap()).toBe(42);
+
+        const nestedNone = Some(None<number>()).mapAsync(async (x) => x);
+        expect(await nestedNone.flatten().isNone()).toBe(true);
+
+        const noneNested = None<Option<number>>().mapAsync(async (x) => x);
+        expect(await noneNested.flatten().isNone()).toBe(true);
+
+        const invalid = Some(42).mapAsync(async (x) => x);
+        // @ts-expect-error - flatten should only be called on AsyncOption<Option<T>>
+        await expect(invalid.flatten().unwrap()).rejects.toThrow(FlattenError);
+    });
+
+    test('match', async () => {
+        const some = Some(5).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(
+            await some.match({
+                Some: (val) => `Value is ${val}`,
+                None: () => 'No value'
+            })
+        ).toBe('Value is 5');
+
+        expect(
+            await none.match({
+                Some: (val) => `Value is ${val}`,
+                None: () => 'No value'
+            })
+        ).toBe('No value');
+    });
+
     describe('Complex async usage tests', () => {
         test('Async config lookup with fallback chain', async () => {
             const remoteConfig = async (
@@ -176,6 +405,22 @@ describe('Option async methods', () => {
                 .mapAsync(async (x) => x * 3)
                 .unwrap();
             expect(result).toBe(15);
+        });
+
+        test('Round-trip chaining', async () => {
+            const someOption = await Some(5)
+                .mapAsync(async (x) => x * 2)
+                .andThenAsync(async (x) => (x > 10 ? Some(x) : None()))
+                .orElseAsync(async () => Some(100))
+                .unwrap();
+            expect(someOption).toBe(100);
+
+            const noneOption = await Some(5)
+                .mapAsync(async (x) => x * 2)
+                .andThenAsync(async (x) => (x > 10 ? Some(x) : None()))
+                .orElseAsync(async () => None())
+                .unwrapOr(50);
+            expect(noneOption).toBe(50);
         });
     });
 });
