@@ -4,7 +4,7 @@ Thanks for your interest in improving `results-ts`.
 
 ## Prerequisites
 
-- [Bun](https://bun.com/docs/installation) — **required**
+- [Bun](https://bun.com/docs/installation) - **required**
 - Node.js [`>=22.18.0`](./.node-version)
 
 ## Setup
