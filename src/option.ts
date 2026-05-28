@@ -301,6 +301,8 @@ type NoneValue = typeof noneValue;
 class OptionImpl<T> implements OptionMethods<T> {
     // will error at runtime if trying to access # fields
     #state: Either<NoneValue, T>;
+    // Dedupe concurrent getOrInsertWithAsync calls.
+    #pendingInsert?: Promise<T>;
 
     static name = 'Option';
     constructor(state: Either<NoneValue, T>) {
@@ -629,12 +631,22 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isLeft(state)) {
-            const value = await f();
-            this.#state = Right(value);
-            return value;
-        }
-        return state.right;
+        if (isRight(state)) return state.right;
+
+        if (this.#pendingInsert) return this.#pendingInsert;
+
+        const insertPromise = Promise.resolve()
+            .then(() => f())
+            .then((value) => {
+                this.#state = Right(value);
+                return value;
+            });
+
+        this.#pendingInsert = insertPromise.finally(() => {
+            this.#pendingInsert = undefined;
+        });
+
+        return this.#pendingInsert;
     }
 
     take(): Option<T> {

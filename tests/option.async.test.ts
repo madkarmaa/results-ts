@@ -399,6 +399,62 @@ describe('Option async methods', () => {
             expect(calls).toBe(1);
         });
 
+        test('getOrInsertWithAsync dedupes concurrent calls on None', async () => {
+            let calls = 0;
+            const opt = None<number>();
+            let resolve!: (value: number) => void;
+            const gate = new Promise<number>((res) => {
+                resolve = res;
+            });
+
+            const first = opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return gate;
+            });
+            const second = opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return gate;
+            });
+
+            resolve(42);
+
+            const [firstValue, secondValue] = await Promise.all([
+                first,
+                second
+            ]);
+
+            expect(firstValue).toBe(42);
+            expect(secondValue).toBe(42);
+            expect(calls).toBe(1);
+            expect(opt.unwrap()).toBe(42);
+        });
+
+        test('getOrInsertWithAsync inserts again after None reset', async () => {
+            let calls = 0;
+            const opt = None<number>();
+
+            const first = await opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return 1;
+            });
+
+            expect(first).toBe(1);
+            expect(opt.unwrap()).toBe(1);
+
+            const taken = opt.take();
+            expect(taken.unwrap()).toBe(1);
+            expect(opt.isNone()).toBe(true);
+
+            const second = await opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return 2;
+            });
+
+            expect(second).toBe(2);
+            expect(opt.unwrap()).toBe(2);
+            expect(calls).toBe(2);
+        });
+
         test('orElseAsync chains with mapAsync on recovered value', async () => {
             const result = await None<number>()
                 .orElseAsync(async () => Some(5))
