@@ -1,6 +1,8 @@
 import { FlattenError, InvalidArgumentError, PanicError } from './errors';
 import { type Either, Left, Right, isLeft, isRight } from './either';
 import { type Result, Ok, Err } from './result';
+import { type AsyncOption, AsyncOptionImpl } from './async-option';
+import { type AsyncResult, AsyncResultImpl } from './async-result';
 
 /**
  * Represents some value of type `T`.
@@ -79,6 +81,13 @@ interface OptionMethods<T> {
     unwrapOrElse(f: () => T): T;
 
     /**
+     * Async version of `unwrapOrElse`. Returns the contained `Some` value or computes it from an async closure.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T>;
+
+    /**
      * Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
@@ -86,11 +95,25 @@ interface OptionMethods<T> {
     map<U>(f: (val: T) => U): Option<U>;
 
     /**
+     * Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an async function to a contained value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U>;
+
+    /**
      * Calls the provided closure with a reference to the contained value (if `Some`).
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspect(f: (val: T) => void): Option<T>;
+
+    /**
+     * Async version of `inspect`. Calls the provided async closure with a reference to the contained value (if `Some`), then returns the original option.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T>;
 
     /**
      * Returns the provided default result (if none), or applies a function to the contained value (if any).
@@ -107,6 +130,16 @@ interface OptionMethods<T> {
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U;
 
     /**
+     * Async version of `mapOrElse`. Computes a default async function result (if none), or applies a different async function to the contained value (if any).
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    mapOrElseAsync<U>(
+        defaultF: () => PromiseLike<U>,
+        f: (val: T) => PromiseLike<U>
+    ): Promise<U>;
+
+    /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
@@ -119,6 +152,13 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     okOrElse<E>(errF: () => E): Result<T, E>;
+
+    /**
+     * Async version of `okOrElse`. Transforms the `Option<T>` into a `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E>;
 
     /**
      * Returns an iterator over the possibly contained value.
@@ -140,6 +180,13 @@ interface OptionMethods<T> {
     andThen<U>(f: (val: T) => Option<U>): Option<U>;
 
     /**
+     * Async version of `andThen`. Returns `None` if the option is `None`, otherwise calls async `f` with the wrapped value and returns the result.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U>;
+
+    /**
      * Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
      * - `Some(t)` if `predicate` returns `true` (where `t` is the wrapped value), and
      * - `None` if `predicate` returns `false`.
@@ -147,6 +194,15 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     filter(predicate: (val: T) => boolean): Option<T>;
+
+    /**
+     * Async version of `filter`. Returns `None` if the option is `None`, otherwise calls async `predicate` with the wrapped value and returns:
+     * - `Some(t)` if `predicate` resolves to `true` (where `t` is the wrapped value), and
+     * - `None` if `predicate` resolves to `false`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T>;
 
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
@@ -161,6 +217,13 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     orElse<T2>(f: () => Option<T2>): Option<T | T2>;
+
+    /**
+     * Async version of `orElse`. Returns the option if it contains a value, otherwise calls async `f` and returns the result.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
@@ -189,6 +252,13 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     getOrInsertWith(f: () => T): T;
+
+    /**
+     * Async version of `getOrInsertWith`. Inserts a value computed from async `f` into the option if it is `None`, then returns a reference to the contained value.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    getOrInsertWithAsync(f: () => PromiseLike<T>): Promise<T>;
 
     /**
      * Takes the value out of the option, leaving a `None` in its place.
@@ -229,12 +299,20 @@ const noneValue = { _tag: 'NoneValue' } as const;
 type NoneValue = typeof noneValue;
 
 class OptionImpl<T> implements OptionMethods<T> {
-    // will error at runtime if trying to access # fields
     #state: Either<NoneValue, T>;
+    #pendingInsert?: Promise<T>;
+    #pendingInsertToken = 0;
+    #mutationVersion = 0;
 
     static name = 'Option';
     constructor(state: Either<NoneValue, T>) {
         this.#state = state;
+    }
+
+    #invalidatePendingInsert(): void {
+        this.#mutationVersion += 1;
+        this.#pendingInsertToken += 1;
+        this.#pendingInsert = undefined;
     }
 
     get _isSome(): boolean {
@@ -307,13 +385,36 @@ class OptionImpl<T> implements OptionMethods<T> {
         return isRight(state) ? state.right : f();
     }
 
+    async unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        return isRight(state) ? state.right : f();
+    }
+
     map<U>(f: (val: T) => U): Option<U> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
         if (isRight(state)) return Some(f(state.right));
-        return None<U>();
+        return None();
+    }
+
+    mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncOptionImpl(
+                Promise.resolve()
+                    .then(() => f(state.right))
+                    .then(Some)
+            );
+
+        return new AsyncOptionImpl(Promise.resolve(None()));
     }
 
     inspect(f: (val: T) => void): Option<T> {
@@ -325,6 +426,21 @@ class OptionImpl<T> implements OptionMethods<T> {
         return this;
     }
 
+    inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncOptionImpl(
+                Promise.resolve()
+                    .then(() => f(state.right))
+                    .then(() => this)
+            );
+
+        return new AsyncOptionImpl(Promise.resolve(this));
+    }
+
     mapOr<U>(defaultVal: U, f: (val: T) => U): U {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
@@ -334,6 +450,22 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U {
+        if (typeof defaultF !== 'function')
+            throw new InvalidArgumentError(
+                "Argument 'defaultF' must be a function"
+            );
+
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError("Argument 'f' must be a function");
+
+        const state = this.#state;
+        return isRight(state) ? f(state.right) : defaultF();
+    }
+
+    async mapOrElseAsync<U>(
+        defaultF: () => PromiseLike<U>,
+        f: (val: T) => PromiseLike<U>
+    ): Promise<U> {
         if (typeof defaultF !== 'function')
             throw new InvalidArgumentError(
                 "Argument 'defaultF' must be a function"
@@ -361,6 +493,17 @@ class OptionImpl<T> implements OptionMethods<T> {
         return Err(errF());
     }
 
+    okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E> {
+        if (typeof errF !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncResultImpl(Promise.resolve(Ok(state.right)));
+
+        return new AsyncResultImpl(Promise.resolve().then(errF).then(Err));
+    }
+
     *iter(): IterableIterator<T> {
         const state = this.#state;
         if (isRight(state)) yield state.right;
@@ -384,6 +527,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return None();
     }
 
+    andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncOptionImpl(
+                Promise.resolve().then(() => f(state.right))
+            );
+
+        return new AsyncOptionImpl(Promise.resolve(None()));
+    }
+
     filter(predicate: (val: T) => boolean): Option<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
@@ -391,6 +547,21 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state) && predicate(state.right)) return this;
         return None();
+    }
+
+    filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T> {
+        if (typeof predicate !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state))
+            return new AsyncOptionImpl(
+                Promise.resolve()
+                    .then(() => predicate(state.right))
+                    .then((pass) => (pass ? this : None()))
+            );
+
+        return new AsyncOptionImpl(Promise.resolve(None()));
     }
 
     or<T2>(optb: Option<T2>): Option<T | T2> {
@@ -411,6 +582,16 @@ class OptionImpl<T> implements OptionMethods<T> {
         return f();
     }
 
+    orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state)) return new AsyncOptionImpl(Promise.resolve(this));
+
+        return new AsyncOptionImpl(Promise.resolve().then(f));
+    }
+
     xor<T2>(optb: Option<T2>): Option<T | T2> {
         if (!(optb instanceof OptionImpl))
             throw new InvalidArgumentError('Argument must be an Option');
@@ -425,33 +606,98 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     insert(value: T): T {
+        this.#invalidatePendingInsert();
         this.#state = Right(value);
         return value;
     }
 
     getOrInsert(value: T): T {
+        this.#invalidatePendingInsert();
+
         const state = this.#state;
-        if (isLeft(state)) {
-            this.#state = Right(value);
-            return value;
-        }
-        return state.right;
+        if (isRight(state)) return state.right;
+
+        this.#state = Right(value);
+        return value;
     }
 
     getOrInsertWith(f: () => T): T {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
+        this.#invalidatePendingInsert();
+
         const state = this.#state;
-        if (isLeft(state)) {
-            const value = f();
-            this.#state = Right(value);
-            return value;
-        }
-        return state.right;
+        if (isRight(state)) return state.right;
+
+        const value = f();
+        this.#state = Right(value);
+        return value;
+    }
+
+    async getOrInsertWithAsync(f: () => PromiseLike<T>): Promise<T> {
+        if (typeof f !== 'function')
+            throw new InvalidArgumentError('Argument must be a function');
+
+        const state = this.#state;
+        if (isRight(state)) return state.right;
+
+        if (this.#pendingInsert) return this.#pendingInsert;
+
+        const startVersion = this.#mutationVersion;
+
+        const pendingToken = this.#pendingInsertToken + 1;
+        this.#pendingInsertToken = pendingToken;
+
+        const insertPromise = Promise.resolve()
+            .then(() => f())
+            .then((value) => {
+                if (
+                    this.#mutationVersion === startVersion &&
+                    this.#pendingInsertToken === pendingToken
+                ) {
+                    this.#mutationVersion += 1;
+                    this.#state = Right(value);
+                    return value;
+                }
+
+                const current = this.#state;
+                if (isRight(current)) return current.right;
+
+                const pending = this.#pendingInsert;
+                if (pending && this.#pendingInsertToken !== pendingToken) {
+                    return pending.then(() => {
+                        const latest = this.#state;
+                        if (isRight(latest)) return latest.right;
+
+                        this.#mutationVersion += 1;
+                        this.#state = Right(value);
+                        return value;
+                    });
+                }
+
+                this.#mutationVersion += 1;
+                this.#state = Right(value);
+                return value;
+            });
+
+        this.#pendingInsert = insertPromise;
+
+        void insertPromise
+            .finally(() => {
+                if (
+                    this.#pendingInsertToken === pendingToken &&
+                    this.#pendingInsert === insertPromise
+                )
+                    this.#pendingInsert = undefined;
+            })
+            .catch(() => {});
+
+        return insertPromise;
     }
 
     take(): Option<T> {
+        this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state)) {
             this.#state = Left(noneValue);
@@ -465,6 +711,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
+        this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state) && predicate(state.right)) {
             this.#state = Left(noneValue);
@@ -475,6 +722,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     replace(value: T): Option<T> {
+        this.#invalidatePendingInsert();
         const state = this.#state;
         this.#state = Right(value);
 
