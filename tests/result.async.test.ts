@@ -190,7 +190,7 @@ describe('Result async methods', () => {
         const ok = Ok(5).mapAsync(async (x) => x);
         const err = Err({ code: 'ERR' }).mapAsync(async (x: number) => x);
 
-        expect(await ok.mapOr(10, (x) => x * 2)).toBe(10);
+        expect(await ok.mapOr(0, (x) => x * 2)).toBe(10);
         expect(await err.mapOr(10, (x: number) => x * 2)).toBe(10);
     });
 

@@ -227,16 +227,16 @@ describe('Option async methods', () => {
 
         expect(
             await some.mapOrElse(
-                () => 10,
+                () => 0,
                 (x) => x * 2
             )
         ).toBe(10);
         expect(
             await none.mapOrElse(
-                () => 10,
+                () => 0,
                 (x) => x * 2
             )
-        ).toBe(10);
+        ).toBe(0);
     });
 
     test('okOr', async () => {
