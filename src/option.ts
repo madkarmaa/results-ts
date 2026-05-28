@@ -299,9 +299,7 @@ const noneValue = { _tag: 'NoneValue' } as const;
 type NoneValue = typeof noneValue;
 
 class OptionImpl<T> implements OptionMethods<T> {
-    // will error at runtime if trying to access # fields
     #state: Either<NoneValue, T>;
-    // Dedupe concurrent getOrInsertWithAsync calls.
     #pendingInsert?: Promise<T>;
 
     static name = 'Option';

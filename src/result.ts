@@ -295,7 +295,6 @@ interface ResultMethods<T, E> {
 }
 
 class ResultImpl<T, E> implements ResultMethods<T, E> {
-    // will error at runtime if trying to access # fields
     #state: Either<E, T>;
 
     static name = 'Result';
