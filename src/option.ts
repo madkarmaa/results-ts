@@ -613,12 +613,12 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     getOrInsert(value: T): T {
         this.#invalidatePendingInsert();
+
         const state = this.#state;
-        if (isLeft(state)) {
-            this.#state = Right(value);
-            return value;
-        }
-        return state.right;
+        if (isRight(state)) return state.right;
+
+        this.#state = Right(value);
+        return value;
     }
 
     getOrInsertWith(f: () => T): T {
@@ -626,13 +626,13 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         this.#invalidatePendingInsert();
+
         const state = this.#state;
-        if (isLeft(state)) {
-            const value = f();
-            this.#state = Right(value);
-            return value;
-        }
-        return state.right;
+        if (isRight(state)) return state.right;
+
+        const value = f();
+        this.#state = Right(value);
+        return value;
     }
 
     async getOrInsertWithAsync(f: () => PromiseLike<T>): Promise<T> {
