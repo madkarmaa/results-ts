@@ -101,19 +101,162 @@ describe('Option async methods', () => {
         expect(opt2).toBe(10);
     });
 
-    test('getOrInsertWithAsync', async () => {
-        const opt = None<number>();
-        expect(await opt.getOrInsertWithAsync(async () => 5)).toBe(5);
-        expect(opt.unwrap()).toBe(5);
+    describe('getOrInsertWithAsync resolution cases', () => {
+        test('fast path returns existing value', async () => {
+            let calls = 0;
+            const optSome = Some(10);
 
-        const optSome = Some(10);
-        expect(await optSome.getOrInsertWithAsync(async () => 5)).toBe(10);
-        expect(optSome.unwrap()).toBe(10);
+            const value = await optSome.getOrInsertWithAsync(async () => {
+                calls += 1;
+                return 5;
+            });
 
-        const optNull = None<number | null>();
-        expect(await optNull.getOrInsertWithAsync(async () => null)).toBeNull();
-        expect(optNull.isSome()).toBe(true);
-        expect(optNull.unwrap()).toBeNull();
+            expect(value).toBe(10);
+            expect(optSome.unwrap()).toBe(10);
+            expect(calls).toBe(0);
+        });
+
+        test('inserts when none and unchanged', async () => {
+            const opt = None<number>();
+            expect(await opt.getOrInsertWithAsync(async () => 5)).toBe(5);
+            expect(opt.unwrap()).toBe(5);
+
+            const optNull = None<number | null>();
+            expect(
+                await optNull.getOrInsertWithAsync(async () => null)
+            ).toBeNull();
+            expect(optNull.isSome()).toBe(true);
+            expect(optNull.unwrap()).toBeNull();
+        });
+
+        test('dedupes concurrent calls on none', async () => {
+            let calls = 0;
+            const opt = None<number>();
+            let resolve!: (value: number) => void;
+            const gate = new Promise<number>((res) => {
+                resolve = res;
+            });
+
+            const first = opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return gate;
+            });
+            const second = opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return gate;
+            });
+
+            resolve(42);
+
+            const [firstValue, secondValue] = await Promise.all([
+                first,
+                second
+            ]);
+
+            expect(firstValue).toBe(42);
+            expect(secondValue).toBe(42);
+            expect(calls).toBe(1);
+            expect(opt.unwrap()).toBe(42);
+        });
+
+        test('returns latest value after mutation', async () => {
+            const opt = None<number>();
+            let resolve!: (value: number) => void;
+            const gate = new Promise<number>((res) => {
+                resolve = res;
+            });
+
+            const pending = opt.getOrInsertWithAsync(async () => gate);
+
+            opt.insert(7);
+            resolve(42);
+
+            const resolved = await pending;
+
+            expect(resolved).toBe(7);
+            expect(opt.unwrap()).toBe(7);
+        });
+
+        test('awaits newer pending insert and returns its value', async () => {
+            let calls = 0;
+            const opt = None<number>();
+            let resolveFirst!: (value: number) => void;
+            let resolveSecond!: (value: number) => void;
+            const gateFirst = new Promise<number>((res) => {
+                resolveFirst = res;
+            });
+            const gateSecond = new Promise<number>((res) => {
+                resolveSecond = res;
+            });
+
+            const first = opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return gateFirst;
+            });
+
+            opt.take();
+            const second = opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return gateSecond;
+            });
+
+            resolveFirst(1);
+            resolveSecond(2);
+
+            const [firstValue, secondValue] = await Promise.all([
+                first,
+                second
+            ]);
+
+            expect(secondValue).toBe(2);
+            expect(firstValue).toBe(2);
+            expect(calls).toBe(2);
+            expect(opt.unwrap()).toBe(2);
+        });
+
+        test('late resolve inserts when mutation left none', async () => {
+            const opt = None<number>();
+            let resolve!: (value: number) => void;
+            const gate = new Promise<number>((res) => {
+                resolve = res;
+            });
+
+            const pending = opt.getOrInsertWithAsync(async () => gate);
+
+            opt.take();
+            resolve(3);
+
+            const resolved = await pending;
+
+            expect(resolved).toBe(3);
+            expect(opt.unwrap()).toBe(3);
+        });
+
+        test('inserts again after none reset', async () => {
+            let calls = 0;
+            const opt = None<number>();
+
+            const first = await opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return 1;
+            });
+
+            expect(first).toBe(1);
+            expect(opt.unwrap()).toBe(1);
+
+            const taken = opt.take();
+            expect(taken.unwrap()).toBe(1);
+            expect(opt.isNone()).toBe(true);
+
+            const second = await opt.getOrInsertWithAsync(async () => {
+                calls++;
+                return 2;
+            });
+
+            expect(second).toBe(2);
+            expect(opt.unwrap()).toBe(2);
+            expect(calls).toBe(2);
+        });
     });
 
     test('isSome', async () => {
@@ -379,98 +522,6 @@ describe('Option async methods', () => {
                 .mapAsync(doubleAsync)
                 .unwrapOr(0);
             expect(doubledOdd).toBe(0);
-        });
-
-        test('getOrInsertWithAsync only calls factory once on None', async () => {
-            let calls = 0;
-            const opt = None<number>();
-
-            const first = await opt.getOrInsertWithAsync(async () => {
-                calls++;
-                return 42;
-            });
-            const second = await opt.getOrInsertWithAsync(async () => {
-                calls++;
-                return 99;
-            });
-
-            expect(first).toBe(42);
-            expect(second).toBe(42);
-            expect(calls).toBe(1);
-        });
-
-        test('getOrInsertWithAsync dedupes concurrent calls on None', async () => {
-            let calls = 0;
-            const opt = None<number>();
-            let resolve!: (value: number) => void;
-            const gate = new Promise<number>((res) => {
-                resolve = res;
-            });
-
-            const first = opt.getOrInsertWithAsync(async () => {
-                calls++;
-                return gate;
-            });
-            const second = opt.getOrInsertWithAsync(async () => {
-                calls++;
-                return gate;
-            });
-
-            resolve(42);
-
-            const [firstValue, secondValue] = await Promise.all([
-                first,
-                second
-            ]);
-
-            expect(firstValue).toBe(42);
-            expect(secondValue).toBe(42);
-            expect(calls).toBe(1);
-            expect(opt.unwrap()).toBe(42);
-        });
-
-        test('getOrInsertWithAsync returns latest value after mutation', async () => {
-            const opt = None<number>();
-            let resolve!: (value: number) => void;
-            const gate = new Promise<number>((res) => {
-                resolve = res;
-            });
-
-            const pending = opt.getOrInsertWithAsync(async () => gate);
-
-            opt.insert(7);
-            resolve(42);
-
-            const resolved = await pending;
-
-            expect(resolved).toBe(7);
-            expect(opt.unwrap()).toBe(7);
-        });
-
-        test('getOrInsertWithAsync inserts again after None reset', async () => {
-            let calls = 0;
-            const opt = None<number>();
-
-            const first = await opt.getOrInsertWithAsync(async () => {
-                calls++;
-                return 1;
-            });
-
-            expect(first).toBe(1);
-            expect(opt.unwrap()).toBe(1);
-
-            const taken = opt.take();
-            expect(taken.unwrap()).toBe(1);
-            expect(opt.isNone()).toBe(true);
-
-            const second = await opt.getOrInsertWithAsync(async () => {
-                calls++;
-                return 2;
-            });
-
-            expect(second).toBe(2);
-            expect(opt.unwrap()).toBe(2);
-            expect(calls).toBe(2);
         });
 
         test('orElseAsync chains with mapAsync on recovered value', async () => {
