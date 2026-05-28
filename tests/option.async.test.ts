@@ -429,7 +429,7 @@ describe('Option async methods', () => {
             expect(opt.unwrap()).toBe(42);
         });
 
-        test('getOrInsertWithAsync does not overwrite after mutation', async () => {
+        test('getOrInsertWithAsync returns latest value after mutation', async () => {
             const opt = None<number>();
             let resolve!: (value: number) => void;
             const gate = new Promise<number>((res) => {
@@ -443,7 +443,7 @@ describe('Option async methods', () => {
 
             const resolved = await pending;
 
-            expect(resolved).toBe(42);
+            expect(resolved).toBe(7);
             expect(opt.unwrap()).toBe(7);
         });
 

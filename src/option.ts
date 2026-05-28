@@ -644,10 +644,32 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const startVersion = this.#mutationVersion;
 
-        const insertPromise = Promise.resolve()
+        const insertPromise: Promise<T> = Promise.resolve()
             .then(() => f())
             .then((value) => {
-                if (this.#mutationVersion !== startVersion) return value;
+                if (
+                    this.#mutationVersion === startVersion &&
+                    this.#pendingInsert === insertPromise
+                ) {
+                    this.#mutationVersion += 1;
+                    this.#state = Right(value);
+                    return value;
+                }
+
+                const current = this.#state;
+                if (isRight(current)) return current.right;
+
+                const pending = this.#pendingInsert;
+                if (pending && pending !== insertPromise) {
+                    return pending.then(() => {
+                        const latest = this.#state;
+                        if (isRight(latest)) return latest.right;
+                        this.#mutationVersion += 1;
+                        this.#state = Right(value);
+                        return value;
+                    });
+                }
+
                 this.#mutationVersion += 1;
                 this.#state = Right(value);
                 return value;
