@@ -682,13 +682,16 @@ class OptionImpl<T> implements OptionMethods<T> {
             });
 
         this.#pendingInsert = insertPromise;
-        insertPromise.finally(() => {
-            if (
-                this.#pendingInsertToken === pendingToken &&
-                this.#pendingInsert === insertPromise
-            )
-                this.#pendingInsert = undefined;
-        });
+
+        void insertPromise
+            .finally(() => {
+                if (
+                    this.#pendingInsertToken === pendingToken &&
+                    this.#pendingInsert === insertPromise
+                )
+                    this.#pendingInsert = undefined;
+            })
+            .catch(() => {});
 
         return insertPromise;
     }
