@@ -301,6 +301,7 @@ type NoneValue = typeof noneValue;
 class OptionImpl<T> implements OptionMethods<T> {
     #state: Either<NoneValue, T>;
     #pendingInsert?: Promise<T>;
+    #pendingInsertToken = 0;
     #mutationVersion = 0;
 
     static name = 'Option';
@@ -310,6 +311,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     #invalidatePendingInsert(): void {
         this.#mutationVersion += 1;
+        this.#pendingInsertToken += 1;
         this.#pendingInsert = undefined;
     }
 
@@ -644,12 +646,15 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const startVersion = this.#mutationVersion;
 
-        const insertPromise: Promise<T> = Promise.resolve()
+        const pendingToken = this.#pendingInsertToken + 1;
+        this.#pendingInsertToken = pendingToken;
+
+        const insertPromise = Promise.resolve()
             .then(() => f())
             .then((value) => {
                 if (
                     this.#mutationVersion === startVersion &&
-                    this.#pendingInsert === insertPromise
+                    this.#pendingInsertToken === pendingToken
                 ) {
                     this.#mutationVersion += 1;
                     this.#state = Right(value);
@@ -660,10 +665,11 @@ class OptionImpl<T> implements OptionMethods<T> {
                 if (isRight(current)) return current.right;
 
                 const pending = this.#pendingInsert;
-                if (pending && pending !== insertPromise) {
+                if (pending && this.#pendingInsertToken !== pendingToken) {
                     return pending.then(() => {
                         const latest = this.#state;
                         if (isRight(latest)) return latest.right;
+
                         this.#mutationVersion += 1;
                         this.#state = Right(value);
                         return value;
@@ -677,7 +683,10 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         this.#pendingInsert = insertPromise;
         insertPromise.finally(() => {
-            if (this.#pendingInsert === insertPromise)
+            if (
+                this.#pendingInsertToken === pendingToken &&
+                this.#pendingInsert === insertPromise
+            )
                 this.#pendingInsert = undefined;
         });
 
