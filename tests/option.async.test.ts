@@ -429,6 +429,24 @@ describe('Option async methods', () => {
             expect(opt.unwrap()).toBe(42);
         });
 
+        test('getOrInsertWithAsync does not overwrite after mutation', async () => {
+            const opt = None<number>();
+            let resolve!: (value: number) => void;
+            const gate = new Promise<number>((res) => {
+                resolve = res;
+            });
+
+            const pending = opt.getOrInsertWithAsync(async () => gate);
+
+            opt.insert(7);
+            resolve(42);
+
+            const resolved = await pending;
+
+            expect(resolved).toBe(42);
+            expect(opt.unwrap()).toBe(7);
+        });
+
         test('getOrInsertWithAsync inserts again after None reset', async () => {
             let calls = 0;
             const opt = None<number>();

@@ -301,10 +301,16 @@ type NoneValue = typeof noneValue;
 class OptionImpl<T> implements OptionMethods<T> {
     #state: Either<NoneValue, T>;
     #pendingInsert?: Promise<T>;
+    #mutationVersion = 0;
 
     static name = 'Option';
     constructor(state: Either<NoneValue, T>) {
         this.#state = state;
+    }
+
+    #invalidatePendingInsert(): void {
+        this.#mutationVersion += 1;
+        this.#pendingInsert = undefined;
     }
 
     get _isSome(): boolean {
@@ -598,11 +604,13 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     insert(value: T): T {
+        this.#invalidatePendingInsert();
         this.#state = Right(value);
         return value;
     }
 
     getOrInsert(value: T): T {
+        this.#invalidatePendingInsert();
         const state = this.#state;
         if (isLeft(state)) {
             this.#state = Right(value);
@@ -615,6 +623,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
+        this.#invalidatePendingInsert();
         const state = this.#state;
         if (isLeft(state)) {
             const value = f();
@@ -633,21 +642,28 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         if (this.#pendingInsert) return this.#pendingInsert;
 
+        const startVersion = this.#mutationVersion;
+
         const insertPromise = Promise.resolve()
             .then(() => f())
             .then((value) => {
+                if (this.#mutationVersion !== startVersion) return value;
+                this.#mutationVersion += 1;
                 this.#state = Right(value);
                 return value;
             });
 
-        this.#pendingInsert = insertPromise.finally(() => {
-            this.#pendingInsert = undefined;
+        this.#pendingInsert = insertPromise;
+        insertPromise.finally(() => {
+            if (this.#pendingInsert === insertPromise)
+                this.#pendingInsert = undefined;
         });
 
-        return this.#pendingInsert;
+        return insertPromise;
     }
 
     take(): Option<T> {
+        this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state)) {
             this.#state = Left(noneValue);
@@ -661,6 +677,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (typeof predicate !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
+        this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state) && predicate(state.right)) {
             this.#state = Left(noneValue);
@@ -671,6 +688,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     replace(value: T): Option<T> {
+        this.#invalidatePendingInsert();
         const state = this.#state;
         this.#state = Right(value);
 
