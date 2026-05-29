@@ -38,16 +38,20 @@ const parseUserId = (id: string) => {
         return Err({
             code: 'INVALID_INPUT',
             message: 'ID must be a valid number'
-        });
+        } as const);
 
     if (parsed <= 0)
-        return Err({ code: 'INVALID_ID', message: 'ID must be positive' });
+        return Err({
+            code: 'INVALID_ID',
+            message: 'ID must be positive'
+        } as const);
 
     return Ok(parsed);
 };
 
 const fetchUser = (id: number) => {
-    if (id === 13) return Err({ code: 'NOT_FOUND', message: 'User not found' });
+    if (id === 13)
+        return Err({ code: 'NOT_FOUND', message: 'User not found' } as const);
     return Ok({ id, name: 'Alice', role: 'admin' });
 };
 
