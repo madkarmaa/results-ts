@@ -601,7 +601,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
                 Promise.resolve().then(() => f(state.left))
             );
 
-        return new AsyncResultImpl(Promise.resolve(Ok<T | T2, F>(state.right)));
+        return new AsyncResultImpl(Promise.resolve(Ok<T | T2>(state.right)));
     }
 
     unwrapOr<T2>(fallback: T2): T | T2 {
