@@ -33,15 +33,19 @@ describe('Result', () => {
     });
 
     test('isErrAnd', () => {
-        expect(Err({ code: 'ERR' }).isErrAnd((err) => err.code === 'ERR')).toBe(
-            true
-        );
         expect(
-            // @ts-expect-error - err.code is typed as literal "ERR"
-            Err({ code: 'ERR' }).isErrAnd((err) => err.code === 'OTHER')
+            Err<{ code: 'ERR' }>({ code: 'ERR' }).isErrAnd(
+                (err) => err.code === 'ERR'
+            )
+        ).toBe(true);
+        expect(
+            Err<{ code: 'ERR' }>({ code: 'ERR' }).isErrAnd(
+                // @ts-expect-error - err.code is typed as literal "ERR"
+                (err) => err.code === 'OTHER'
+            )
         ).toBe(false);
         expect(Ok(5).isErrAnd((_) => true)).toBe(false);
-        const result = Err(
+        const result = Err<{ code: 'ERR' } | { code: 'OTHER' }>(
             Math.random() > 0.5 ? { code: 'ERR' } : { code: 'OTHER' }
         );
         if (result.isErrAnd((err) => err.code === 'ERR')) {
