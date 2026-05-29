@@ -665,7 +665,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
  * @param value - The value to wrap in a successful result.
  * @returns A `Result` representing a successful outcome.
  */
-export function Ok<T, E = never>(value: T): Result<T, E> {
+export function Ok<T>(value: T): Result<T, never> {
     return new ResultImpl(Right(value));
 }
 
@@ -675,6 +675,6 @@ export function Ok<T, E = never>(value: T): Result<T, E> {
  * @param error - The error to wrap in a failed result.
  * @returns A `Result` representing a failed outcome.
  */
-export function Err<const E>(error: E): Result<never, E> {
+export function Err<E>(error: E): Result<never, E> {
     return new ResultImpl(Left(error));
 }
