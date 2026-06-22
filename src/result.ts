@@ -525,7 +525,9 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state))
-            throw new PanicError(`${msg}: "${String(state.right)}"`);
+            throw new PanicError(`${msg}: "${String(state.right)}"`, {
+                cause: state.right
+            });
         return state.left;
     }
 
@@ -533,7 +535,8 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isRight(state))
             throw new PanicError(
-                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(state.right)}"`
+                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(state.right)}"`,
+                { cause: state.right }
             );
         return state.left;
     }
