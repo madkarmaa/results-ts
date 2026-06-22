@@ -298,6 +298,12 @@ interface OptionMethods<T> {
 const noneValue = { _tag: 'NoneValue' } as const;
 type NoneValue = typeof noneValue;
 
+// `Either` objects are immutable (no code mutates `.left`/`.right`/`._tag`),
+// so the `Left(noneValue)` payload can be shared across every `None`/emptied
+// Option without aliasing issues — only the `OptionImpl` wrapper holds mutable
+// per-instance state, and that still allocates fresh per call.
+const noneEither = Left(noneValue);
+
 class OptionImpl<T> implements OptionMethods<T> {
     #state: Either<NoneValue, T>;
     #pendingInsert?: Promise<T>;
@@ -700,7 +706,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state)) {
-            this.#state = Left(noneValue);
+            this.#state = noneEither;
             return Some(state.right);
         }
 
@@ -714,7 +720,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state) && predicate(state.right)) {
-            this.#state = Left(noneValue);
+            this.#state = noneEither;
             return Some(state.right);
         }
 
@@ -778,5 +784,5 @@ export function Some<T>(value: T): Option<T> {
  * @returns An `Option` representing the absence of a value.
  */
 export function None<T = never>(): Option<T> {
-    return new OptionImpl(Left(noneValue));
+    return new OptionImpl(noneEither);
 }
