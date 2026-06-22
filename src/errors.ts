@@ -18,13 +18,3 @@ export class FlattenError extends InvalidArgumentError {
         this.name = 'FlattenError';
     }
 }
-
-export function assertValueIsNotMissing<T>(
-    value: T | null | undefined,
-    message?: string
-): asserts value is T {
-    if (value === null || value === undefined)
-        throw new InvalidArgumentError(
-            message || 'Expected a non-null, non-undefined value'
-        );
-}
