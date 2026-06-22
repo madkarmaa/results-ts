@@ -542,7 +542,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     and<U, E2>(res: Result<U, E2>): Result<U, E | E2> {
-        if (!(res instanceof ResultImpl))
+        if (typeof (res as Result<unknown, unknown>)._isOk !== 'boolean')
             throw new InvalidArgumentError('Argument must be a Result');
 
         const state = this.#state;
@@ -575,7 +575,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
-        if (!(res instanceof ResultImpl))
+        if (typeof (res as Result<unknown, unknown>)._isOk !== 'boolean')
             throw new InvalidArgumentError('Argument must be a Result');
 
         const state = this.#state;
