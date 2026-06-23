@@ -53,7 +53,7 @@ jobs:
 
             - name: Semantic release
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.SR_TOKEN }}
               run: bun run release
 
             - name: Publish to npm registry
