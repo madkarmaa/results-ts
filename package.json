@@ -5,10 +5,13 @@
     "devDependencies": {
         "@commitlint/cli": "^21.0.2",
         "@commitlint/config-conventional": "^21.0.2",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/git": "^10.0.1",
         "@types/bun": "^1.3.14",
         "husky": "^9.1.7",
         "mitata": "^1.0.34",
         "prettier": "3.8.3",
+        "semantic-release": "^25.0.5",
         "tsdown": "^0.22.3",
         "typescript": "^6.0.3",
         "vitest": "^4.1.9"
@@ -35,10 +38,8 @@
         "typecheck": "tsc --noEmit",
         "typecheck:dev": "tsc --noEmit --watch",
         "format": "prettier --write --ignore-unknown .",
-        "tags": "git push origin --tags && git push",
-        "patch": "bun pm version patch && bun run tags",
-        "minor": "bun pm version minor && bun run tags",
-        "major": "bun pm version major && bun run tags"
+        "release": "semantic-release",
+        "release:dry": "semantic-release --dry-run"
     },
     "repository": {
         "type": "git",
