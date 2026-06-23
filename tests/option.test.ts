@@ -1,6 +1,12 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
+import { type Result, Ok, Err } from '../src/result';
+import {
+    FlattenError,
+    InvalidArgumentError,
+    PanicError,
+    TransposeError
+} from '../src/errors';
 
 describe('Option', () => {
     test('construction', () => {
@@ -325,6 +331,17 @@ describe('Option', () => {
         expect(None<Option<string>>().flatten().isNone()).toBe(true);
         // @ts-expect-error - flatten should only be called on Option<Option<T>>
         expect(() => Some(42).flatten()).toThrow(FlattenError);
+    });
+
+    test('transpose', () => {
+        expect(Some(Ok(42)).transpose().unwrap().unwrap()).toBe(42);
+        expect(Some(Err<string>('oops')).transpose().unwrapErr()).toBe('oops');
+        expect(None<Result<number, string>>().transpose().isOk()).toBe(true);
+        expect(
+            None<Result<number, string>>().transpose().unwrap().isNone()
+        ).toBe(true);
+        // @ts-expect-error - transpose should only be called on Option<Result<T, E>>
+        expect(() => Some(42).transpose()).toThrow(TransposeError);
     });
 
     test('match', () => {

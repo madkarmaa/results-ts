@@ -1,4 +1,5 @@
 import { type Option } from './option';
+import { type Result } from './result';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
 
 /**
@@ -176,6 +177,14 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     flatten<U>(this: AsyncOption<Option<U>>): AsyncOption<U>;
 
     /**
+     * Transposes an `AsyncOption` of a `Result` into an `AsyncResult` of an `Option`.
+     *
+     * **Async note:** If the inner value is not a `Result`, this produces a rejected `Promise`
+     * with `TransposeError` rather than a synchronous throw.
+     */
+    transpose<T, E>(this: AsyncOption<Result<T, E>>): AsyncResult<Option<T>, E>;
+
+    /**
      * Matches the `Option` with two functions, one for each variant.
      */
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): Promise<U>;
@@ -316,6 +325,12 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
 
     flatten<U>(this: AsyncOptionImpl<Option<U>>): AsyncOption<U> {
         return new AsyncOptionImpl(this.then((opt) => opt.flatten()));
+    }
+
+    transpose<T, E>(
+        this: AsyncOptionImpl<Result<T, E>>
+    ): AsyncResult<Option<T>, E> {
+        return new AsyncResultImpl(this.then((opt) => opt.transpose()));
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): Promise<U> {
