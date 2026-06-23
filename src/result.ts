@@ -1,4 +1,9 @@
-import { FlattenError, InvalidArgumentError, PanicError } from './errors';
+import {
+    FlattenError,
+    InvalidArgumentError,
+    PanicError,
+    TransposeError
+} from './errors';
 import { type Either, Left, Right, isLeft, isRight } from './either';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -285,6 +290,16 @@ interface ResultMethods<T, E> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     flatten<U, F>(this: Result<Result<U, F>, E>): Result<U, E | F>;
+
+    /**
+     * Transposes a `Result` of an `Option` into an `Option` of a `Result`.
+     *
+     * `Ok(None)` will be mapped to `None`. `Ok(Some(_))` and `Err(_)` will be mapped to
+     * `Some(Ok(_))` and `Some(Err(_))`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    transpose<T, E>(this: Result<Option<T>, E>): Option<Result<T, E>>;
 
     /**
      * Matches the `Result` with two functions, one for each variant.
@@ -651,6 +666,21 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
             );
 
         return state.right;
+    }
+
+    transpose<T, E>(this: Result<Option<T>, E>): Option<Result<T, E>> {
+        const _this = this as ResultImpl<Option<T>, E>;
+        const state = _this.#state;
+
+        if (isLeft(state)) return Some(Err(state.left));
+
+        if (typeof state.right._isSome !== 'boolean')
+            throw new TransposeError(
+                'transpose can only be called on Result<Option<T>, E>'
+            );
+
+        const inner = state.right;
+        return inner.isSome() ? Some(Ok(inner.unwrap())) : None();
     }
 
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U {
