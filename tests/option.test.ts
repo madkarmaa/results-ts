@@ -327,6 +327,18 @@ describe('Option', () => {
         expect(() => Some(42).flatten()).toThrow(FlattenError);
     });
 
+    test('unzip', () => {
+        const [a, b] = Some([42, 'hello'] as [number, string]).unzip();
+        expect(a.unwrap()).toBe(42);
+        expect(b.unwrap()).toBe('hello');
+
+        const [na, nb] = None<[number, string]>().unzip();
+        expect(na.isNone()).toBe(true);
+        expect(nb.isNone()).toBe(true);
+        // @ts-expect-error - unzip should only be called on Option<[T, U]>
+        expect(() => Some(42).unzip()).toThrow(TypeError);
+    });
+
     test('match', () => {
         expect(
             Some(5).match({
