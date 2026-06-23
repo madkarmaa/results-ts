@@ -183,6 +183,14 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
      * with `TransposeError` rather than a synchronous throw.
      */
     transpose<T, E>(this: AsyncOption<Result<T, E>>): AsyncResult<Option<T>, E>;
+    
+    /**
+     * Unzips an `AsyncOption` containing a tuple of two values.
+     *
+     * If `self` resolves to `Some((a, b))` this method returns `(AsyncOption(a), AsyncOption(b))`.
+     * Otherwise, `(AsyncOption(None), AsyncOption(None))` is returned.
+     */
+    unzip<T, U>(this: AsyncOption<[T, U]>): [AsyncOption<T>, AsyncOption<U>];
 
     /**
      * Matches the `Option` with two functions, one for each variant.
@@ -331,6 +339,16 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         this: AsyncOptionImpl<Result<T, E>>
     ): AsyncResult<Option<T>, E> {
         return new AsyncResultImpl(this.then((opt) => opt.transpose()));
+    }
+  
+    unzip<T, U>(
+        this: AsyncOptionImpl<[T, U]>
+    ): [AsyncOption<T>, AsyncOption<U>] {
+        const pair = this.then((opt) => opt.unzip());
+        return [
+            new AsyncOptionImpl(pair.then(([a]) => a)),
+            new AsyncOptionImpl(pair.then(([, b]) => b))
+        ];
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): Promise<U> {

@@ -99,6 +99,22 @@ describe('Option types', () => {
         // @ts-expect-error - transpose can only be called on Option<Result<T, E>>
         Some(42).transpose();
     });
+    
+    test('unzip splits Option<[T, U]> into a tuple of two Options', () => {
+        const someTuple = Some([42, 'hello']) as Option<[number, string]>;
+        const noneTuple = None<[number, string]>();
+
+        expectTypeOf(someTuple.unzip()).toEqualTypeOf<
+            [Option<number>, Option<string>]
+        >();
+        expectTypeOf(noneTuple.unzip()).toEqualTypeOf<
+            [Option<number>, Option<string>]
+        >();
+
+        // unzip requires the inner value to be a 2-tuple
+        // @ts-expect-error - unzip can only be called on Option<[T, U]>
+        Some(42).unzip();
+    });
 });
 
 describe('Result types', () => {
@@ -227,6 +243,18 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
         // flatten requires the inner value to be an Option
         // @ts-expect-error - flatten can only be called on AsyncOption<Option<T>>
         (({}) as AsyncOption<number>).flatten();
+    });
+
+    test('AsyncOption.unzip splits AsyncOption<[T, U]> into a tuple of two AsyncOptions', () => {
+        const nestedOpt = {} as AsyncOption<[number, string]>;
+
+        expectTypeOf(nestedOpt.unzip()).toEqualTypeOf<
+            [AsyncOption<number>, AsyncOption<string>]
+        >();
+
+        // unzip requires the inner value to be a 2-tuple
+        // @ts-expect-error - unzip can only be called on AsyncOption<[T, U]>
+        (({}) as AsyncOption<number>).unzip();
     });
 
     test('AsyncResult.flatten unwraps AsyncResult<Result<T, F>, E> to AsyncResult<T, E | F>', () => {

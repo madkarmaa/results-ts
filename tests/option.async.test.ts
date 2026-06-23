@@ -489,6 +489,26 @@ describe('Option async methods', () => {
             TransposeError
         );
     });
+    
+    test('unzip', async () => {
+        const nested = Some<[number, string]>([42, 'hello']).mapAsync(
+            async (x) => x
+        );
+        const [a, b] = nested.unzip();
+        expect(await a.unwrap()).toBe(42);
+        expect(await b.unwrap()).toBe('hello');
+
+        const noneNested = None<[number, string]>().mapAsync(async (x) => x);
+        const [na, nb] = noneNested.unzip();
+        expect(await na.isNone()).toBe(true);
+        expect(await nb.isNone()).toBe(true);
+
+        const invalid = Some(42).mapAsync(async (x) => x);
+        // @ts-expect-error - unzip should only be called on AsyncOption<[T, U]>
+        const [rejA, rejB] = invalid.unzip();
+        await expect(rejA).rejects.toThrow(TypeError);
+        await expect(rejB).rejects.toThrow(TypeError);
+    });
 
     test('match', async () => {
         const some = Some(5).mapAsync(async (x) => x);
