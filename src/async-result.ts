@@ -230,24 +230,20 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return Promise.resolve(this.promise).then(onfulfilled, onrejected);
     }
 
-    async isOk(): Promise<boolean> {
-        const res = await this;
-        return res.isOk();
+    isOk(): Promise<boolean> {
+        return this.then((res) => res.isOk());
     }
 
-    async isOkAnd(f: (val: T) => boolean): Promise<boolean> {
-        const res = await this;
-        return res.isOkAnd(f);
+    isOkAnd(f: (val: T) => boolean): Promise<boolean> {
+        return this.then((res) => res.isOkAnd(f));
     }
 
-    async isErr(): Promise<boolean> {
-        const res = await this;
-        return res.isErr();
+    isErr(): Promise<boolean> {
+        return this.then((res) => res.isErr());
     }
 
-    async isErrAnd(f: (err: E) => boolean): Promise<boolean> {
-        const res = await this;
-        return res.isErrAnd(f);
+    isErrAnd(f: (err: E) => boolean): Promise<boolean> {
+        return this.then((res) => res.isErrAnd(f));
     }
 
     ok(): AsyncOption<T> {
@@ -266,25 +262,19 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.mapAsync(f)));
     }
 
-    async mapOr<U>(fallback: U, f: (val: T) => U): Promise<U> {
-        const res = await this;
-        return res.mapOr(fallback, f);
+    mapOr<U>(fallback: U, f: (val: T) => U): Promise<U> {
+        return this.then((res) => res.mapOr(fallback, f));
     }
 
-    async mapOrElse<U>(
-        fallbackFn: (err: E) => U,
-        f: (val: T) => U
-    ): Promise<U> {
-        const res = await this;
-        return res.mapOrElse(fallbackFn, f);
+    mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): Promise<U> {
+        return this.then((res) => res.mapOrElse(fallbackFn, f));
     }
 
-    async mapOrElseAsync<U>(
+    mapOrElseAsync<U>(
         fallbackFn: (err: E) => PromiseLike<U>,
         f: (val: T) => PromiseLike<U>
     ): Promise<U> {
-        const res = await this;
-        return await res.mapOrElseAsync(fallbackFn, f);
+        return this.then((res) => res.mapOrElseAsync(fallbackFn, f));
     }
 
     mapErr<F>(f: (err: E) => F): AsyncResult<T, F> {
@@ -311,24 +301,20 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.inspectErrAsync(f)));
     }
 
-    async expect(msg: string): Promise<T> {
-        const res = await this;
-        return res.expect(msg);
+    expect(msg: string): Promise<T> {
+        return this.then((res) => res.expect(msg));
     }
 
-    async unwrap(): Promise<T> {
-        const res = await this;
-        return res.unwrap();
+    unwrap(): Promise<T> {
+        return this.then((res) => res.unwrap());
     }
 
-    async expectErr(msg: string): Promise<E> {
-        const res = await this;
-        return res.expectErr(msg);
+    expectErr(msg: string): Promise<E> {
+        return this.then((res) => res.expectErr(msg));
     }
 
-    async unwrapErr(): Promise<E> {
-        const res = await this;
-        return res.unwrapErr();
+    unwrapErr(): Promise<E> {
+        return this.then((res) => res.unwrapErr());
     }
 
     and<U, E2>(res: Result<U, E2>): AsyncResult<U, E | E2> {
@@ -359,21 +345,16 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.orElseAsync(f)));
     }
 
-    async unwrapOr<T2>(fallback: T2): Promise<T | T2> {
-        const res = await this;
-        return res.unwrapOr(fallback);
+    unwrapOr<T2>(fallback: T2): Promise<T | T2> {
+        return this.then((res) => res.unwrapOr(fallback));
     }
 
-    async unwrapOrElse<T2>(f: (err: E) => T2): Promise<T | T2> {
-        const res = await this;
-        return res.unwrapOrElse(f);
+    unwrapOrElse<T2>(f: (err: E) => T2): Promise<T | T2> {
+        return this.then((res) => res.unwrapOrElse(f));
     }
 
-    async unwrapOrElseAsync<T2>(
-        f: (err: E) => PromiseLike<T2>
-    ): Promise<T | T2> {
-        const res = await this;
-        return await res.unwrapOrElseAsync(f);
+    unwrapOrElseAsync<T2>(f: (err: E) => PromiseLike<T2>): Promise<T | T2> {
+        return this.then((res) => res.unwrapOrElseAsync(f));
     }
 
     flatten<U, F>(
@@ -382,11 +363,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.flatten()));
     }
 
-    async match<U>(handlers: {
-        Ok: (val: T) => U;
-        Err: (err: E) => U;
-    }): Promise<U> {
-        const res = await this;
-        return res.match(handlers);
+    match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): Promise<U> {
+        return this.then((res) => res.match(handlers));
     }
 }

@@ -5,7 +5,6 @@
         "target": "ESNext",
         "module": "ESNext",
         "moduleDetection": "force",
-        "jsx": "react-jsx",
 
         // Module resolution
         "moduleResolution": "bundler",
@@ -24,6 +23,6 @@
         "noUnusedParameters": true,
         "noPropertyAccessFromIndexSignature": false
     },
-    "include": ["src", "tests"],
+    "include": ["src", "tests", "bench"],
     "exclude": ["node_modules", "dist"]
 }

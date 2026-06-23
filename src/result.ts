@@ -364,7 +364,10 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
 
-        if (isLeft(state)) return new ResultImpl(state);
+        // Err path: the wrapped value is unchanged, so reuse `this` to avoid an
+        // extra allocation. The Ok type is narrowed to `U` via a cast - safe
+        // because the value is never read on an `Err`.
+        if (isLeft(state)) return this as unknown as ResultImpl<U, E>;
 
         const mappedValue = f(state.right);
         return new ResultImpl(Right(mappedValue));
@@ -429,7 +432,11 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
 
         if (isLeft(state)) return new ResultImpl(Left(f(state.left)));
-        return new ResultImpl(Right(state.right));
+
+        // Ok path: the wrapped value is unchanged, so reuse `this`. The Err
+        // type is narrowed to `F` via a cast - safe because the value is never
+        // read on an `Ok`.
+        return this as unknown as ResultImpl<T, F>;
     }
 
     mapErrAsync<F>(f: (err: E) => PromiseLike<F>): AsyncResult<T, F> {
@@ -525,7 +532,9 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state))
-            throw new PanicError(`${msg}: "${String(state.right)}"`);
+            throw new PanicError(`${msg}: "${String(state.right)}"`, {
+                cause: state.right
+            });
         return state.left;
     }
 
@@ -533,18 +542,19 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isRight(state))
             throw new PanicError(
-                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(state.right)}"`
+                `called \`Result.unwrapErr()\` on an \`Ok\` value: "${String(state.right)}"`,
+                { cause: state.right }
             );
         return state.left;
     }
 
     and<U, E2>(res: Result<U, E2>): Result<U, E | E2> {
-        if (!(res instanceof ResultImpl))
+        if (typeof res._isOk !== 'boolean')
             throw new InvalidArgumentError('Argument must be a Result');
 
         const state = this.#state;
         if (isRight(state)) return res;
-        return new ResultImpl(Left(state.left));
+        return this as unknown as ResultImpl<U, E | E2>;
     }
 
     andThen<U, F>(f: (val: T) => Result<U, F>): Result<U, E | F> {
@@ -572,12 +582,12 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
-        if (!(res instanceof ResultImpl))
+        if (typeof res._isOk !== 'boolean')
             throw new InvalidArgumentError('Argument must be a Result');
 
         const state = this.#state;
         if (isLeft(state)) return res;
-        return new ResultImpl(Right(state.right));
+        return this as unknown as ResultImpl<T | T2, F>;
     }
 
     orElse<T2, F>(f: (err: E) => Result<T2, F>): Result<T | T2, F> {

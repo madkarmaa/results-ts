@@ -297,6 +297,7 @@ interface OptionMethods<T> {
 
 const noneValue = { _tag: 'NoneValue' } as const;
 type NoneValue = typeof noneValue;
+const noneEither = Left(noneValue); // immutable shared reference
 
 class OptionImpl<T> implements OptionMethods<T> {
     #state: Either<NoneValue, T>;
@@ -510,7 +511,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     and<U>(optb: Option<U>): Option<U> {
-        if (!(optb instanceof OptionImpl))
+        if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
@@ -565,7 +566,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     or<T2>(optb: Option<T2>): Option<T | T2> {
-        if (!(optb instanceof OptionImpl))
+        if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
@@ -593,11 +594,11 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     xor<T2>(optb: Option<T2>): Option<T | T2> {
-        if (!(optb instanceof OptionImpl))
+        if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
         const thisIsSome = isRight(this.#state);
-        const optbIsSome = optb.isSome();
+        const optbIsSome = optb._isSome;
 
         if (thisIsSome && !optbIsSome) return this;
         if (!thisIsSome && optbIsSome) return optb;
@@ -700,7 +701,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state)) {
-            this.#state = Left(noneValue);
+            this.#state = noneEither;
             return Some(state.right);
         }
 
@@ -714,7 +715,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#invalidatePendingInsert();
         const state = this.#state;
         if (isRight(state) && predicate(state.right)) {
-            this.#state = Left(noneValue);
+            this.#state = noneEither;
             return Some(state.right);
         }
 
@@ -778,5 +779,5 @@ export function Some<T>(value: T): Option<T> {
  * @returns An `Option` representing the absence of a value.
  */
 export function None<T = never>(): Option<T> {
-    return new OptionImpl(Left(noneValue));
+    return new OptionImpl(noneEither);
 }
