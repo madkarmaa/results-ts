@@ -57,4 +57,35 @@ bench('AsyncResult.then (await)', async () => {
     await okAsync;
 }).gc('once');
 
+// --- Perf 6: sync-type *Async methods (still `async` in source) ---
+// These wrap both branches in an extra Promise. Measure the fast path
+// (Some/Ok returns value) and the slow path (None/Err calls f).
+const noneOpt = None<number>();
+const errResult = Err<number>(1);
+
+bench('Option.unwrapOrElseAsync (Some fast path)', async () => {
+    await Some(1).unwrapOrElseAsync(async () => 2);
+}).gc('once');
+bench('Option.unwrapOrElseAsync (None slow path)', async () => {
+    await noneOpt.unwrapOrElseAsync(async () => 2);
+}).gc('once');
+bench('Option.mapOrElseAsync (None slow path)', async () => {
+    await noneOpt.mapOrElseAsync(
+        async () => 0,
+        async (x) => x + 1
+    );
+}).gc('once');
+bench('Result.unwrapOrElseAsync (Ok fast path)', async () => {
+    await Ok(1).unwrapOrElseAsync(async () => 2);
+}).gc('once');
+bench('Result.unwrapOrElseAsync (Err slow path)', async () => {
+    await errResult.unwrapOrElseAsync(async () => 2);
+}).gc('once');
+bench('Result.mapOrElseAsync (Err slow path)', async () => {
+    await errResult.mapOrElseAsync(
+        async () => 0,
+        async (x) => x + 1
+    );
+}).gc('once');
+
 await run();

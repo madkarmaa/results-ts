@@ -409,7 +409,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return isLeft(state) ? fallbackFn(state.left) : f(state.right);
     }
 
-    async mapOrElseAsync<U>(
+    mapOrElseAsync<U>(
         fallbackFn: (err: E) => PromiseLike<U>,
         f: (val: T) => PromiseLike<U>
     ): Promise<U> {
@@ -422,7 +422,9 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
         const state = this.#state;
-        return isLeft(state) ? fallbackFn(state.left) : f(state.right);
+        return isLeft(state)
+            ? Promise.resolve(fallbackFn(state.left))
+            : Promise.resolve(f(state.right));
     }
 
     mapErr<F>(f: (err: E) => F): Result<T, F> {
@@ -627,14 +629,14 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return isLeft(state) ? f(state.left) : state.right;
     }
 
-    async unwrapOrElseAsync<T2>(
-        f: (err: E) => PromiseLike<T2>
-    ): Promise<T | T2> {
+    unwrapOrElseAsync<T2>(f: (err: E) => PromiseLike<T2>): Promise<T | T2> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        return isLeft(state) ? f(state.left) : state.right;
+        return isLeft(state)
+            ? Promise.resolve(f(state.left))
+            : Promise.resolve(state.right);
     }
 
     flatten<U, F>(this: Result<Result<U, F>, E>): Result<U, E | F> {
