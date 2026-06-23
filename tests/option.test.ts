@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, PanicError } from '../src/errors';
+import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
 
 describe('Option', () => {
     test('construction', () => {
@@ -198,6 +198,58 @@ describe('Option', () => {
         expect(None().xor(Some(10)).unwrap()).toBe(10);
         expect(Some(5).xor(Some(10)).isNone()).toBe(true);
         expect(None().xor(None()).isNone()).toBe(true);
+    });
+
+    describe('and/or/xor structural validation', () => {
+        // A duck-typed Option: carries the `_isSome` discriminator the
+        // structural check looks for. Mimics an Option created in a different
+        // realm / from a duplicate install where `instanceof` would fail.
+        const duckTypedSome = { _isSome: true } as unknown as ReturnType<
+            typeof Some<number>
+        >;
+        const duckTypedNone = { _isSome: false } as unknown as ReturnType<
+            typeof None<number>
+        >;
+
+        test('and accepts a duck-typed Option', () => {
+            // `and` returns the foreign value verbatim on the Some-self
+            // branch, so assert via the discriminator (a duck-typed Option
+            // has no instance methods).
+            expect(
+                (Some(5).and(duckTypedSome) as { _isSome: boolean })._isSome
+            ).toBe(true);
+            expect(None().and(duckTypedSome).isNone()).toBe(true);
+        });
+
+        test('or accepts a duck-typed Option', () => {
+            expect(
+                (None().or(duckTypedSome) as { _isSome: boolean })._isSome
+            ).toBe(true);
+            expect(Some(5).or(duckTypedNone).unwrap()).toBe(5);
+        });
+
+        test('xor accepts a duck-typed Option', () => {
+            // Some xor None returns the Some (self), None xor Some returns
+            // the foreign value verbatim -> assert via discriminator.
+            expect(Some(5).xor(duckTypedNone).unwrap()).toBe(5);
+            expect(
+                (None().xor(duckTypedSome) as { _isSome: boolean })._isSome
+            ).toBe(true);
+            expect(Some(5).xor(duckTypedSome).isNone()).toBe(true);
+        });
+
+        test('non-Option values are rejected', () => {
+            expect(() => Some(5).and({} as never)).toThrow(
+                InvalidArgumentError
+            );
+            expect(() => Some(5).and({ _isSome: 'yes' } as never)).toThrow(
+                InvalidArgumentError
+            );
+            expect(() => None().or(42 as never)).toThrow(InvalidArgumentError);
+            expect(() => Some(5).xor('x' as never)).toThrow(
+                InvalidArgumentError
+            );
+        });
     });
 
     test('insert', () => {

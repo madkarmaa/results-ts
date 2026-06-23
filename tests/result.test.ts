@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Ok, Err } from '../src/result';
-import { FlattenError, PanicError } from '../src/errors';
+import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
 
 describe('Result', () => {
     test('construction', () => {
@@ -256,6 +256,52 @@ describe('Result', () => {
                 Err: (err) => `Error code is ${err.code}`
             })
         ).toBe('Error code is ERR');
+    });
+
+    describe('and/or structural validation', () => {
+        // A duck-typed Result: carries the `_isOk` discriminator the structural
+        // check looks for. Mimics a Result created in a different realm / from
+        // a duplicate install where `instanceof` would fail.
+        const duckTypedOk = { _isOk: true } as unknown as ReturnType<
+            typeof Ok<number>
+        >;
+        const duckTypedErr = { _isOk: false } as unknown as ReturnType<
+            typeof Err<{ code: string }>
+        >;
+
+        test('and accepts a duck-typed Result', () => {
+            // `and` returns the foreign value verbatim on the Ok-self branch,
+            // so assert via the discriminator (a duck-typed Result has no
+            // instance methods).
+            expect((Ok(5).and(duckTypedOk) as { _isOk: boolean })._isOk).toBe(
+                true
+            );
+            expect((Ok(5).and(duckTypedErr) as { _isOk: boolean })._isOk).toBe(
+                false
+            );
+            // Err self short-circuits, ignoring the foreign value
+            expect(Err({ code: 'E' }).and(duckTypedOk).isErr()).toBe(true);
+        });
+
+        test('or accepts a duck-typed Result', () => {
+            expect(
+                (Err({ code: 'E' }).or(duckTypedOk) as { _isOk: boolean })._isOk
+            ).toBe(true);
+            expect(
+                (Err({ code: 'E' }).or(duckTypedErr) as { _isOk: boolean })
+                    ._isOk
+            ).toBe(false);
+            // Ok self short-circuits, ignoring the foreign value
+            expect(Ok(5).or(duckTypedErr).isOk()).toBe(true);
+        });
+
+        test('non-Result values are rejected', () => {
+            expect(() => Ok(5).and({} as never)).toThrow(InvalidArgumentError);
+            expect(() => Ok(5).and({ _isOk: 'yes' } as never)).toThrow(
+                InvalidArgumentError
+            );
+            expect(() => Ok(5).or(42 as never)).toThrow(InvalidArgumentError);
+        });
     });
 
     describe('Complex usage tests', () => {
