@@ -365,7 +365,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
 
         // Err path: the wrapped value is unchanged, so reuse `this` to avoid an
-        // extra allocation. The Ok type is narrowed to `U` via a cast — safe
+        // extra allocation. The Ok type is narrowed to `U` via a cast - safe
         // because the value is never read on an `Err`.
         if (isLeft(state)) return this as unknown as ResultImpl<U, E>;
 
@@ -432,8 +432,9 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
 
         if (isLeft(state)) return new ResultImpl(Left(f(state.left)));
+
         // Ok path: the wrapped value is unchanged, so reuse `this`. The Err
-        // type is narrowed to `F` via a cast — safe because the value is never
+        // type is narrowed to `F` via a cast - safe because the value is never
         // read on an `Ok`.
         return this as unknown as ResultImpl<T, F>;
     }
@@ -553,7 +554,6 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state)) return res;
-        // Err path: reuse `this`, narrowing Ok from `T` to `U`.
         return this as unknown as ResultImpl<U, E | E2>;
     }
 
@@ -587,7 +587,6 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state)) return res;
-        // Ok path: reuse `this`, narrowing Err from `E` to `F`.
         return this as unknown as ResultImpl<T | T2, F>;
     }
 
