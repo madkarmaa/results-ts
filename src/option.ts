@@ -288,6 +288,16 @@ interface OptionMethods<T> {
     flatten<U>(this: Option<Option<U>>): Option<U>;
 
     /**
+     * Unzips an `Option` containing a tuple of two values.
+     *
+     * If `self` is `Some((a, b))` this method returns `(Some(a), Some(b))`. Otherwise, `(None, None)`
+     * is returned.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>];
+
+    /**
      * Matches the `Option` with two functions, one for each variant.
      *
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
@@ -747,6 +757,16 @@ class OptionImpl<T> implements OptionMethods<T> {
             );
 
         return state.right;
+    }
+
+    unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>] {
+        const _this = this as OptionImpl<[T, U]>;
+        const state = _this.#state;
+
+        if (isLeft(state)) return [None(), None()];
+
+        const [a, b] = state.right;
+        return [Some(a), Some(b)];
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {
