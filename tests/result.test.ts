@@ -270,9 +270,6 @@ describe('Result', () => {
         >;
 
         test('and accepts a duck-typed Result', () => {
-            // `and` returns the foreign value verbatim on the Ok-self branch,
-            // so assert via the discriminator (a duck-typed Result has no
-            // instance methods).
             expect((Ok(5).and(duckTypedOk) as { _isOk: boolean })._isOk).toBe(
                 true
             );
@@ -291,7 +288,6 @@ describe('Result', () => {
                 (Err({ code: 'E' }).or(duckTypedErr) as { _isOk: boolean })
                     ._isOk
             ).toBe(false);
-            // Ok self short-circuits, ignoring the foreign value
             expect(Ok(5).or(duckTypedErr).isOk()).toBe(true);
         });
 

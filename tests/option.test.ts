@@ -212,9 +212,6 @@ describe('Option', () => {
         >;
 
         test('and accepts a duck-typed Option', () => {
-            // `and` returns the foreign value verbatim on the Some-self
-            // branch, so assert via the discriminator (a duck-typed Option
-            // has no instance methods).
             expect(
                 (Some(5).and(duckTypedSome) as { _isSome: boolean })._isSome
             ).toBe(true);
@@ -229,8 +226,6 @@ describe('Option', () => {
         });
 
         test('xor accepts a duck-typed Option', () => {
-            // Some xor None returns the Some (self), None xor Some returns
-            // the foreign value verbatim -> assert via discriminator.
             expect(Some(5).xor(duckTypedNone).unwrap()).toBe(5);
             expect(
                 (None().xor(duckTypedSome) as { _isSome: boolean })._isSome
