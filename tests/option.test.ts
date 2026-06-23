@@ -333,6 +333,21 @@ describe('Option', () => {
         expect(() => Some(42).flatten()).toThrow(FlattenError);
     });
 
+    test('flatten accepts a duck-typed (cross-realm) Option', () => {
+        // Mimics an inner Option created in a different realm / from a
+        // duplicate install where `instanceof` would fail. Only the
+        // `_isSome` discriminator is carried.
+        const duckTypedSome = { _isSome: true } as unknown as Option<number>;
+        expect(
+            (Some(duckTypedSome).flatten() as { _isSome: boolean })._isSome
+        ).toBe(true);
+
+        const duckTypedNone = { _isSome: false } as unknown as Option<number>;
+        expect(
+            (Some(duckTypedNone).flatten() as { _isSome: boolean })._isSome
+        ).toBe(false);
+    });
+
     test('transpose', () => {
         expect(Some(Ok(42)).transpose().unwrap().unwrap()).toBe(42);
         expect(Some(Err<string>('oops')).transpose().unwrapErr()).toBe('oops');

@@ -766,7 +766,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const _this = this as OptionImpl<Option<U>>;
         const state = _this.#state;
 
-        if (!isRight(state) || !(state.right instanceof OptionImpl))
+        if (!isRight(state) || typeof state.right._isSome !== 'boolean')
             throw new FlattenError(
                 'flatten can only be called on Option<Option<T>>'
             );

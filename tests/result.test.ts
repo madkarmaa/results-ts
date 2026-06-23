@@ -247,6 +247,27 @@ describe('Result', () => {
         expect(() => Ok(42).flatten()).toThrow(FlattenError);
     });
 
+    test('flatten accepts a duck-typed (cross-realm) Result', () => {
+        // Mimics an inner Result created in a different realm / from a
+        // duplicate install where `instanceof` would fail. Only the
+        // `_isOk` discriminator is carried.
+        const duckTypedOk = { _isOk: true } as unknown as Result<
+            number,
+            string
+        >;
+        expect((Ok(duckTypedOk).flatten() as { _isOk: boolean })._isOk).toBe(
+            true
+        );
+
+        const duckTypedErr = { _isOk: false } as unknown as Result<
+            number,
+            string
+        >;
+        expect((Ok(duckTypedErr).flatten() as { _isOk: boolean })._isOk).toBe(
+            false
+        );
+    });
+
     test('transpose', () => {
         expect(Ok(Some(42)).transpose().unwrap().unwrap()).toBe(42);
         expect(Ok(None<number>()).transpose().isNone()).toBe(true);

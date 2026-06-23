@@ -660,7 +660,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         if (isLeft(state)) return new ResultImpl(Left(state.left));
 
-        if (!(state.right instanceof ResultImpl))
+        if (typeof state.right._isOk !== 'boolean')
             throw new FlattenError(
                 'flatten can only be called on Result<Result<T, E>, E>'
             );
