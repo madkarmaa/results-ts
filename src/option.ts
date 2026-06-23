@@ -386,12 +386,14 @@ class OptionImpl<T> implements OptionMethods<T> {
         return isRight(state) ? state.right : f();
     }
 
-    async unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T> {
+    unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T> {
         if (typeof f !== 'function')
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        return isRight(state) ? state.right : f();
+        return isRight(state)
+            ? Promise.resolve(state.right)
+            : Promise.resolve(f());
     }
 
     map<U>(f: (val: T) => U): Option<U> {
@@ -463,7 +465,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         return isRight(state) ? f(state.right) : defaultF();
     }
 
-    async mapOrElseAsync<U>(
+    mapOrElseAsync<U>(
         defaultF: () => PromiseLike<U>,
         f: (val: T) => PromiseLike<U>
     ): Promise<U> {
@@ -476,7 +478,9 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
         const state = this.#state;
-        return isRight(state) ? f(state.right) : defaultF();
+        return isRight(state)
+            ? Promise.resolve(f(state.right))
+            : Promise.resolve(defaultF());
     }
 
     okOr<E>(err: E): Result<T, E> {

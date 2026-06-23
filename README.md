@@ -94,6 +94,36 @@ const displayName = parseNickname('  Ada  ')
 console.log(displayName);
 ```
 
+### Plain HTML
+
+You can also use `results-ts` directly in the browser without a bundler. Import it from a CDN in a `<script type="module">` (the `type="module"` attribute is required, since this is an ES module):
+
+```html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>results-ts Demo</title>
+    </head>
+
+    <body>
+        <code style="font-size: 1.5rem">
+            Ok(1).map((x) => x + 1).unwrap() =
+            <span id="result" style="color: #f00">Loading...</span>
+        </code>
+
+        <script type="module">
+            import { Ok } from 'https://unpkg.com/results-ts/dist/index.js';
+
+            document.querySelector('#result').textContent = Ok(1)
+                .map((x) => x + 1)
+                .unwrap();
+        </script>
+    </body>
+</html>
+```
+
 ## How this differs from Rust
 
 Rust uses the `match` keyword syntax; this library provides a `.match()` method on both `Result` and `Option` to achieve the same branching style in TypeScript.
