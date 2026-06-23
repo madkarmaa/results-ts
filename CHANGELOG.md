@@ -1,3 +1,9 @@
+## [4.1.0](https://github.com/madkarmaa/results-ts/compare/v4.0.1...v4.1.0) (2026-06-23)
+
+### Features
+
+- add transpose and unzip for Option/Result and async variants ([42cddaf](https://github.com/madkarmaa/results-ts/commit/42cddafe39e18f674f982f8ea855ddea810d3110))
+
 ## [4.0.1](https://github.com/madkarmaa/results-ts/compare/v4.0.0...v4.0.1) (2026-06-23)
 
 ### Bug Fixes
