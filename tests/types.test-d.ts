@@ -65,6 +65,20 @@ describe('Option types', () => {
             Result<number, string>
         >();
     });
+
+    test('flatten unwraps nested Option<Option<T>> to Option<T>', () => {
+        const nestedSome = Some(Some(42));
+        const nestedNone = Some(None<number>());
+        const outerNone = None<Option<number>>();
+
+        expectTypeOf(nestedSome.flatten()).toEqualTypeOf<Option<number>>();
+        expectTypeOf(nestedNone.flatten()).toEqualTypeOf<Option<number>>();
+        expectTypeOf(outerNone.flatten()).toEqualTypeOf<Option<number>>();
+
+        // flatten requires an outer Option whose value is itself an Option
+        // @ts-expect-error - flatten can only be called on Option<Option<T>>
+        Some(42).flatten();
+    });
 });
 
 describe('Result types', () => {
@@ -115,6 +129,25 @@ describe('Result types', () => {
         expectTypeOf(res.ok()).toEqualTypeOf<Option<number>>();
         expectTypeOf(res.err()).toEqualTypeOf<Option<string>>();
     });
+
+    test('flatten unwraps nested Result<Result<T, F>, E> to Result<T, E | F>', () => {
+        const okNested = Ok(Ok(42)) as Result<Result<number, string>, Error>;
+        const errNested = Err(new Error('e')) as Result<
+            Result<number, string>,
+            Error
+        >;
+
+        expectTypeOf(okNested.flatten()).toEqualTypeOf<
+            Result<number, string | Error>
+        >();
+        expectTypeOf(errNested.flatten()).toEqualTypeOf<
+            Result<number, string | Error>
+        >();
+
+        // flatten requires an outer Result whose Ok value is itself a Result
+        // @ts-expect-error - flatten can only be called on Result<Result<T, F>, E>
+        Ok(42).flatten();
+    });
 });
 
 describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
@@ -144,5 +177,27 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
         >();
         expectTypeOf(asyncRes.ok()).toEqualTypeOf<AsyncOption<number>>();
         expectTypeOf(asyncRes.err()).toEqualTypeOf<AsyncOption<string>>();
+    });
+
+    test('AsyncOption.flatten unwraps AsyncOption<Option<T>> to AsyncOption<T>', () => {
+        const nestedOpt = {} as AsyncOption<Option<number>>;
+
+        expectTypeOf(nestedOpt.flatten()).toEqualTypeOf<AsyncOption<number>>();
+
+        // flatten requires the inner value to be an Option
+        // @ts-expect-error - flatten can only be called on AsyncOption<Option<T>>
+        (({}) as AsyncOption<number>).flatten();
+    });
+
+    test('AsyncResult.flatten unwraps AsyncResult<Result<T, F>, E> to AsyncResult<T, E | F>', () => {
+        const nestedRes = {} as AsyncResult<Result<number, string>, Error>;
+
+        expectTypeOf(nestedRes.flatten()).toEqualTypeOf<
+            AsyncResult<number, string | Error>
+        >();
+
+        // flatten requires the inner Ok value to be a Result
+        // @ts-expect-error - flatten can only be called on AsyncResult<Result<T, F>, E>
+        (({}) as AsyncResult<number, string>).flatten();
     });
 });
