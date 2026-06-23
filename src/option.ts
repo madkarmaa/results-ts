@@ -297,12 +297,7 @@ interface OptionMethods<T> {
 
 const noneValue = { _tag: 'NoneValue' } as const;
 type NoneValue = typeof noneValue;
-
-// `Either` objects are immutable (no code mutates `.left`/`.right`/`._tag`),
-// so the `Left(noneValue)` payload can be shared across every `None`/emptied
-// Option without aliasing issues — only the `OptionImpl` wrapper holds mutable
-// per-instance state, and that still allocates fresh per call.
-const noneEither = Left(noneValue);
+const noneEither = Left(noneValue); // immutable shared reference
 
 class OptionImpl<T> implements OptionMethods<T> {
     #state: Either<NoneValue, T>;
