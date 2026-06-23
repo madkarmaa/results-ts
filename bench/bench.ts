@@ -1,12 +1,3 @@
-/**
- * Local micro-benchmarks for the hot paths targeted by the perf changes.
- * Run with: `bun run bench/bench.ts` (or `npx tsx bench/bench.ts`).
- *
- * Uses `mitata` so the harness is runtime-agnostic (no runtime-specific APIs).
- * `.gc('once')` forces a GC pass before each timed run (mitata auto-warms),
- * matching the stabilization intent of the previous hand-rolled harness.
- */
-
 import { run, bench } from 'mitata';
 import { Ok, Err } from '../src/result';
 import { Some, None } from '../src/option';
