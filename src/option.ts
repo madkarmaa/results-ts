@@ -301,7 +301,7 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E>;
-  
+
     /**
      * Unzips an `Option` containing a tuple of two values.
      *
@@ -788,7 +788,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const inner = state.right;
         return inner.isOk() ? Ok(Some(inner.unwrap())) : Err(inner.unwrapErr());
     }
-    
+
     unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>] {
         const _this = this as OptionImpl<[T, U]>;
         const state = _this.#state;

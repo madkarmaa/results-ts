@@ -489,7 +489,7 @@ describe('Option async methods', () => {
             TransposeError
         );
     });
-    
+
     test('unzip', async () => {
         const nested = Some<[number, string]>([42, 'hello']).mapAsync(
             async (x) => x

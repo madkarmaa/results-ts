@@ -343,7 +343,7 @@ describe('Option', () => {
         // @ts-expect-error - transpose should only be called on Option<Result<T, E>>
         expect(() => Some(42).transpose()).toThrow(TransposeError);
     });
-    
+
     test('unzip', () => {
         const [a, b] = Some([42, 'hello'] as [number, string]).unzip();
         expect(a.unwrap()).toBe(42);

@@ -99,7 +99,7 @@ describe('Option types', () => {
         // @ts-expect-error - transpose can only be called on Option<Result<T, E>>
         Some(42).transpose();
     });
-    
+
     test('unzip splits Option<[T, U]> into a tuple of two Options', () => {
         const someTuple = Some([42, 'hello']) as Option<[number, string]>;
         const noneTuple = None<[number, string]>();
