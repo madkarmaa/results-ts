@@ -7,8 +7,6 @@
 
 This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
 
-> Inspired by [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc) by **Web Dev Simplified** and [vultix/ts-results](https://github.com/vultix/ts-results).
-
 ## Installation
 
 ```bash
@@ -139,6 +137,12 @@ Error classes are intentionally not exported, this encourages treating thrown Ja
 ## Contributing
 
 Interested in contributing? See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, development guidelines, and pull request expectations.
+
+## Attribution
+
+- **[Web Dev Simplified](https://www.youtube.com/@WebDevSimplified)** - concept from [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc).
+- **[vultix/ts-results](https://github.com/vultix/ts-results)**
+- **[supermacro/neverthrow](https://github.com/supermacro/neverthrow)**
 
 ## License
 

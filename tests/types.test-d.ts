@@ -79,6 +79,42 @@ describe('Option types', () => {
         // @ts-expect-error - flatten can only be called on Option<Option<T>>
         Some(42).flatten();
     });
+
+    test('transpose flips Option<Result<T, E>> to Result<Option<T>, E>', () => {
+        const someOk = Some(Ok(42)) as Option<Result<number, string>>;
+        const someErr = Some(Err('oops')) as Option<Result<number, string>>;
+        const outerNone = None<Result<number, string>>();
+
+        expectTypeOf(someOk.transpose()).toEqualTypeOf<
+            Result<Option<number>, string>
+        >();
+        expectTypeOf(someErr.transpose()).toEqualTypeOf<
+            Result<Option<number>, string>
+        >();
+        expectTypeOf(outerNone.transpose()).toEqualTypeOf<
+            Result<Option<number>, string>
+        >();
+
+        // transpose requires the inner value to be a Result
+        // @ts-expect-error - transpose can only be called on Option<Result<T, E>>
+        Some(42).transpose();
+    });
+
+    test('unzip splits Option<[T, U]> into a tuple of two Options', () => {
+        const someTuple = Some([42, 'hello']) as Option<[number, string]>;
+        const noneTuple = None<[number, string]>();
+
+        expectTypeOf(someTuple.unzip()).toEqualTypeOf<
+            [Option<number>, Option<string>]
+        >();
+        expectTypeOf(noneTuple.unzip()).toEqualTypeOf<
+            [Option<number>, Option<string>]
+        >();
+
+        // unzip requires the inner value to be a 2-tuple
+        // @ts-expect-error - unzip can only be called on Option<[T, U]>
+        Some(42).unzip();
+    });
 });
 
 describe('Result types', () => {
@@ -148,6 +184,26 @@ describe('Result types', () => {
         // @ts-expect-error - flatten can only be called on Result<Result<T, F>, E>
         Ok(42).flatten();
     });
+
+    test('transpose flips Result<Option<T>, E> to Option<Result<T, E>>', () => {
+        const okSome = Ok(Some(42)) as Result<Option<number>, string>;
+        const okNone = Ok(None<number>()) as Result<Option<number>, string>;
+        const errVal = Err('oops') as Result<Option<number>, string>;
+
+        expectTypeOf(okSome.transpose()).toEqualTypeOf<
+            Option<Result<number, string>>
+        >();
+        expectTypeOf(okNone.transpose()).toEqualTypeOf<
+            Option<Result<number, string>>
+        >();
+        expectTypeOf(errVal.transpose()).toEqualTypeOf<
+            Option<Result<number, string>>
+        >();
+
+        // transpose requires the inner Ok value to be an Option
+        // @ts-expect-error - transpose can only be called on Result<Option<T>, E>
+        Ok(42).transpose();
+    });
 });
 
 describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
@@ -189,6 +245,18 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
         (({}) as AsyncOption<number>).flatten();
     });
 
+    test('AsyncOption.unzip splits AsyncOption<[T, U]> into a tuple of two AsyncOptions', () => {
+        const nestedOpt = {} as AsyncOption<[number, string]>;
+
+        expectTypeOf(nestedOpt.unzip()).toEqualTypeOf<
+            [AsyncOption<number>, AsyncOption<string>]
+        >();
+
+        // unzip requires the inner value to be a 2-tuple
+        // @ts-expect-error - unzip can only be called on AsyncOption<[T, U]>
+        (({}) as AsyncOption<number>).unzip();
+    });
+
     test('AsyncResult.flatten unwraps AsyncResult<Result<T, F>, E> to AsyncResult<T, E | F>', () => {
         const nestedRes = {} as AsyncResult<Result<number, string>, Error>;
 
@@ -199,5 +267,29 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
         // flatten requires the inner Ok value to be a Result
         // @ts-expect-error - flatten can only be called on AsyncResult<Result<T, F>, E>
         (({}) as AsyncResult<number, string>).flatten();
+    });
+
+    test('AsyncOption.transpose flips AsyncOption<Result<T, E>> to AsyncResult<Option<T>, E>', () => {
+        const nestedOpt = {} as AsyncOption<Result<number, string>>;
+
+        expectTypeOf(nestedOpt.transpose()).toEqualTypeOf<
+            AsyncResult<Option<number>, string>
+        >();
+
+        // transpose requires the inner value to be a Result
+        // @ts-expect-error - transpose can only be called on AsyncOption<Result<T, E>>
+        (({}) as AsyncOption<number>).transpose();
+    });
+
+    test('AsyncResult.transpose flips AsyncResult<Option<T>, E> to AsyncOption<Result<T, E>>', () => {
+        const nestedRes = {} as AsyncResult<Option<number>, string>;
+
+        expectTypeOf(nestedRes.transpose()).toEqualTypeOf<
+            AsyncOption<Result<number, string>>
+        >();
+
+        // transpose requires the inner Ok value to be an Option
+        // @ts-expect-error - transpose can only be called on AsyncResult<Option<T>, E>
+        (({}) as AsyncResult<number, string>).transpose();
     });
 });

@@ -1,6 +1,12 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
+import { type Result, Ok, Err } from '../src/result';
+import {
+    FlattenError,
+    InvalidArgumentError,
+    PanicError,
+    TransposeError
+} from '../src/errors';
 
 describe('Option', () => {
     test('construction', () => {
@@ -325,6 +331,44 @@ describe('Option', () => {
         expect(None<Option<string>>().flatten().isNone()).toBe(true);
         // @ts-expect-error - flatten should only be called on Option<Option<T>>
         expect(() => Some(42).flatten()).toThrow(FlattenError);
+    });
+
+    test('flatten accepts a duck-typed (cross-realm) Option', () => {
+        // Mimics an inner Option created in a different realm / from a
+        // duplicate install where `instanceof` would fail. Only the
+        // `_isSome` discriminator is carried.
+        const duckTypedSome = { _isSome: true } as unknown as Option<number>;
+        expect(
+            (Some(duckTypedSome).flatten() as { _isSome: boolean })._isSome
+        ).toBe(true);
+
+        const duckTypedNone = { _isSome: false } as unknown as Option<number>;
+        expect(
+            (Some(duckTypedNone).flatten() as { _isSome: boolean })._isSome
+        ).toBe(false);
+    });
+
+    test('transpose', () => {
+        expect(Some(Ok(42)).transpose().unwrap().unwrap()).toBe(42);
+        expect(Some(Err<string>('oops')).transpose().unwrapErr()).toBe('oops');
+        expect(None<Result<number, string>>().transpose().isOk()).toBe(true);
+        expect(
+            None<Result<number, string>>().transpose().unwrap().isNone()
+        ).toBe(true);
+        // @ts-expect-error - transpose should only be called on Option<Result<T, E>>
+        expect(() => Some(42).transpose()).toThrow(TransposeError);
+    });
+
+    test('unzip', () => {
+        const [a, b] = Some([42, 'hello'] as [number, string]).unzip();
+        expect(a.unwrap()).toBe(42);
+        expect(b.unwrap()).toBe('hello');
+
+        const [na, nb] = None<[number, string]>().unzip();
+        expect(na.isNone()).toBe(true);
+        expect(nb.isNone()).toBe(true);
+        // @ts-expect-error - unzip should only be called on Option<[T, U]>
+        expect(() => Some(42).unzip()).toThrow(TypeError);
     });
 
     test('match', () => {

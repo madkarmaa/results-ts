@@ -18,3 +18,10 @@ export class FlattenError extends InvalidArgumentError {
         this.name = 'FlattenError';
     }
 }
+
+export class TransposeError extends InvalidArgumentError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'TransposeError';
+    }
+}

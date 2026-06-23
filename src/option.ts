@@ -1,4 +1,9 @@
-import { FlattenError, InvalidArgumentError, PanicError } from './errors';
+import {
+    FlattenError,
+    InvalidArgumentError,
+    PanicError,
+    TransposeError
+} from './errors';
 import { type Either, Left, Right, isLeft, isRight } from './either';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
@@ -286,6 +291,26 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     flatten<U>(this: Option<Option<U>>): Option<U>;
+
+    /**
+     * Transposes an `Option` of a `Result` into a `Result` of an `Option`.
+     *
+     * `Some(Ok(_))` is mapped to `Ok(Some(_))`, `Some(Err(_))` is mapped to `Err(_)`, and `None`
+     * will be mapped to `Ok(None)`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E>;
+
+    /**
+     * Unzips an `Option` containing a tuple of two values.
+     *
+     * If `self` is `Some((a, b))` this method returns `(Some(a), Some(b))`. Otherwise, `(None, None)`
+     * is returned.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>];
 
     /**
      * Matches the `Option` with two functions, one for each variant.
@@ -741,12 +766,37 @@ class OptionImpl<T> implements OptionMethods<T> {
         const _this = this as OptionImpl<Option<U>>;
         const state = _this.#state;
 
-        if (!isRight(state) || !(state.right instanceof OptionImpl))
+        if (!isRight(state) || typeof state.right._isSome !== 'boolean')
             throw new FlattenError(
                 'flatten can only be called on Option<Option<T>>'
             );
 
         return state.right;
+    }
+
+    transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E> {
+        if (this.isNone()) return Ok(None());
+
+        const _this = this as OptionImpl<Result<T, E>>;
+        const state = _this.#state;
+
+        if (!isRight(state) || typeof state.right._isOk !== 'boolean')
+            throw new TransposeError(
+                'transpose can only be called on Option<Result<T, E>>'
+            );
+
+        const inner = state.right;
+        return inner.isOk() ? Ok(Some(inner.unwrap())) : Err(inner.unwrapErr());
+    }
+
+    unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>] {
+        const _this = this as OptionImpl<[T, U]>;
+        const state = _this.#state;
+
+        if (isLeft(state)) return [None(), None()];
+
+        const [a, b] = state.right;
+        return [Some(a), Some(b)];
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {

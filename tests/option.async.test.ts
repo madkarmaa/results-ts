@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, PanicError } from '../src/errors';
+import { type Result, Ok, Err } from '../src/result';
+import { FlattenError, PanicError, TransposeError } from '../src/errors';
 
 describe('Option async methods', () => {
     test('mapAsync', async () => {
@@ -466,6 +467,47 @@ describe('Option async methods', () => {
         const invalid = Some(42).mapAsync(async (x) => x);
         // @ts-expect-error - flatten should only be called on AsyncOption<Option<T>>
         await expect(invalid.flatten().unwrap()).rejects.toThrow(FlattenError);
+    });
+
+    test('transpose', async () => {
+        const okNested = Some(Ok(42)).mapAsync(async (x) => x);
+        const okTransposed = await okNested.transpose();
+        expect(await okTransposed.unwrap().unwrap()).toBe(42);
+
+        const errNested = Some(Err<string>('oops')).mapAsync(async (x) => x);
+        expect(await errNested.transpose().unwrapErr()).toBe('oops');
+
+        const noneNested = None<Result<number, string>>().mapAsync(
+            async (x) => x
+        );
+        const noneTransposed = await noneNested.transpose();
+        expect(await noneTransposed.unwrap().isNone()).toBe(true);
+
+        const invalid = Some(42).mapAsync(async (x) => x);
+        // @ts-expect-error - transpose should only be called on AsyncOption<Result<T, E>>
+        await expect(invalid.transpose().unwrap()).rejects.toThrow(
+            TransposeError
+        );
+    });
+
+    test('unzip', async () => {
+        const nested = Some<[number, string]>([42, 'hello']).mapAsync(
+            async (x) => x
+        );
+        const [a, b] = nested.unzip();
+        expect(await a.unwrap()).toBe(42);
+        expect(await b.unwrap()).toBe('hello');
+
+        const noneNested = None<[number, string]>().mapAsync(async (x) => x);
+        const [na, nb] = noneNested.unzip();
+        expect(await na.isNone()).toBe(true);
+        expect(await nb.isNone()).toBe(true);
+
+        const invalid = Some(42).mapAsync(async (x) => x);
+        // @ts-expect-error - unzip should only be called on AsyncOption<[T, U]>
+        const [rejA, rejB] = invalid.unzip();
+        await expect(rejA).rejects.toThrow(TypeError);
+        await expect(rejB).rejects.toThrow(TypeError);
     });
 
     test('match', async () => {

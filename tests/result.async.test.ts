@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
-import { Ok, Err } from '../src/result';
-import { FlattenError, PanicError } from '../src/errors';
+import { Ok, Err, type Result } from '../src/result';
+import { Some, None, type Option } from '../src/option';
+import { FlattenError, PanicError, TransposeError } from '../src/errors';
 
 describe('Result async methods', () => {
     test('mapAsync', async () => {
@@ -397,6 +398,27 @@ describe('Result async methods', () => {
         const invalid = Ok(42).mapAsync(async (x) => x);
         // @ts-expect-error - flatten should only be called on AsyncResult<Result<T, E>, E>
         await expect(invalid.flatten().unwrap()).rejects.toThrow(FlattenError);
+    });
+
+    test('transpose', async () => {
+        const someNested = Ok(Some(42)).mapAsync(async (x) => x);
+        const someTransposed = await someNested.transpose();
+        expect(await someTransposed.unwrap().unwrap()).toBe(42);
+
+        const noneNested = Ok(None<number>()).mapAsync(async (x) => x);
+        expect(await noneNested.transpose().isNone()).toBe(true);
+
+        const errNested = (
+            Err('oops') as Result<Option<number>, string>
+        ).mapAsync(async (x) => x);
+        const errTransposed = await errNested.transpose();
+        expect(await errTransposed.unwrap().unwrapErr()).toBe('oops');
+
+        const invalid = Ok(42).mapAsync(async (x) => x);
+        // @ts-expect-error - transpose should only be called on AsyncResult<Option<T>, E>
+        await expect(invalid.transpose().unwrap()).rejects.toThrow(
+            TransposeError
+        );
     });
 
     test('match', async () => {

@@ -1,6 +1,12 @@
 import { describe, test, expect } from 'vitest';
-import { Ok, Err } from '../src/result';
-import { FlattenError, InvalidArgumentError, PanicError } from '../src/errors';
+import { Ok, Err, type Result } from '../src/result';
+import { Some, None, type Option } from '../src/option';
+import {
+    FlattenError,
+    InvalidArgumentError,
+    PanicError,
+    TransposeError
+} from '../src/errors';
 
 describe('Result', () => {
     test('construction', () => {
@@ -239,6 +245,40 @@ describe('Result', () => {
         });
         // @ts-expect-error - flatten should only be called on Result<Result<T, E>, E>
         expect(() => Ok(42).flatten()).toThrow(FlattenError);
+    });
+
+    test('flatten accepts a duck-typed (cross-realm) Result', () => {
+        // Mimics an inner Result created in a different realm / from a
+        // duplicate install where `instanceof` would fail. Only the
+        // `_isOk` discriminator is carried.
+        const duckTypedOk = { _isOk: true } as unknown as Result<
+            number,
+            string
+        >;
+        expect((Ok(duckTypedOk).flatten() as { _isOk: boolean })._isOk).toBe(
+            true
+        );
+
+        const duckTypedErr = { _isOk: false } as unknown as Result<
+            number,
+            string
+        >;
+        expect((Ok(duckTypedErr).flatten() as { _isOk: boolean })._isOk).toBe(
+            false
+        );
+    });
+
+    test('transpose', () => {
+        expect(Ok(Some(42)).transpose().unwrap().unwrap()).toBe(42);
+        expect(Ok(None<number>()).transpose().isNone()).toBe(true);
+        expect(
+            (Err('oops') as Result<Option<number>, string>)
+                .transpose()
+                .unwrap()
+                .unwrapErr()
+        ).toBe('oops');
+        // @ts-expect-error - transpose should only be called on Result<Option<T>, E>
+        expect(() => Ok(42).transpose()).toThrow(TransposeError);
     });
 
     test('match', () => {
