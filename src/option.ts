@@ -598,7 +598,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be an Option');
 
         const thisIsSome = isRight(this.#state);
-        const optbIsSome = optb.isSome();
+        const optbIsSome = optb._isSome;
 
         if (thisIsSome && !optbIsSome) return this;
         if (!thisIsSome && optbIsSome) return optb;
