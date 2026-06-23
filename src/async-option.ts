@@ -197,49 +197,40 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return Promise.resolve(this.promise).then(onfulfilled, onrejected);
     }
 
-    async isSome(): Promise<boolean> {
-        const opt = await this;
-        return opt.isSome();
+    isSome(): Promise<boolean> {
+        return this.then((opt) => opt.isSome());
     }
 
-    async isSomeAnd(f: (val: T) => boolean): Promise<boolean> {
-        const opt = await this;
-        return opt.isSomeAnd(f);
+    isSomeAnd(f: (val: T) => boolean): Promise<boolean> {
+        return this.then((opt) => opt.isSomeAnd(f));
     }
 
-    async isNone(): Promise<boolean> {
-        const opt = await this;
-        return opt.isNone();
+    isNone(): Promise<boolean> {
+        return this.then((opt) => opt.isNone());
     }
 
-    async isNoneOr(f: (val: T) => boolean): Promise<boolean> {
-        const opt = await this;
-        return opt.isNoneOr(f);
+    isNoneOr(f: (val: T) => boolean): Promise<boolean> {
+        return this.then((opt) => opt.isNoneOr(f));
     }
 
-    async expect(msg: string): Promise<T> {
-        const opt = await this;
-        return opt.expect(msg);
+    expect(msg: string): Promise<T> {
+        return this.then((opt) => opt.expect(msg));
     }
 
-    async unwrap(): Promise<T> {
-        const opt = await this;
-        return opt.unwrap();
+    unwrap(): Promise<T> {
+        return this.then((opt) => opt.unwrap());
     }
 
-    async unwrapOr(defaultVal: T): Promise<T> {
-        const opt = await this;
-        return opt.unwrapOr(defaultVal);
+    unwrapOr(defaultVal: T): Promise<T> {
+        return this.then((opt) => opt.unwrapOr(defaultVal));
     }
 
-    async unwrapOrElse(f: () => T): Promise<T> {
-        const opt = await this;
-        return opt.unwrapOrElse(f);
+    unwrapOrElse(f: () => T): Promise<T> {
+        return this.then((opt) => opt.unwrapOrElse(f));
     }
 
-    async unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T> {
-        const opt = await this;
-        return await opt.unwrapOrElseAsync(f);
+    unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T> {
+        return this.then((opt) => opt.unwrapOrElseAsync(f));
     }
 
     map<U>(f: (val: T) => U): AsyncOption<U> {
@@ -258,22 +249,19 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncOptionImpl(this.then((opt) => opt.inspectAsync(f)));
     }
 
-    async mapOr<U>(defaultVal: U, f: (val: T) => U): Promise<U> {
-        const opt = await this;
-        return opt.mapOr(defaultVal, f);
+    mapOr<U>(defaultVal: U, f: (val: T) => U): Promise<U> {
+        return this.then((opt) => opt.mapOr(defaultVal, f));
     }
 
-    async mapOrElse<U>(defaultF: () => U, f: (val: T) => U): Promise<U> {
-        const opt = await this;
-        return opt.mapOrElse(defaultF, f);
+    mapOrElse<U>(defaultF: () => U, f: (val: T) => U): Promise<U> {
+        return this.then((opt) => opt.mapOrElse(defaultF, f));
     }
 
-    async mapOrElseAsync<U>(
+    mapOrElseAsync<U>(
         defaultF: () => PromiseLike<U>,
         f: (val: T) => PromiseLike<U>
     ): Promise<U> {
-        const opt = await this;
-        return await opt.mapOrElseAsync(defaultF, f);
+        return this.then((opt) => opt.mapOrElseAsync(defaultF, f));
     }
 
     okOr<E>(err: E): AsyncResult<T, E> {
@@ -330,11 +318,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncOptionImpl(this.then((opt) => opt.flatten()));
     }
 
-    async match<U>(handlers: {
-        Some: (val: T) => U;
-        None: () => U;
-    }): Promise<U> {
-        const opt = await this;
-        return opt.match(handlers);
+    match<U>(handlers: { Some: (val: T) => U; None: () => U }): Promise<U> {
+        return this.then((opt) => opt.match(handlers));
     }
 }
