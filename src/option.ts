@@ -511,7 +511,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     and<U>(optb: Option<U>): Option<U> {
-        if (typeof (optb as Option<unknown>)._isSome !== 'boolean')
+        if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
@@ -566,7 +566,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     or<T2>(optb: Option<T2>): Option<T | T2> {
-        if (typeof (optb as Option<unknown>)._isSome !== 'boolean')
+        if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
@@ -594,7 +594,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     xor<T2>(optb: Option<T2>): Option<T | T2> {
-        if (typeof (optb as Option<unknown>)._isSome !== 'boolean')
+        if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
         const thisIsSome = isRight(this.#state);
