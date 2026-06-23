@@ -54,12 +54,21 @@ jobs:
             - name: Build
               run: bun run build
 
+            - name: Get previous version
+              id: prev
+              run: echo "version=$(bun pm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
+
             - name: Semantic release
               env:
                   GITHUB_TOKEN: ${{ secrets.SR_TOKEN }}
               run: bun run release
 
+            - name: Get new version
+              id: next
+              run: echo "version=$(bun pm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
+
             - name: Publish to npm registry
+              if: steps.prev.outputs.version != steps.next.outputs.version
               run: bunx npm@latest publish --access public
 
     canary:
