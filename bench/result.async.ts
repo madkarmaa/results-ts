@@ -1,0 +1,110 @@
+import { bench, do_not_optimize, group } from 'mitata';
+import { Ok, Err, type Result } from '../src/result';
+import { ok, err } from './fixtures';
+
+// ---------------------------------------------------------------------------
+// Async Result - terminal unwrap (AsyncResult)
+// ---------------------------------------------------------------------------
+group('Async Result - terminal unwrap', () => {
+    const okAsync = ok.mapAsync((x) => Promise.resolve(x + 1));
+    const errAsync = err.mapAsync((x) => Promise.resolve(x + 1));
+
+    bench('AsyncResult.unwrap (Ok path)', async () => {
+        do_not_optimize(await okAsync.unwrap());
+    }).gc('once');
+    bench('AsyncResult.unwrap (Err path)', async () => {
+        try {
+            await errAsync.unwrapErr();
+        } catch (e) {
+            do_not_optimize(e);
+        }
+    }).gc('once');
+});
+
+// ---------------------------------------------------------------------------
+// Async Result - sync-typed *Async methods (the extra-Promise wrappers)
+// ---------------------------------------------------------------------------
+group('Async Result - sync-typed methods', () => {
+    const okT: Result<number, number> = Ok(1);
+    const errT: Result<number, number> = Err(1);
+
+    bench('Result.mapOrElseAsync (Ok path)', async () => {
+        do_not_optimize(
+            await okT.mapOrElseAsync(
+                async () => 0,
+                async (x) => x + 1
+            )
+        );
+    }).gc('once');
+    bench('Result.mapOrElseAsync (Err path)', async () => {
+        do_not_optimize(
+            await errT.mapOrElseAsync(
+                async () => 0,
+                async (x) => x + 1
+            )
+        );
+    }).gc('once');
+    bench('Result.unwrapOrElseAsync (Ok path)', async () => {
+        do_not_optimize(await okT.unwrapOrElseAsync(async () => 2));
+    }).gc('once');
+    bench('Result.unwrapOrElseAsync (Err path)', async () => {
+        do_not_optimize(await errT.unwrapOrElseAsync(async () => 2));
+    }).gc('once');
+});
+
+// ---------------------------------------------------------------------------
+// Async Result - transform methods (each constructs a new AsyncResultImpl)
+// ---------------------------------------------------------------------------
+group('Async Result - transform methods', () => {
+    bench('Ok.mapAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await ok.mapAsync((x) => Promise.resolve(x + 1)));
+    }).gc('once');
+    bench('Err.mapAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await err.mapAsync((x) => Promise.resolve(x + 1)));
+    }).gc('once');
+    bench('Ok.mapErrAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await ok.mapErrAsync((x) => Promise.resolve(x + 1)));
+    }).gc('once');
+    bench('Err.mapErrAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await err.mapErrAsync((x) => Promise.resolve(x + 1)));
+    }).gc('once');
+    bench('Ok.inspectAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await ok.inspectAsync(() => Promise.resolve()));
+    }).gc('once');
+    bench('Err.inspectAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await err.inspectAsync(() => Promise.resolve()));
+    }).gc('once');
+    bench('Ok.inspectErrAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await ok.inspectErrAsync(() => Promise.resolve()));
+    }).gc('once');
+    bench('Err.inspectErrAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await err.inspectErrAsync(() => Promise.resolve()));
+    }).gc('once');
+    bench('Ok.andThenAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(
+            await ok.andThenAsync((x) => Promise.resolve(Ok(x + 1)))
+        );
+    }).gc('once');
+    bench('Err.andThenAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(
+            await err.andThenAsync((x) => Promise.resolve(Ok(x + 1)))
+        );
+    }).gc('once');
+    bench('Ok.orElseAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await ok.orElseAsync(() => Promise.resolve(Err(2))));
+    }).gc('once');
+    bench('Err.orElseAsync (alloc AsyncResult)', async () => {
+        do_not_optimize(await err.orElseAsync(() => Promise.resolve(Ok(2))));
+    }).gc('once');
+});
+
+// ---------------------------------------------------------------------------
+// Async Result - then() wrapping (await cost)
+// ---------------------------------------------------------------------------
+group('Async Result - then() wrapping', () => {
+    const okAsync = ok.mapAsync((x) => Promise.resolve(x + 1));
+
+    bench('AsyncResult.then (await)', async () => {
+        do_not_optimize(await okAsync);
+    }).gc('once');
+});
