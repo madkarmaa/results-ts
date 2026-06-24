@@ -1,3 +1,14 @@
+## [4.1.1](https://github.com/madkarmaa/results-ts/compare/v4.1.0...v4.1.1) (2026-06-24)
+
+### Bug Fixes
+
+- use custom token to bypass branch push rules [skip ci] ([e7acdfd](https://github.com/madkarmaa/results-ts/commit/e7acdfd70053eba54893d1c5d87fa2e0cafa9cc2))
+
+### Performance Improvements
+
+- fewer allocations ([#38](https://github.com/madkarmaa/results-ts/issues/38)) ([08cfc4b](https://github.com/madkarmaa/results-ts/commit/08cfc4bca935dffb52bcfa66259561d8ddf9f113))
+- manually implement generator protocol ([b96b830](https://github.com/madkarmaa/results-ts/commit/b96b830997f4f931b762ed0b1aaac3af86ee86e6))
+
 ## [4.1.0](https://github.com/madkarmaa/results-ts/compare/v4.0.1...v4.1.0) (2026-06-23)
 
 ### Features
