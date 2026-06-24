@@ -4,7 +4,14 @@ import {
     PanicError,
     TransposeError
 } from './errors';
-import { type Either, Left, Right, isLeft, isRight } from './either';
+import {
+    type Either,
+    Left,
+    Right,
+    isLeft,
+    isRight,
+    EMPTY_ITERATOR
+} from './utils';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -427,7 +434,11 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isRight(state)) return Some(f(state.right));
-        return None();
+
+        // None path: the wrapped value is unchanged, so reuse `this` to avoid an
+        // extra allocation. The Some type is narrowed to `U` via a cast - safe
+        // because the value is never read on a `None`.
+        return this as unknown as OptionImpl<U>;
     }
 
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U> {
@@ -534,9 +545,14 @@ class OptionImpl<T> implements OptionMethods<T> {
         return new AsyncResultImpl(Promise.resolve().then(errF).then(Err));
     }
 
-    *iter(): IterableIterator<T> {
+    iter(): IterableIterator<T> {
         const state = this.#state;
-        if (isRight(state)) yield state.right;
+
+        if (isLeft(state)) return EMPTY_ITERATOR as IterableIterator<T>;
+
+        return (function* (value: T) {
+            yield value;
+        })(state.right);
     }
 
     and<U>(optb: Option<U>): Option<U> {
@@ -545,7 +561,11 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isRight(state)) return optb;
-        return None();
+
+        // None path: `this` is already `None`, so reuse it to avoid an extra
+        // allocation. The Some type is narrowed to `U` via a cast - safe because
+        // the value is never read on a `None`.
+        return this as unknown as OptionImpl<U>;
     }
 
     andThen<U>(f: (val: T) => Option<U>): Option<U> {
@@ -554,7 +574,11 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isRight(state)) return f(state.right);
-        return None();
+
+        // None path: `this` is already `None`, so reuse it to avoid an extra
+        // allocation. The Some type is narrowed to `U` via a cast - safe because
+        // the value is never read on a `None`.
+        return this as unknown as OptionImpl<U>;
     }
 
     andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U> {
@@ -575,8 +599,10 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state) && predicate(state.right)) return this;
-        return None();
+
+        if (isLeft(state)) return this; // already `None`, reuse
+        if (predicate(state.right)) return this; // `Some` passes the filter, reuse
+        return None(); // `Some` fails the filter - must allocate
     }
 
     filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T> {
@@ -632,7 +658,12 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (thisIsSome && !optbIsSome) return this;
         if (!thisIsSome && optbIsSome) return optb;
 
-        return None();
+        // Reaching here means both sides match. When both are `None`, `this` is
+        // already `None` and can be reused (cast narrows the Some type to
+        // `T | T2` - safe because the value is never read on a `None`). When both
+        // are `Some`, `xor` must yield `None` - a fresh allocation, since `this`
+        // holds a value and cannot represent `None`.
+        return thisIsSome ? None() : (this as unknown as OptionImpl<T | T2>);
     }
 
     insert(value: T): T {

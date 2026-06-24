@@ -4,7 +4,14 @@ import {
     PanicError,
     TransposeError
 } from './errors';
-import { type Either, Left, Right, isLeft, isRight } from './either';
+import {
+    type Either,
+    Left,
+    Right,
+    isLeft,
+    isRight,
+    EMPTY_ITERATOR
+} from './utils';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
 
@@ -519,9 +526,14 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return new AsyncResultImpl(Promise.resolve(this));
     }
 
-    *iter(): IterableIterator<T> {
+    iter(): IterableIterator<T> {
         const state = this.#state;
-        if (isRight(state)) yield state.right;
+
+        if (isLeft(state)) return EMPTY_ITERATOR as IterableIterator<T>;
+
+        return (function* (value: T) {
+            yield value;
+        })(state.right);
     }
 
     expect(msg: string): T {
@@ -580,7 +592,11 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state)) return f(state.right);
-        return new ResultImpl(Left(state.left));
+
+        // Err path: the wrapped error is unchanged, so reuse `this` to avoid an
+        // extra allocation. The Ok type is narrowed to `U` via a cast - safe
+        // because the value is never read on an `Err`.
+        return this as unknown as ResultImpl<U, E | F>;
     }
 
     andThenAsync<U, F>(
@@ -613,7 +629,11 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state)) return f(state.left);
-        return new ResultImpl(Right(state.right));
+
+        // Ok path: the wrapped value is unchanged, so reuse `this` to avoid an
+        // extra allocation. The Err type is narrowed to `F` via a cast - safe
+        // because the value is never read on an `Ok`.
+        return this as unknown as ResultImpl<T | T2, F>;
     }
 
     orElseAsync<T2, F>(
