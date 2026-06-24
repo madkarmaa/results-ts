@@ -10,7 +10,8 @@ import {
     Right,
     isLeft,
     isRight,
-    EMPTY_ITERATOR
+    EMPTY_ITERATOR,
+    OneItemIterator
 } from './utils';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -528,12 +529,8 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
     iter(): IterableIterator<T> {
         const state = this.#state;
-
-        if (isLeft(state)) return EMPTY_ITERATOR as IterableIterator<T>;
-
-        return (function* (value: T) {
-            yield value;
-        })(state.right);
+        if (isLeft(state)) return EMPTY_ITERATOR;
+        return new OneItemIterator(state.right);
     }
 
     expect(msg: string): T {

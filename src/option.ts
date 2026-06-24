@@ -10,7 +10,8 @@ import {
     Right,
     isLeft,
     isRight,
-    EMPTY_ITERATOR
+    EMPTY_ITERATOR,
+    OneItemIterator
 } from './utils';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
@@ -547,12 +548,8 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     iter(): IterableIterator<T> {
         const state = this.#state;
-
-        if (isLeft(state)) return EMPTY_ITERATOR as IterableIterator<T>;
-
-        return (function* (value: T) {
-            yield value;
-        })(state.right);
+        if (isLeft(state)) return EMPTY_ITERATOR;
+        return new OneItemIterator(state.right);
     }
 
     and<U>(optb: Option<U>): Option<U> {
