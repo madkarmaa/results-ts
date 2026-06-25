@@ -737,3 +737,44 @@ export function Ok<T>(value: T): Result<T, never> {
 export function Err<E>(error: E): Result<never, E> {
     return new ResultImpl(Left(error));
 }
+
+/**
+ * Wraps a function `fn` that may throw into a function that, when called, returns a `Result`.
+ *
+ * If `fn` returns normally, its return value is wrapped in `Ok`. If `fn` throws, the thrown value is caught:
+ * - when no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
+ *   (typed as `unknown`, since JavaScript allows throwing anything);
+ * - when `onThrow` is provided, it is called with the thrown value and its return value is wrapped in an `Err`.
+ *
+ * @param fn - The throwing function to wrap.
+ * @param onThrow - Optional handler invoked when `fn` throws; its return value becomes the `Err` payload.
+ * @returns A function returning `Result<T, E>` that never throws.
+ */
+export function fromThrowable<T, Args extends unknown[]>(
+    fn: (...args: Args) => T,
+    onThrow?: undefined
+): (...args: Args) => Result<T, unknown>;
+export function fromThrowable<T, Args extends unknown[], E>(
+    fn: (...args: Args) => T,
+    onThrow: (thrown: unknown, ...args: Args) => E
+): (...args: Args) => Result<T, E>;
+export function fromThrowable<T, Args extends unknown[], E>(
+    fn: (...args: Args) => T,
+    onThrow?: (thrown: unknown, ...args: Args) => E
+): (...args: Args) => Result<T, E | unknown> {
+    if (typeof fn !== 'function')
+        throw new InvalidArgumentError("'fn' must be a function");
+
+    if (onThrow !== undefined && typeof onThrow !== 'function')
+        throw new InvalidArgumentError("'onThrow' must be a function");
+
+    return function (this: unknown, ...args: Args): Result<T, E | unknown> {
+        try {
+            return Ok(fn.apply(this, args));
+        } catch (thrown) {
+            return onThrow === undefined
+                ? Err(thrown)
+                : Err(onThrow.call(this, thrown, ...args));
+        }
+    };
+}
