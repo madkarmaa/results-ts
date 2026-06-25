@@ -68,6 +68,54 @@ const message = parseUserId('10')
 console.log(message);
 ```
 
+#### `fromThrowable`
+
+Wraps a function that may throw into one that returns a `Result` instead.
+
+[Official Rust `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
+
+```typescript
+import { fromThrowable } from 'results-ts';
+
+const safeParse = fromThrowable(JSON.parse, (thrown) =>
+    thrown instanceof Error ? thrown.message : 'parse error'
+);
+
+const result = safeParse('{"a":1}'); // Ok({ a: 1 })
+const error = safeParse('{bad'); // Err('Unexpected token ...')
+```
+
+Without an `onThrow` handler, the thrown value is caught as-is and the error type defaults to `unknown` (since JavaScript allows throwing anything):
+
+```typescript
+const unsafe = fromThrowable(() => {
+    throw 'literal string';
+});
+
+const result = unsafe();
+//    ^? Result<never, unknown>
+```
+
+#### `fromThrowableAsync`
+
+Async counterpart of `fromThrowable`. Wraps a function returning a `Promise` (possibly rejecting) or a sync value into a function returning an `AsyncResult`. Both synchronous throws and rejected promises are caught.
+
+```typescript
+import { fromThrowableAsync } from 'results-ts';
+
+const safeFetch = fromThrowableAsync(
+    async (url: string) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    },
+    (thrown) => (thrown instanceof Error ? thrown.message : 'request failed')
+);
+
+const result = await safeFetch('https://api.example.com');
+//    ^? AsyncResult<unknown, string>
+```
+
 ### Option
 
 [Official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
