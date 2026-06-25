@@ -772,9 +772,11 @@ export function fromThrowable<T, Args extends unknown[], E>(
         try {
             return Ok(fn.apply(this, args));
         } catch (thrown) {
-            return onThrow === undefined
-                ? Err(thrown)
-                : Err(onThrow.call(this, thrown, ...args));
+            const error =
+                onThrow === undefined
+                    ? thrown
+                    : onThrow.call(this, thrown, ...args);
+            return Err(error);
         }
     };
 }
