@@ -1,3 +1,15 @@
+## [4.2.0](https://github.com/madkarmaa/results-ts/compare/v4.1.1...v4.2.0) (2026-06-26)
+
+### Features
+
+- add `fromThrowable` and `fromThrowableAsync` helper methods ([#41](https://github.com/madkarmaa/results-ts/issues/41)) ([52560d8](https://github.com/madkarmaa/results-ts/commit/52560d85918ddb60b8004b7cdfd1896740f47ee6))
+
+### Documentation
+
+- add badges ([1834c77](https://github.com/madkarmaa/results-ts/commit/1834c776ef4ff50bf8a03ee374118ac35477b443))
+- add contributors section ([7174b2b](https://github.com/madkarmaa/results-ts/commit/7174b2b7b6475b1746b22af4d526b21af601351e))
+- update jsdocs and readme for `catchUnwind` ([a9e848b](https://github.com/madkarmaa/results-ts/commit/a9e848b23ebd416c1e75052116956ac7388526ff))
+
 ## [4.1.1](https://github.com/madkarmaa/results-ts/compare/v4.1.0...v4.1.1) (2026-06-24)
 
 ### Bug Fixes
