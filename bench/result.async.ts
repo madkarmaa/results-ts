@@ -1,6 +1,14 @@
 import { bench, do_not_optimize, group } from 'mitata';
 import { Ok, Err, type Result } from '../src/result';
-import { ok, err } from './fixtures';
+import { catchUnwindAsync } from '../src/async-result';
+import {
+    ok,
+    err,
+    asyncInc,
+    safeAsyncInc,
+    asyncReject,
+    safeAsyncReject
+} from './fixtures';
 
 // ---------------------------------------------------------------------------
 // Async Result - terminal unwrap (AsyncResult)
@@ -106,5 +114,25 @@ group('Async Result - then() wrapping', () => {
 
     bench('AsyncResult.then (await)', async () => {
         do_not_optimize(await okAsync);
+    }).gc('once');
+});
+
+// ---------------------------------------------------------------------------
+// Async Result - catchUnwindAsync
+// ---------------------------------------------------------------------------
+group('Async Result - catchUnwindAsync', () => {
+    bench('catchUnwindAsync (wrap + call, Ok)', async () => {
+        const fn = catchUnwindAsync(asyncInc);
+        do_not_optimize(await fn(1));
+    }).gc('once');
+    bench('catchUnwindAsync (call only, Ok)', async () => {
+        do_not_optimize(await safeAsyncInc(1));
+    }).gc('once');
+    bench('catchUnwindAsync (wrap + call, reject)', async () => {
+        const fn = catchUnwindAsync(asyncReject);
+        do_not_optimize(await fn());
+    }).gc('once');
+    bench('catchUnwindAsync (call only, reject)', async () => {
+        do_not_optimize(await safeAsyncReject());
     }).gc('once');
 });

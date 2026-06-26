@@ -7,6 +7,18 @@
 
 This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
 
+<p align="center">
+    <a href="https://npmx.dev/package/results-ts/v/latest">
+        <img src="https://img.shields.io/npm/v/results-ts?labelColor=blue&color=grey" alt="npm version" />
+    </a>
+    <a href="https://npmx.dev/package/results-ts/v/canary">
+        <img src="https://img.shields.io/npm/v/results-ts/canary?labelColor=yellow&color=grey" alt="npm canary version" />
+    </a>
+    <a href="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml">
+        <img src="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml/badge.svg" alt="Release workflow" />
+    </a>
+</p>
+
 ## Installation
 
 ```bash
@@ -66,6 +78,60 @@ const message = parseUserId('10')
     });
 
 console.log(message);
+```
+
+#### `catchUnwind`
+
+Invokes a function, capturing the cause of a thrown error if one occurs.
+
+Returns `Ok` with the function's result if it does not throw, and `Err(cause)` if it throws. The cause returned is the value with which the function originally threw.
+
+It is not recommended to use this function for a general try/catch mechanism. The `Result` type is more appropriate to use for functions that can fail on a regular basis.
+
+[Official Rust `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
+
+```typescript
+import { catchUnwind } from 'results-ts';
+
+const safeParse = catchUnwind(JSON.parse, (thrown) =>
+    thrown instanceof Error ? thrown.message : 'parse error'
+);
+
+const result = safeParse('{"a":1}'); // Ok({ a: 1 })
+const error = safeParse('{bad'); // Err('Unexpected token ...')
+```
+
+Without an `onThrow` handler, the thrown value is caught as-is and the error type defaults to `unknown` (since JavaScript allows throwing anything):
+
+```typescript
+const unsafe = catchUnwind(() => {
+    throw 'literal string';
+});
+
+const result = unsafe();
+//    ^? Result<never, unknown>
+```
+
+#### `catchUnwindAsync`
+
+Async counterpart of `catchUnwind`. Invokes a function returning a `Promise` (possibly rejecting) or a sync value, capturing the cause of a thrown error or rejected `Promise` if one occurs.
+
+Returns `Ok` with the function's result if it does not throw or reject, and `Err(cause)` otherwise. Both synchronous throws and rejected promises are caught.
+
+```typescript
+import { catchUnwindAsync } from 'results-ts';
+
+const safeFetch = catchUnwindAsync(
+    async (url: string) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    },
+    (thrown) => (thrown instanceof Error ? thrown.message : 'request failed')
+);
+
+const result = await safeFetch('https://api.example.com');
+//    ^? AsyncResult<unknown, string>
 ```
 
 ### Option
@@ -143,6 +209,12 @@ Interested in contributing? See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup i
 - **[Web Dev Simplified](https://www.youtube.com/@WebDevSimplified)** - concept from [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc).
 - **[vultix/ts-results](https://github.com/vultix/ts-results)**
 - **[supermacro/neverthrow](https://github.com/supermacro/neverthrow)**
+
+## Contributors
+
+Thanks to all the contributors who helped make this project better!
+
+[![Contributors](https://contrib.rocks/image?repo=madkarmaa/results-ts&max=400&columns=20)](https://github.com/madkarmaa/results-ts/graphs/contributors)
 
 ## License
 

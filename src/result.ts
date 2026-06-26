@@ -737,3 +737,53 @@ export function Ok<T>(value: T): Result<T, never> {
 export function Err<E>(error: E): Result<never, E> {
     return new ResultImpl(Left(error));
 }
+
+/**
+ * Invokes a function, capturing the cause of a thrown error if one occurs.
+ *
+ * This function will return `Ok` with the function's result if it does not throw, and will return
+ * `Err(cause)` if the function throws. The cause returned is the value with which the function
+ * originally threw.
+ *
+ * It is not recommended to use this function for a general try/catch mechanism. The `Result` type
+ * is more appropriate to use for functions that can fail on a regular basis.
+ *
+ * When no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
+ * (typed as `unknown`, since JavaScript allows throwing anything).
+ * When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
+ * in an `Err`, allowing the error type to be narrowed and normalized.
+ *
+ * @param fn - The throwing function to wrap.
+ * @param onThrow - Optional handler invoked when `fn` throws; its return value becomes the `Err` payload.
+ * @returns A function returning `Result<T, E>` that never throws.
+ */
+export function catchUnwind<T, Args extends unknown[]>(
+    fn: (...args: Args) => T,
+    onThrow?: undefined
+): (...args: Args) => Result<T, unknown>;
+export function catchUnwind<T, Args extends unknown[], E>(
+    fn: (...args: Args) => T,
+    onThrow: (thrown: unknown, ...args: Args) => E
+): (...args: Args) => Result<T, E>;
+export function catchUnwind<T, Args extends unknown[], E>(
+    fn: (...args: Args) => T,
+    onThrow?: (thrown: unknown, ...args: Args) => E
+): (...args: Args) => Result<T, E | unknown> {
+    if (typeof fn !== 'function')
+        throw new InvalidArgumentError("'fn' must be a function");
+
+    if (onThrow !== undefined && typeof onThrow !== 'function')
+        throw new InvalidArgumentError("'onThrow' must be a function");
+
+    return function (this: unknown, ...args: Args): Result<T, E | unknown> {
+        try {
+            return Ok(fn.apply(this, args));
+        } catch (thrown) {
+            const error =
+                onThrow === undefined
+                    ? thrown
+                    : onThrow.call(this, thrown, ...args);
+            return Err(error);
+        }
+    };
+}

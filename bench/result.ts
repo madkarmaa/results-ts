@@ -1,7 +1,7 @@
 import { bench, do_not_optimize, group } from 'mitata';
-import { Ok, Err, type Result } from '../src/result';
+import { Ok, Err, catchUnwind, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
-import { ok, err, inc, gt0 } from './fixtures';
+import { ok, err, inc, gt0, safeInc, thrower, safeThower } from './fixtures';
 
 // ---------------------------------------------------------------------------
 // Result - queries
@@ -201,4 +201,24 @@ group('Result - iter', () => {
     bench('Err.iter', () => {
         for (const v of err.iter()) do_not_optimize(v);
     });
+});
+
+// ---------------------------------------------------------------------------
+// Result - catchUnwind
+// ---------------------------------------------------------------------------
+group('Result - catchUnwind', () => {
+    bench('catchUnwind (wrap + call, Ok)', () => {
+        const fn = catchUnwind(inc);
+        do_not_optimize(fn(1));
+    }).gc('once');
+    bench('catchUnwind (call only, Ok)', () => {
+        do_not_optimize(safeInc(1));
+    }).gc('once');
+    bench('catchUnwind (wrap + call, Err)', () => {
+        const fn = catchUnwind(thrower);
+        do_not_optimize(fn());
+    }).gc('once');
+    bench('catchUnwind (call only, catch)', () => {
+        do_not_optimize(safeThower());
+    }).gc('once');
 });

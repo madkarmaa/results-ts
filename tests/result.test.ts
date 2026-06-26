@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { Ok, Err, type Result } from '../src/result';
+import { Ok, Err, catchUnwind, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
 import {
     FlattenError,
@@ -337,6 +337,104 @@ describe('Result', () => {
                 InvalidArgumentError
             );
             expect(() => Ok(5).or(42 as never)).toThrow(InvalidArgumentError);
+        });
+    });
+
+    describe('catchUnwind', () => {
+        test('wraps a successful return value in Ok', () => {
+            const add = catchUnwind((a: number, b: number) => a + b);
+            expect(add(2, 3).unwrap()).toBe(5);
+            expect(add(2, 3).isOk()).toBe(true);
+        });
+
+        test('catches throws into Err when no handler is given', () => {
+            const boom = catchUnwind(() => {
+                throw new Error('boom');
+            });
+            const res = boom();
+            expect(res.isErr()).toBe(true);
+            expect((res.unwrapErr() as Error).message).toBe('boom');
+        });
+
+        test('catches non-Error throws as unknown', () => {
+            const throwString = catchUnwind(() => {
+                throw 'literal string';
+            });
+            expect(throwString().unwrapErr()).toBe('literal string');
+
+            const throwNumber = catchUnwind(() => {
+                throw 42;
+            });
+            expect(throwNumber().unwrapErr()).toBe(42);
+        });
+
+        test('uses onThrow to normalize the error type', () => {
+            const safe = catchUnwind(
+                () => {
+                    throw new Error('nope');
+                },
+                (thrown) =>
+                    thrown instanceof Error ? thrown.message : 'unknown'
+            );
+            const res = safe();
+            expect(res.isErr()).toBe(true);
+            expect(res.unwrapErr()).toBe('nope');
+        });
+
+        test('passes arguments through to fn and onThrow', () => {
+            const recorded: { args: number[]; thrown: unknown }[] = [];
+            const fn = catchUnwind(
+                (a: number, b: number) => {
+                    if (b === 0) throw new Error(`div by zero: ${a}`);
+                    return a / b;
+                },
+                (thrown, a, b) => {
+                    recorded.push({ args: [a, b], thrown });
+                    return { code: 'DIV_ZERO' as const, a, b };
+                }
+            );
+
+            expect(fn(10, 2).unwrap()).toBe(5);
+            expect(fn(10, 0).unwrapErr()).toEqual({
+                code: 'DIV_ZERO',
+                a: 10,
+                b: 0
+            });
+            expect(recorded).toEqual([
+                { args: [10, 0], thrown: expect.any(Error) }
+            ]);
+        });
+
+        test('preserves `this` binding of the returned function', () => {
+            const obj = {
+                x: 10,
+                method(this: { x: number }, n: number) {
+                    if (n < 0) throw new Error('negative');
+                    return this.x + n;
+                }
+            };
+            const safe = catchUnwind(obj.method, (thrown) =>
+                thrown instanceof Error ? thrown.message : 'err'
+            );
+            expect(safe.call(obj, 5).unwrap()).toBe(15);
+            expect(safe.call(obj, -1).unwrapErr()).toBe('negative');
+        });
+
+        test('rejects non-function fn and onThrow', () => {
+            expect(() => catchUnwind('not a fn' as never)).toThrow(
+                InvalidArgumentError
+            );
+            expect(() => catchUnwind(() => 1, 'not a fn' as never)).toThrow(
+                InvalidArgumentError
+            );
+        });
+
+        test('wraps JSON.parse realistically', () => {
+            const safeParse = catchUnwind(JSON.parse, (thrown) =>
+                thrown instanceof Error ? thrown.message : 'parse error'
+            );
+            expect(safeParse('{"a":1}').unwrap()).toEqual({ a: 1 });
+            expect(safeParse('{bad').unwrapErr()).toMatch(/JSON|Unexpected/);
         });
     });
 

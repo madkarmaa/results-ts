@@ -1,6 +1,7 @@
-import { type Result } from './result';
+import { Ok, Err, type Result } from './result';
 import { type Option } from './option';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
+import { InvalidArgumentError } from './errors';
 
 /**
  * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
@@ -381,4 +382,61 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): Promise<U> {
         return this.then((res) => res.match(handlers));
     }
+}
+
+/**
+ * Async counterpart of `catchUnwind`. Invokes a function, capturing the cause of a thrown
+ * error or rejected `Promise` if one occurs.
+ *
+ * This function will return `Ok` with the function's result if it does not throw or reject, and
+ * will return `Err(cause)` if the function throws or the returned `Promise` rejects. The cause
+ * returned is the value with which the function originally threw or rejected.
+ *
+ * It is not recommended to use this function for a general try/catch mechanism. The `AsyncResult`
+ * type is more appropriate to use for functions that can fail on a regular basis.
+ *
+ * When no `onThrow` handler is provided, the thrown/rejected value is wrapped as-is in an `Err`
+ * (typed as `unknown`, since JavaScript allows throwing anything).
+ * When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
+ * in an `Err`, allowing the error type to be narrowed and normalized.
+ *
+ * @param fn - The throwing/async function to wrap.
+ * @param onThrow - Optional handler invoked when `fn` throws or rejects; its return value becomes the `Err` payload.
+ * @returns A function returning `AsyncResult<T, E>` that never throws.
+ */
+export function catchUnwindAsync<T, Args extends unknown[]>(
+    fn: (...args: Args) => PromiseLike<T> | T,
+    onThrow?: undefined
+): (...args: Args) => AsyncResult<T, unknown>;
+export function catchUnwindAsync<T, Args extends unknown[], E>(
+    fn: (...args: Args) => PromiseLike<T> | T,
+    onThrow: (thrown: unknown, ...args: Args) => E
+): (...args: Args) => AsyncResult<T, E>;
+export function catchUnwindAsync<T, Args extends unknown[], E>(
+    fn: (...args: Args) => PromiseLike<T> | T,
+    onThrow?: (thrown: unknown, ...args: Args) => E
+): (...args: Args) => AsyncResult<T, E | unknown> {
+    if (typeof fn !== 'function')
+        throw new InvalidArgumentError("'fn' must be a function");
+
+    if (onThrow !== undefined && typeof onThrow !== 'function')
+        throw new InvalidArgumentError("'onThrow' must be a function");
+
+    return function (
+        this: unknown,
+        ...args: Args
+    ): AsyncResult<T, E | unknown> {
+        const handle = (thrown: unknown) =>
+            Err(
+                onThrow === undefined
+                    ? thrown
+                    : onThrow.call(this, thrown, ...args)
+            );
+
+        const result = Promise.resolve()
+            .then(() => fn.apply(this, args))
+            .then(Ok, handle);
+
+        return new AsyncResultImpl(result);
+    };
 }

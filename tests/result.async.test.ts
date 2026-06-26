@@ -1,7 +1,13 @@
 import { describe, test, expect } from 'vitest';
 import { Ok, Err, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
-import { FlattenError, PanicError, TransposeError } from '../src/errors';
+import { catchUnwindAsync } from '../src/async-result';
+import {
+    InvalidArgumentError,
+    FlattenError,
+    PanicError,
+    TransposeError
+} from '../src/errors';
 
 describe('Result async methods', () => {
     test('mapAsync', async () => {
@@ -517,6 +523,117 @@ describe('Result async methods', () => {
                 .mapAsync(async (x) => x + 1)
                 .unwrap();
             expect(errResult).toBe(1);
+        });
+    });
+
+    describe('catchUnwindAsync', () => {
+        test('wraps a resolved promise into Ok', async () => {
+            const add = catchUnwindAsync(async (a: number, b: number) => a + b);
+            const res = await add(2, 3);
+            expect(res.unwrap()).toBe(5);
+            expect(res.isOk()).toBe(true);
+        });
+
+        test('wraps a sync return value from fn into Ok', async () => {
+            const fn = catchUnwindAsync((n: number) => n * 2);
+            const res = await fn(21);
+            expect(res.unwrap()).toBe(42);
+        });
+
+        test('catches promise rejection into Err when no handler given', async () => {
+            const fn = catchUnwindAsync(async () => {
+                throw new Error('rej');
+            });
+            const res = await fn();
+            expect(res.isErr()).toBe(true);
+            expect((res.unwrapErr() as Error).message).toBe('rej');
+        });
+
+        test('catches non-Error rejections as unknown', async () => {
+            const throwString = catchUnwindAsync(async () => {
+                throw 'literal';
+            });
+            expect((await throwString()).unwrapErr()).toBe('literal');
+
+            const throwNumber = catchUnwindAsync(async () => {
+                throw 7;
+            });
+            expect((await throwNumber()).unwrapErr()).toBe(7);
+        });
+
+        test('uses onThrow to normalize the error type', async () => {
+            const fn = catchUnwindAsync(
+                async () => {
+                    throw new Error('nope');
+                },
+                (thrown) =>
+                    thrown instanceof Error ? thrown.message : 'unknown'
+            );
+            const res = await fn();
+            expect(res.unwrapErr()).toBe('nope');
+        });
+
+        test('passes arguments through to fn and onThrow', async () => {
+            const recorded: number[] = [];
+            const fn = catchUnwindAsync(
+                async (a: number, b: number) => {
+                    if (b === 0) throw new Error(`div by zero: ${a}`);
+                    return a / b;
+                },
+                (_thrown, a, b) => {
+                    recorded.push(a, b);
+                    return { code: 'DIV_ZERO' as const, a, b };
+                }
+            );
+
+            expect((await fn(10, 2)).unwrap()).toBe(5);
+            const err = await fn(10, 0);
+            expect(err.unwrapErr()).toEqual({ code: 'DIV_ZERO', a: 10, b: 0 });
+            expect(recorded).toEqual([10, 0]);
+        });
+
+        test('preserves `this` binding of the returned function', async () => {
+            const obj = { x: 10 };
+            const fn = catchUnwindAsync(
+                function (this: { x: number }, n: number) {
+                    return Promise.resolve(this.x + n);
+                },
+                (thrown) => (thrown instanceof Error ? thrown.message : 'err')
+            );
+            expect((await fn.call(obj, 5)).unwrap()).toBe(15);
+        });
+
+        test('rejects non-function fn and onThrow', () => {
+            expect(() => catchUnwindAsync('nope' as never)).toThrow(
+                InvalidArgumentError
+            );
+            expect(() =>
+                catchUnwindAsync(async () => 1, 'nope' as never)
+            ).toThrow(InvalidArgumentError);
+        });
+
+        test('wraps fetch-like promise realistically', async () => {
+            const fakeFetch = catchUnwindAsync(
+                async (url: string) => {
+                    if (url === 'bad') throw new Error('network');
+                    return { status: 200, url };
+                },
+                (thrown) =>
+                    thrown instanceof Error ? thrown.message : 'fetch error'
+            );
+            expect((await fakeFetch('good')).unwrap()).toEqual({
+                status: 200,
+                url: 'good'
+            });
+            expect((await fakeFetch('bad')).unwrapErr()).toBe('network');
+        });
+
+        test('returns an AsyncResult that is awaitable and chainable', async () => {
+            const fn = catchUnwindAsync(async (n: number) => n + 1);
+            const chained = await fn(1)
+                .map((x) => x * 10)
+                .unwrap();
+            expect(chained).toBe(20);
         });
     });
 });
