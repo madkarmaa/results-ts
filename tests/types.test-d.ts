@@ -9,13 +9,13 @@ import {
 import {
     Ok,
     Err,
-    fromThrowable,
+    catchUnwind,
     type Result,
     type OkResult,
     type ErrResult
 } from '../src/result';
 import { type AsyncOption } from '../src/async-option';
-import { type AsyncResult, fromThrowableAsync } from '../src/async-result';
+import { type AsyncResult, catchUnwindAsync } from '../src/async-result';
 
 describe('Option types', () => {
     test('Some and None constructors map correctly to Option<T>', () => {
@@ -206,17 +206,17 @@ describe('Result types', () => {
         Ok(42).transpose();
     });
 
-    test('fromThrowable without onThrow returns Result<T, unknown>', () => {
+    test('catchUnwind without onThrow returns Result<T, unknown>', () => {
         const unsafe = (a: number, b: string) => a + b.length;
-        const safe = fromThrowable(unsafe);
+        const safe = catchUnwind(unsafe);
 
         expectTypeOf(safe).toEqualTypeOf<
             (a: number, b: string) => Result<number, unknown>
         >();
     });
 
-    test('fromThrowable with onThrow narrows the error type', () => {
-        const safe = fromThrowable(
+    test('catchUnwind with onThrow narrows the error type', () => {
+        const safe = catchUnwind(
             (n: number) => n,
             (thrown: unknown): string =>
                 thrown instanceof Error ? thrown.message : 'err'
@@ -315,17 +315,17 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
         (({}) as AsyncResult<number, string>).transpose();
     });
 
-    test('fromThrowableAsync without onThrow returns AsyncResult<T, unknown>', () => {
+    test('catchUnwindAsync without onThrow returns AsyncResult<T, unknown>', () => {
         const unsafe = async (a: number, b: string) => a + b.length;
-        const safe = fromThrowableAsync(unsafe);
+        const safe = catchUnwindAsync(unsafe);
 
         expectTypeOf(safe).toEqualTypeOf<
             (a: number, b: string) => AsyncResult<number, unknown>
         >();
     });
 
-    test('fromThrowableAsync with onThrow narrows the error type', () => {
-        const safe = fromThrowableAsync(
+    test('catchUnwindAsync with onThrow narrows the error type', () => {
+        const safe = catchUnwindAsync(
             (n: number) => Promise.resolve(n),
             (thrown: unknown): string =>
                 thrown instanceof Error ? thrown.message : 'err'

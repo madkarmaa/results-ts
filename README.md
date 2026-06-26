@@ -80,16 +80,16 @@ const message = parseUserId('10')
 console.log(message);
 ```
 
-#### `fromThrowable`
+#### `catchUnwind`
 
 Wraps a function that may throw into one that returns a `Result` instead.
 
 [Official Rust `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
 
 ```typescript
-import { fromThrowable } from 'results-ts';
+import { catchUnwind } from 'results-ts';
 
-const safeParse = fromThrowable(JSON.parse, (thrown) =>
+const safeParse = catchUnwind(JSON.parse, (thrown) =>
     thrown instanceof Error ? thrown.message : 'parse error'
 );
 
@@ -100,7 +100,7 @@ const error = safeParse('{bad'); // Err('Unexpected token ...')
 Without an `onThrow` handler, the thrown value is caught as-is and the error type defaults to `unknown` (since JavaScript allows throwing anything):
 
 ```typescript
-const unsafe = fromThrowable(() => {
+const unsafe = catchUnwind(() => {
     throw 'literal string';
 });
 
@@ -108,14 +108,14 @@ const result = unsafe();
 //    ^? Result<never, unknown>
 ```
 
-#### `fromThrowableAsync`
+#### `catchUnwindAsync`
 
-Async counterpart of `fromThrowable`. Wraps a function returning a `Promise` (possibly rejecting) or a sync value into a function returning an `AsyncResult`. Both synchronous throws and rejected promises are caught.
+Async counterpart of `catchUnwind`. Wraps a function returning a `Promise` (possibly rejecting) or a sync value into a function returning an `AsyncResult`. Both synchronous throws and rejected promises are caught.
 
 ```typescript
-import { fromThrowableAsync } from 'results-ts';
+import { catchUnwindAsync } from 'results-ts';
 
-const safeFetch = fromThrowableAsync(
+const safeFetch = catchUnwindAsync(
     async (url: string) => {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

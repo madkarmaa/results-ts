@@ -1,6 +1,6 @@
 import { bench, do_not_optimize, group } from 'mitata';
 import { Ok, Err, type Result } from '../src/result';
-import { fromThrowableAsync } from '../src/async-result';
+import { catchUnwindAsync } from '../src/async-result';
 import {
     ok,
     err,
@@ -118,21 +118,21 @@ group('Async Result - then() wrapping', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Async Result - fromThrowableAsync
+// Async Result - catchUnwindAsync
 // ---------------------------------------------------------------------------
-group('Async Result - fromThrowableAsync', () => {
-    bench('fromThrowableAsync (wrap + call, Ok)', async () => {
-        const fn = fromThrowableAsync(asyncInc);
+group('Async Result - catchUnwindAsync', () => {
+    bench('catchUnwindAsync (wrap + call, Ok)', async () => {
+        const fn = catchUnwindAsync(asyncInc);
         do_not_optimize(await fn(1));
     }).gc('once');
-    bench('fromThrowableAsync (call only, Ok)', async () => {
+    bench('catchUnwindAsync (call only, Ok)', async () => {
         do_not_optimize(await safeAsyncInc(1));
     }).gc('once');
-    bench('fromThrowableAsync (wrap + call, reject)', async () => {
-        const fn = fromThrowableAsync(asyncReject);
+    bench('catchUnwindAsync (wrap + call, reject)', async () => {
+        const fn = catchUnwindAsync(asyncReject);
         do_not_optimize(await fn());
     }).gc('once');
-    bench('fromThrowableAsync (call only, reject)', async () => {
+    bench('catchUnwindAsync (call only, reject)', async () => {
         do_not_optimize(await safeAsyncReject());
     }).gc('once');
 });

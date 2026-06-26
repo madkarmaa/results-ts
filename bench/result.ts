@@ -1,5 +1,5 @@
 import { bench, do_not_optimize, group } from 'mitata';
-import { Ok, Err, fromThrowable, type Result } from '../src/result';
+import { Ok, Err, catchUnwind, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
 import { ok, err, inc, gt0, safeInc, thrower, safeThower } from './fixtures';
 
@@ -204,21 +204,21 @@ group('Result - iter', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Result - fromThrowable
+// Result - catchUnwind
 // ---------------------------------------------------------------------------
-group('Result - fromThrowable', () => {
-    bench('fromThrowable (wrap + call, Ok)', () => {
-        const fn = fromThrowable(inc);
+group('Result - catchUnwind', () => {
+    bench('catchUnwind (wrap + call, Ok)', () => {
+        const fn = catchUnwind(inc);
         do_not_optimize(fn(1));
     }).gc('once');
-    bench('fromThrowable (call only, Ok)', () => {
+    bench('catchUnwind (call only, Ok)', () => {
         do_not_optimize(safeInc(1));
     }).gc('once');
-    bench('fromThrowable (wrap + call, Err)', () => {
-        const fn = fromThrowable(thrower);
+    bench('catchUnwind (wrap + call, Err)', () => {
+        const fn = catchUnwind(thrower);
         do_not_optimize(fn());
     }).gc('once');
-    bench('fromThrowable (call only, catch)', () => {
+    bench('catchUnwind (call only, catch)', () => {
         do_not_optimize(safeThower());
     }).gc('once');
 });

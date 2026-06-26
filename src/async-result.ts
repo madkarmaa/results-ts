@@ -398,15 +398,15 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
  * @param onThrow - Optional handler invoked when `fn` throws or rejects; its return value becomes the `Err` payload.
  * @returns A function returning `AsyncResult<T, E>` that never throws.
  */
-export function fromThrowableAsync<T, Args extends unknown[]>(
+export function catchUnwindAsync<T, Args extends unknown[]>(
     fn: (...args: Args) => PromiseLike<T> | T,
     onThrow?: undefined
 ): (...args: Args) => AsyncResult<T, unknown>;
-export function fromThrowableAsync<T, Args extends unknown[], E>(
+export function catchUnwindAsync<T, Args extends unknown[], E>(
     fn: (...args: Args) => PromiseLike<T> | T,
     onThrow: (thrown: unknown, ...args: Args) => E
 ): (...args: Args) => AsyncResult<T, E>;
-export function fromThrowableAsync<T, Args extends unknown[], E>(
+export function catchUnwindAsync<T, Args extends unknown[], E>(
     fn: (...args: Args) => PromiseLike<T> | T,
     onThrow?: (thrown: unknown, ...args: Args) => E
 ): (...args: Args) => AsyncResult<T, E | unknown> {

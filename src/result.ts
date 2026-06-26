@@ -750,15 +750,15 @@ export function Err<E>(error: E): Result<never, E> {
  * @param onThrow - Optional handler invoked when `fn` throws; its return value becomes the `Err` payload.
  * @returns A function returning `Result<T, E>` that never throws.
  */
-export function fromThrowable<T, Args extends unknown[]>(
+export function catchUnwind<T, Args extends unknown[]>(
     fn: (...args: Args) => T,
     onThrow?: undefined
 ): (...args: Args) => Result<T, unknown>;
-export function fromThrowable<T, Args extends unknown[], E>(
+export function catchUnwind<T, Args extends unknown[], E>(
     fn: (...args: Args) => T,
     onThrow: (thrown: unknown, ...args: Args) => E
 ): (...args: Args) => Result<T, E>;
-export function fromThrowable<T, Args extends unknown[], E>(
+export function catchUnwind<T, Args extends unknown[], E>(
     fn: (...args: Args) => T,
     onThrow?: (thrown: unknown, ...args: Args) => E
 ): (...args: Args) => Result<T, E | unknown> {

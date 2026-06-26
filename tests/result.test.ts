@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { Ok, Err, fromThrowable, type Result } from '../src/result';
+import { Ok, Err, catchUnwind, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
 import {
     FlattenError,
@@ -340,15 +340,15 @@ describe('Result', () => {
         });
     });
 
-    describe('fromThrowable', () => {
+    describe('catchUnwind', () => {
         test('wraps a successful return value in Ok', () => {
-            const add = fromThrowable((a: number, b: number) => a + b);
+            const add = catchUnwind((a: number, b: number) => a + b);
             expect(add(2, 3).unwrap()).toBe(5);
             expect(add(2, 3).isOk()).toBe(true);
         });
 
         test('catches throws into Err when no handler is given', () => {
-            const boom = fromThrowable(() => {
+            const boom = catchUnwind(() => {
                 throw new Error('boom');
             });
             const res = boom();
@@ -357,19 +357,19 @@ describe('Result', () => {
         });
 
         test('catches non-Error throws as unknown', () => {
-            const throwString = fromThrowable(() => {
+            const throwString = catchUnwind(() => {
                 throw 'literal string';
             });
             expect(throwString().unwrapErr()).toBe('literal string');
 
-            const throwNumber = fromThrowable(() => {
+            const throwNumber = catchUnwind(() => {
                 throw 42;
             });
             expect(throwNumber().unwrapErr()).toBe(42);
         });
 
         test('uses onThrow to normalize the error type', () => {
-            const safe = fromThrowable(
+            const safe = catchUnwind(
                 () => {
                     throw new Error('nope');
                 },
@@ -383,7 +383,7 @@ describe('Result', () => {
 
         test('passes arguments through to fn and onThrow', () => {
             const recorded: { args: number[]; thrown: unknown }[] = [];
-            const fn = fromThrowable(
+            const fn = catchUnwind(
                 (a: number, b: number) => {
                     if (b === 0) throw new Error(`div by zero: ${a}`);
                     return a / b;
@@ -413,7 +413,7 @@ describe('Result', () => {
                     return this.x + n;
                 }
             };
-            const safe = fromThrowable(obj.method, (thrown) =>
+            const safe = catchUnwind(obj.method, (thrown) =>
                 thrown instanceof Error ? thrown.message : 'err'
             );
             expect(safe.call(obj, 5).unwrap()).toBe(15);
@@ -421,16 +421,16 @@ describe('Result', () => {
         });
 
         test('rejects non-function fn and onThrow', () => {
-            expect(() => fromThrowable('not a fn' as never)).toThrow(
+            expect(() => catchUnwind('not a fn' as never)).toThrow(
                 InvalidArgumentError
             );
-            expect(() => fromThrowable(() => 1, 'not a fn' as never)).toThrow(
+            expect(() => catchUnwind(() => 1, 'not a fn' as never)).toThrow(
                 InvalidArgumentError
             );
         });
 
         test('wraps JSON.parse realistically', () => {
-            const safeParse = fromThrowable(JSON.parse, (thrown) =>
+            const safeParse = catchUnwind(JSON.parse, (thrown) =>
                 thrown instanceof Error ? thrown.message : 'parse error'
             );
             expect(safeParse('{"a":1}').unwrap()).toEqual({ a: 1 });
