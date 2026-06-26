@@ -739,12 +739,19 @@ export function Err<E>(error: E): Result<never, E> {
 }
 
 /**
- * Wraps a function `fn` that may throw into a function that, when called, returns a `Result`.
+ * Invokes a function, capturing the cause of a thrown error if one occurs.
  *
- * If `fn` returns normally, its return value is wrapped in `Ok`. If `fn` throws, the thrown value is caught:
- * - when no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
- *   (typed as `unknown`, since JavaScript allows throwing anything);
- * - when `onThrow` is provided, it is called with the thrown value and its return value is wrapped in an `Err`.
+ * This function will return `Ok` with the function's result if it does not throw, and will return
+ * `Err(cause)` if the function throws. The cause returned is the value with which the function
+ * originally threw.
+ *
+ * It is not recommended to use this function for a general try/catch mechanism. The `Result` type
+ * is more appropriate to use for functions that can fail on a regular basis.
+ *
+ * When no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
+ * (typed as `unknown`, since JavaScript allows throwing anything).
+ * When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
+ * in an `Err`, allowing the error type to be narrowed and normalized.
  *
  * @param fn - The throwing function to wrap.
  * @param onThrow - Optional handler invoked when `fn` throws; its return value becomes the `Err` payload.

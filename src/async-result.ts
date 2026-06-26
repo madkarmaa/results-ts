@@ -385,14 +385,20 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
 }
 
 /**
- * Wraps a function `fn` that returns a `PromiseLike` (and may also throw synchronously or reject asynchronously)
- * into a function that returns an `AsyncResult` instead.
+ * Async counterpart of `catchUnwind`. Invokes a function, capturing the cause of a thrown
+ * error or rejected `Promise` if one occurs.
  *
- * Both synchronous throws inside `fn` and rejected `Promise`s are caught:
- * - when no `onThrow` handler is provided, the thrown/rejected value is wrapped as-is in an `Err`
- *  (typed as `unknown`, since JavaScript allows throwing anything);
- * - when `onThrow` is provided, it is called with the thrown value and its return value is wrapped in an `Err`,
- *  allowing the error type to be narrowed and normalized.
+ * This function will return `Ok` with the function's result if it does not throw or reject, and
+ * will return `Err(cause)` if the function throws or the returned `Promise` rejects. The cause
+ * returned is the value with which the function originally threw or rejected.
+ *
+ * It is not recommended to use this function for a general try/catch mechanism. The `AsyncResult`
+ * type is more appropriate to use for functions that can fail on a regular basis.
+ *
+ * When no `onThrow` handler is provided, the thrown/rejected value is wrapped as-is in an `Err`
+ * (typed as `unknown`, since JavaScript allows throwing anything).
+ * When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
+ * in an `Err`, allowing the error type to be narrowed and normalized.
  *
  * @param fn - The throwing/async function to wrap.
  * @param onThrow - Optional handler invoked when `fn` throws or rejects; its return value becomes the `Err` payload.

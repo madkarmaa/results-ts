@@ -82,7 +82,11 @@ console.log(message);
 
 #### `catchUnwind`
 
-Wraps a function that may throw into one that returns a `Result` instead.
+Invokes a function, capturing the cause of a thrown error if one occurs.
+
+Returns `Ok` with the function's result if it does not throw, and `Err(cause)` if it throws. The cause returned is the value with which the function originally threw.
+
+It is not recommended to use this function for a general try/catch mechanism. The `Result` type is more appropriate to use for functions that can fail on a regular basis.
 
 [Official Rust `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
 
@@ -110,7 +114,9 @@ const result = unsafe();
 
 #### `catchUnwindAsync`
 
-Async counterpart of `catchUnwind`. Wraps a function returning a `Promise` (possibly rejecting) or a sync value into a function returning an `AsyncResult`. Both synchronous throws and rejected promises are caught.
+Async counterpart of `catchUnwind`. Invokes a function returning a `Promise` (possibly rejecting) or a sync value, capturing the cause of a thrown error or rejected `Promise` if one occurs.
+
+Returns `Ok` with the function's result if it does not throw or reject, and `Err(cause)` otherwise. Both synchronous throws and rejected promises are caught.
 
 ```typescript
 import { catchUnwindAsync } from 'results-ts';
