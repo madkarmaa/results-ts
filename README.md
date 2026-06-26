@@ -7,6 +7,18 @@
 
 This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
 
+<p align="center">
+    <a href="https://npmx.dev/package/results-ts/v/latest">
+        <img src="https://img.shields.io/npm/v/results-ts?labelColor=blue&color=grey" alt="npm version" />
+    </a>
+    <a href="https://npmx.dev/package/results-ts/v/canary">
+        <img src="https://img.shields.io/npm/v/results-ts/canary?labelColor=yellow&color=grey" alt="npm canary version" />
+    </a>
+    <a href="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml">
+        <img src="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml/badge.svg" alt="Release workflow" />
+    </a>
+</p>
+
 ## Installation
 
 ```bash
