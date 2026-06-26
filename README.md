@@ -192,6 +192,12 @@ Interested in contributing? See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup i
 - **[vultix/ts-results](https://github.com/vultix/ts-results)**
 - **[supermacro/neverthrow](https://github.com/supermacro/neverthrow)**
 
+## Contributors
+
+Thanks to all the contributors who helped make this project better!
+
+[![Contributors](https://contrib.rocks/image?repo=madkarmaa/results-ts&max=400&columns=20)](https://github.com/madkarmaa/results-ts/graphs/contributors)
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).
