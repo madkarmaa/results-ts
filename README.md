@@ -35,9 +35,9 @@ yarn add results-ts
 
 ## Usage
 
-### Result
+### `Result`
 
-[Official Rust Result documentation](https://doc.rust-lang.org/std/result/enum.Result.html)
+[Official Rust's `Result` documentation](https://doc.rust-lang.org/std/result/enum.Result.html)
 
 ```typescript
 import { Ok, Err } from 'results-ts';
@@ -88,7 +88,7 @@ Returns `Ok` with the function's result if it does not throw, and `Err(cause)` i
 
 It is not recommended to use this function for a general try/catch mechanism. The `Result` type is more appropriate to use for functions that can fail on a regular basis.
 
-[Official Rust `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
+[Official Rust's `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
 
 ```typescript
 import { catchUnwind } from 'results-ts';
@@ -134,9 +134,9 @@ const result = await safeFetch('https://api.example.com');
 //    ^? AsyncResult<unknown, string>
 ```
 
-### Option
+### `Option`
 
-[Official Rust Option documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
+[Official Rust's `Option` documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
 
 ```typescript
 import { Some, None } from 'results-ts';
@@ -160,7 +160,10 @@ console.log(displayName);
 
 ### Plain HTML
 
-You can also use `results-ts` directly in the browser without a bundler. Import it from a CDN in a `<script type="module">` (the `type="module"` attribute is required, since this is an ES module):
+You can also use `results-ts` directly in the browser without a bundler. Import it from a CDN in a `<script type="module">`:
+
+> [!IMPORTANT]
+> The `type="module"` attribute is required, since this is an ES module
 
 ```html
 <!doctype html>
