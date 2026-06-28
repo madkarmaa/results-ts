@@ -14,7 +14,11 @@
         "prettier": "3.8.3",
         "semantic-release": "^25.0.5",
         "tsdown": "^0.22.3",
+        "typedoc": "^0.28.19",
+        "typedoc-plugin-markdown": "^4.12.0",
+        "typedoc-plugin-missing-exports": "^4.1.3",
         "typescript": "^6.0.3",
+        "vitepress": "^1.6.4",
         "vitest": "^4.1.9"
     },
     "type": "module",
@@ -41,7 +45,11 @@
         "typecheck:dev": "tsc --noEmit --watch",
         "format": "prettier --write --ignore-unknown .",
         "release": "semantic-release",
-        "release:dry": "semantic-release --dry-run"
+        "release:dry": "semantic-release --dry-run",
+        "docs:api": "typedoc",
+        "docs:dev": "typedoc && vitepress dev docs",
+        "docs:build": "typedoc && vitepress build docs",
+        "docs:preview": "typedoc && vitepress build docs && vitepress preview docs"
     },
     "repository": {
         "type": "git",
