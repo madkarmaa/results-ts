@@ -1,8 +1,13 @@
 {
     "name": "results-ts",
     "version": "4.2.0",
-    "description": "Rust's Result and Option types, for TypeScript",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/madkarmaa/results-ts.git"
+    },
+    "main": "./dist/index.js",
     "devDependencies": {
+        "@catppuccin/vitepress": "^0.1.2",
         "@commitlint/cli": "^21.1.0",
         "@commitlint/config-conventional": "^21.1.0",
         "@semantic-release/changelog": "^6.0.3",
@@ -21,8 +26,6 @@
         "vitepress": "^1.6.4",
         "vitest": "^4.1.9"
     },
-    "type": "module",
-    "main": "./dist/index.js",
     "exports": {
         ".": {
             "default": "./dist/index.js",
@@ -30,9 +33,27 @@
         },
         "./package.json": "./package.json"
     },
+    "description": "Rust's Result and Option types, for TypeScript",
     "files": [
         "dist"
     ],
+    "keywords": [
+        "javascript",
+        "javascript-library",
+        "js",
+        "js-lib",
+        "library",
+        "rust",
+        "rust-option",
+        "rust-result",
+        "rust-typescript",
+        "ts",
+        "ts-lib",
+        "typescript",
+        "typescript-library",
+        "typescript-rust"
+    ],
+    "license": "MIT",
     "scripts": {
         "prepare": "husky",
         "build": "tsdown",
@@ -51,25 +72,5 @@
         "docs:build": "typedoc && vitepress build docs",
         "docs:preview": "typedoc && vitepress build docs && vitepress preview docs"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/madkarmaa/results-ts.git"
-    },
-    "license": "MIT",
-    "keywords": [
-        "javascript",
-        "javascript-library",
-        "js",
-        "js-lib",
-        "library",
-        "rust",
-        "rust-option",
-        "rust-result",
-        "rust-typescript",
-        "ts",
-        "ts-lib",
-        "typescript",
-        "typescript-library",
-        "typescript-rust"
-    ]
+    "type": "module"
 }
