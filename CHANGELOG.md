@@ -1,3 +1,13 @@
+## [4.2.1](https://github.com/madkarmaa/results-ts/compare/v4.2.0...v4.2.1) (2026-06-29)
+
+### Bug Fixes
+
+- **docs:** match readme style ([15bea49](https://github.com/madkarmaa/results-ts/commit/15bea492a91924808a37e246b716be78ec79f497))
+
+### Documentation
+
+- add `typedoc` + `vitepress` documentation website ([#45](https://github.com/madkarmaa/results-ts/issues/45)) ([0543c72](https://github.com/madkarmaa/results-ts/commit/0543c72eeb49c4fad399742918e42536b0e34b0c))
+
 ## [4.2.0](https://github.com/madkarmaa/results-ts/compare/v4.1.1...v4.2.0) (2026-06-26)
 
 ### Features
