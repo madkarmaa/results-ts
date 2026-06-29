@@ -1,9 +1,24 @@
 import { defineConfig } from 'vitepress';
 import { readdirSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import pkg from '../../package.json';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+const getReleasedVersions = () => {
+    try {
+        return execSync("git tag --list 'v*' --sort=-v:refname", {
+            encoding: 'utf-8'
+        })
+            .trim()
+            .split('\n')
+            .map((tag) => tag.replace(/^v/, ''))
+            .filter(Boolean);
+    } catch {
+        return [];
+    }
+};
 
 const getApiSidebar = () => {
     const apiDir = resolve(
@@ -52,10 +67,19 @@ export default defineConfig({
             {
                 text: `<span style="color: var(--vp-c-brand)">v${pkg.version}</span>`,
                 items: [
-                    {
-                        text: 'Changelog',
-                        link: `https://github.com/madkarmaa/results-ts/releases/tag/v${pkg.version}`
-                    },
+                    ...getReleasedVersions()
+                        .filter((version) => version !== pkg.version)
+                        .map((version) => {
+                            const sameMajor = version.startsWith(
+                                `${pkg.version.split('.')[0]}.`
+                            );
+                            return {
+                                text: sameMajor
+                                    ? `v${version}`
+                                    : `<span style="opacity: 0.5">v${version}</span>`,
+                                link: `https://github.com/madkarmaa/results-ts/releases/tag/v${version}`
+                            };
+                        }),
                     {
                         text: 'Contributing',
                         link: 'https://github.com/madkarmaa/results-ts/blob/main/CONTRIBUTING.md'
