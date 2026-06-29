@@ -14,6 +14,9 @@ This library mimics the Rust `Result` and `Option` enums and includes some of th
     <a href="https://npmx.dev/package/results-ts/v/canary">
         <img src="https://img.shields.io/npm/v/results-ts/canary?labelColor=yellow&color=grey" alt="npm canary version" />
     </a>
+    <a href="https://madkarmaa.github.io/results-ts/">
+        <img src="https://img.shields.io/badge/docs-website?labelColor=purple&color=grey" alt="documentation" />
+    </a>
     <a href="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml">
         <img src="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml/badge.svg" alt="Release workflow" />
     </a>
@@ -35,9 +38,7 @@ yarn add results-ts
 
 ## Usage
 
-### `Result`
-
-[Official Rust's `Result` documentation](https://doc.rust-lang.org/std/result/enum.Result.html)
+A quick taste of the `Result` type:
 
 ```typescript
 import { Ok, Err } from 'results-ts';
@@ -59,149 +60,20 @@ const parseUserId = (id: string) => {
     return Ok(parsed);
 };
 
-const fetchUser = (id: number) => {
-    if (id === 13)
-        return Err({ code: 'NOT_FOUND', message: 'User not found' } as const);
-    return Ok({ id, name: 'Alice', role: 'admin' });
-};
-
 const message = parseUserId('10')
     .map((id) => id + 3)
-    .andThen(fetchUser)
+    .andThen((id) => Ok({ id, name: 'Alice', role: 'admin' }))
     .match({
         Ok: (user) => `Welcome, ${user.role} ${user.name}!`,
-        Err: (error) => {
-            if (error.code === 'NOT_FOUND')
-                return `Database Error: ${error.message}`;
-            return `Validation Error: ${error.message}`;
-        }
+        Err: (error) => `Validation Error: ${error.message}`
     });
 
 console.log(message);
 ```
 
-#### `catchUnwind`
+## Documentation
 
-Invokes a function, capturing the cause of a thrown error if one occurs.
-
-Returns `Ok` with the function's result if it does not throw, and `Err(cause)` if it throws. The cause returned is the value with which the function originally threw.
-
-It is not recommended to use this function for a general try/catch mechanism. The `Result` type is more appropriate to use for functions that can fail on a regular basis.
-
-[Official Rust's `catch_unwind` documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
-
-```typescript
-import { catchUnwind } from 'results-ts';
-
-const safeParse = catchUnwind(JSON.parse, (thrown) =>
-    thrown instanceof Error ? thrown.message : 'parse error'
-);
-
-const result = safeParse('{"a":1}'); // Ok({ a: 1 })
-const error = safeParse('{bad'); // Err('Unexpected token ...')
-```
-
-Without an `onThrow` handler, the thrown value is caught as-is and the error type defaults to `unknown` (since JavaScript allows throwing anything):
-
-```typescript
-const unsafe = catchUnwind(() => {
-    throw 'literal string';
-});
-
-const result = unsafe();
-//    ^? Result<never, unknown>
-```
-
-#### `catchUnwindAsync`
-
-Async counterpart of `catchUnwind`. Invokes a function returning a `Promise` (possibly rejecting) or a sync value, capturing the cause of a thrown error or rejected `Promise` if one occurs.
-
-Returns `Ok` with the function's result if it does not throw or reject, and `Err(cause)` otherwise. Both synchronous throws and rejected promises are caught.
-
-```typescript
-import { catchUnwindAsync } from 'results-ts';
-
-const safeFetch = catchUnwindAsync(
-    async (url: string) => {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-    },
-    (thrown) => (thrown instanceof Error ? thrown.message : 'request failed')
-);
-
-const result = await safeFetch('https://api.example.com');
-//    ^? AsyncResult<unknown, string>
-```
-
-### `Option`
-
-[Official Rust's `Option` documentation](https://doc.rust-lang.org/std/option/enum.Option.html)
-
-```typescript
-import { Some, None } from 'results-ts';
-
-const parseNickname = (nickname?: string) => {
-    if (!nickname) return None();
-
-    const trimmed = nickname.trim();
-    return trimmed.length > 0 ? Some(trimmed) : None();
-};
-
-const displayName = parseNickname('  Ada  ')
-    .map((name) => name.toUpperCase())
-    .match({
-        Some: (name) => name,
-        None: () => 'ANONYMOUS'
-    });
-
-console.log(displayName);
-```
-
-### Plain HTML
-
-You can also use `results-ts` directly in the browser without a bundler. Import it from a CDN in a `<script type="module">`:
-
-> [!IMPORTANT]
-> The `type="module"` attribute is required, since this is an ES module
-
-```html
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>results-ts Demo</title>
-    </head>
-
-    <body>
-        <code style="font-size: 1.5rem">
-            Ok(1).map((x) => x + 1).unwrap() =
-            <span id="result" style="color: #f00">Loading...</span>
-        </code>
-
-        <script type="module">
-            import { Ok } from 'https://unpkg.com/results-ts/dist/index.js';
-
-            document.querySelector('#result').textContent = Ok(1)
-                .map((x) => x + 1)
-                .unwrap();
-        </script>
-    </body>
-</html>
-```
-
-## How this differs from Rust
-
-Rust uses the `match` keyword syntax; this library provides a `.match()` method on both `Result` and `Option` to achieve the same branching style in TypeScript.
-
-## Error philosophy
-
-Some methods (for example `expect`, `unwrap`, `expectErr`, and `unwrapErr`) intentionally panic to mirror Rust behavior.
-
-If you ever get a non-panic JavaScript error from this library, that usually means invalid runtime data was passed in (library misuse, type-system bypass, or garbage input), and the call site should be fixed.
-
-Error classes are intentionally not exported, this encourages treating thrown JavaScript errors as unexpected behavior rather than a normal control-flow path handled with `try/catch`.
+Full documentation and complete API reference: **<https://madkarmaa.github.io/results-ts/>**.
 
 ## Contributing
 
