@@ -48,8 +48,26 @@ export default defineConfig({
     themeConfig: {
         nav: [
             { text: 'Guide', link: '/guide' },
-            { text: 'API', link: '/api/' }
+            { text: 'API', link: '/api/' },
+            {
+                text: `<span style="color: var(--vp-c-brand)">v${pkg.version}</span>`,
+                items: [
+                    {
+                        text: 'Changelog',
+                        link: `https://github.com/madkarmaa/results-ts/releases/tag/v${pkg.version}`
+                    },
+                    {
+                        text: 'Contributing',
+                        link: 'https://github.com/madkarmaa/results-ts/blob/main/CONTRIBUTING.md'
+                    }
+                ]
+            }
         ],
+
+        search: {
+            provider: 'local'
+        },
+
         sidebar: {
             '/api/': [
                 {
@@ -64,10 +82,27 @@ export default defineConfig({
                         {
                             text: 'Getting Started',
                             link: '/guide/getting-started'
+                        },
+                        {
+                            text: 'Async',
+                            link: '/guide/async'
+                        },
+                        {
+                            text: 'Error handling',
+                            link: '/guide/error-handling'
                         }
                     ]
                 }
             ]
+        },
+
+        socialLinks: [
+            { icon: 'github', link: 'https://github.com/madkarmaa/results-ts' }
+        ],
+
+        footer: {
+            message:
+                'Made with ❤️ by <a href="https://github.com/madkarmaa" target="_blank">MadKarma</a> and <a href="https://github.com/madkarmaa/results-ts/graphs/contributors" target="_blank">contributors</a> &#58;&#41;'
         }
     }
 });
