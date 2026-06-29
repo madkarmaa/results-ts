@@ -73,7 +73,7 @@ console.log(message);
 
 ## Documentation
 
-Full documentation and complete API reference: **<https://results-ts.madkarma.top/>**.
+Full documentation and complete API reference: **[results-ts.madkarma.top](https://results-ts.madkarma.top)**.
 
 ## Contributing
 
