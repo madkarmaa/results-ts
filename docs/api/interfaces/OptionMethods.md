@@ -6,7 +6,7 @@
 
 # Interface: OptionMethods\<T\>
 
-Defined in: [option.ts:39](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L39)
+Defined in: [option.ts:39](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L39)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [option.ts:39](https://github.com/madkarmaa/results-ts/blob/c93f915a
 
 > **and**\<`U`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:186](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L186)
+Defined in: [option.ts:186](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L186)
 
 Returns `None` if the option is `None`, otherwise returns `optb`.
 
@@ -50,7 +50,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **andThen**\<`U`\>(`f`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:193](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L193)
+Defined in: [option.ts:193](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L193)
 
 Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
 
@@ -80,7 +80,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **andThenAsync**\<`U`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:200](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L200)
+Defined in: [option.ts:200](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L200)
 
 Async version of `andThen`. Returns `None` if the option is `None`, otherwise calls async `f` with the wrapped value and returns the result.
 
@@ -110,7 +110,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **expect**(`msg`): `T`
 
-Defined in: [option.ts:73](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L73)
+Defined in: [option.ts:73](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L73)
 
 Returns the contained `Some` value.
 
@@ -138,7 +138,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **filter**(`predicate`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:209](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L209)
+Defined in: [option.ts:209](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L209)
 
 Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
 
@@ -165,7 +165,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **filterAsync**(`predicate`): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [option.ts:218](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L218)
+Defined in: [option.ts:218](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L218)
 
 Async version of `filter`. Returns `None` if the option is `None`, otherwise calls async `predicate` with the wrapped value and returns:
 
@@ -192,7 +192,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **flatten**\<`U`\>(`this`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:301](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L301)
+Defined in: [option.ts:301](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L301)
 
 Converts from `Option<Option<T>>` to `Option<T>`.
 
@@ -222,7 +222,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **getOrInsert**(`value`): `T`
 
-Defined in: [option.ts:260](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L260)
+Defined in: [option.ts:260](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L260)
 
 Inserts `value` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -246,7 +246,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **getOrInsertWith**(`f`): `T`
 
-Defined in: [option.ts:267](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L267)
+Defined in: [option.ts:267](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L267)
 
 Inserts a value computed from `f` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -270,7 +270,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **getOrInsertWithAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [option.ts:274](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L274)
+Defined in: [option.ts:274](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L274)
 
 Async version of `getOrInsertWith`. Inserts a value computed from async `f` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -294,7 +294,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **insert**(`value`): `T`
 
-Defined in: [option.ts:253](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L253)
+Defined in: [option.ts:253](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L253)
 
 Inserts `value` into the option, then returns a reference to it.
 
@@ -318,7 +318,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **inspect**(`f`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:122](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L122)
+Defined in: [option.ts:122](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L122)
 
 Calls the provided closure with a reference to the contained value (if `Some`).
 
@@ -342,7 +342,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **inspectAsync**(`f`): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [option.ts:129](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L129)
+Defined in: [option.ts:129](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L129)
 
 Async version of `inspect`. Calls the provided async closure with a reference to the contained value (if `Some`), then returns the original option.
 
@@ -366,7 +366,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **isNone**(): `this is NoneOption<T>`
 
-Defined in: [option.ts:58](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L58)
+Defined in: [option.ts:58](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L58)
 
 Returns `true` if the option is a `None` value.
 
@@ -380,7 +380,7 @@ Returns `true` if the option is a `None` value.
 
 > **isNoneOr**(`f`): `boolean`
 
-Defined in: [option.ts:65](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L65)
+Defined in: [option.ts:65](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L65)
 
 Returns `true` if the option is a `None` or the value inside of it matches a predicate.
 
@@ -404,7 +404,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **isSome**(): `this is SomeOption<T>`
 
-Defined in: [option.ts:45](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L45)
+Defined in: [option.ts:45](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L45)
 
 Returns `true` if the option is a `Some` value.
 
@@ -420,7 +420,7 @@ Returns `true` if the option is a `Some` value.
 
 > **isSomeAnd**\<`U`\>(`f`): `this is SomeOption<U>`
 
-Defined in: [option.ts:52](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L52)
+Defined in: [option.ts:52](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L52)
 
 Returns `true` if the option is a `Some` and the value inside of it matches a predicate.
 
@@ -448,7 +448,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **isSomeAnd**(`f`): `this is SomeOption<T>`
 
-Defined in: [option.ts:53](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L53)
+Defined in: [option.ts:53](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L53)
 
 ##### Parameters
 
@@ -466,7 +466,7 @@ Defined in: [option.ts:53](https://github.com/madkarmaa/results-ts/blob/c93f915a
 
 > **iter**(): `IterableIterator`\<`T`\>
 
-Defined in: [option.ts:179](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L179)
+Defined in: [option.ts:179](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L179)
 
 Returns an iterator over the possibly contained value.
 
@@ -480,7 +480,7 @@ Returns an iterator over the possibly contained value.
 
 > **map**\<`U`\>(`f`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:108](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L108)
+Defined in: [option.ts:108](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L108)
 
 Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
@@ -510,7 +510,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **mapAsync**\<`U`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:115](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L115)
+Defined in: [option.ts:115](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L115)
 
 Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an async function to a contained value.
 
@@ -540,7 +540,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **mapOr**\<`U`\>(`defaultVal`, `f`): `U`
 
-Defined in: [option.ts:136](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L136)
+Defined in: [option.ts:136](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L136)
 
 Returns the provided default result (if none), or applies a function to the contained value (if any).
 
@@ -574,7 +574,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **mapOrElse**\<`U`\>(`defaultF`, `f`): `U`
 
-Defined in: [option.ts:143](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L143)
+Defined in: [option.ts:143](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L143)
 
 Computes a default function result (if none), or applies a different function to the contained value (if any).
 
@@ -608,7 +608,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **mapOrElseAsync**\<`U`\>(`defaultF`, `f`): `Promise`\<`U`\>
 
-Defined in: [option.ts:150](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L150)
+Defined in: [option.ts:150](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L150)
 
 Async version of `mapOrElse`. Computes a default async function result (if none), or applies a different async function to the contained value (if any).
 
@@ -642,7 +642,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **match**\<`U`\>(`handlers`): `U`
 
-Defined in: [option.ts:328](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L328)
+Defined in: [option.ts:328](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L328)
 
 Matches the `Option` with two functions, one for each variant.
 
@@ -678,7 +678,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **okOr**\<`E`\>(`err`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [option.ts:160](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L160)
+Defined in: [option.ts:160](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L160)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 
@@ -708,7 +708,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **okOrElse**\<`E`\>(`errF`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [option.ts:167](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L167)
+Defined in: [option.ts:167](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L167)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
 
@@ -738,7 +738,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **okOrElseAsync**\<`E`\>(`errF`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [option.ts:174](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L174)
+Defined in: [option.ts:174](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L174)
 
 Async version of `okOrElse`. Transforms the `Option<T>` into a `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
 
@@ -768,7 +768,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **or**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:225](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L225)
+Defined in: [option.ts:225](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L225)
 
 Returns the option if it contains a value, otherwise returns `optb`.
 
@@ -798,7 +798,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **orElse**\<`T2`\>(`f`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:232](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L232)
+Defined in: [option.ts:232](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L232)
 
 Returns the option if it contains a value, otherwise calls `f` and returns the result.
 
@@ -828,7 +828,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **orElseAsync**\<`T2`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:239](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L239)
+Defined in: [option.ts:239](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L239)
 
 Async version of `orElse`. Returns the option if it contains a value, otherwise calls async `f` and returns the result.
 
@@ -858,7 +858,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **replace**(`value`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:294](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L294)
+Defined in: [option.ts:294](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L294)
 
 Replaces the actual value in the option by the value given in parameter, returning the old value if present,
 leaving a `Some` in its place.
@@ -883,7 +883,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **take**(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:279](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L279)
+Defined in: [option.ts:279](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L279)
 
 Takes the value out of the option, leaving a `None` in its place.
 
@@ -897,7 +897,7 @@ Takes the value out of the option, leaving a `None` in its place.
 
 > **takeIf**(`predicate`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:286](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L286)
+Defined in: [option.ts:286](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L286)
 
 Takes the value out of the option, but only if the predicate evaluates to `true` on the value.
 
@@ -921,7 +921,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **toString**(): `string`
 
-Defined in: [option.ts:40](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L40)
+Defined in: [option.ts:40](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L40)
 
 #### Returns
 
@@ -933,7 +933,7 @@ Defined in: [option.ts:40](https://github.com/madkarmaa/results-ts/blob/c93f915a
 
 > **transpose**\<`T`, `E`\>(`this`): [`Result`](../type-aliases/Result.md)\<[`Option`](../type-aliases/Option.md)\<`T`\>, `E`\>
 
-Defined in: [option.ts:311](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L311)
+Defined in: [option.ts:311](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L311)
 
 Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
@@ -970,7 +970,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **unwrap**(): `T`
 
-Defined in: [option.ts:80](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L80)
+Defined in: [option.ts:80](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L80)
 
 Returns the contained `Some` value.
 
@@ -988,7 +988,7 @@ Panics if the self value equals `None`.
 
 > **unwrapOr**(`defaultVal`): `T`
 
-Defined in: [option.ts:87](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L87)
+Defined in: [option.ts:87](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L87)
 
 Returns the contained `Some` value or a provided default.
 
@@ -1012,7 +1012,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **unwrapOrElse**(`f`): `T`
 
-Defined in: [option.ts:94](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L94)
+Defined in: [option.ts:94](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L94)
 
 Returns the contained `Some` value or computes it from a closure.
 
@@ -1036,7 +1036,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **unwrapOrElseAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [option.ts:101](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L101)
+Defined in: [option.ts:101](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L101)
 
 Async version of `unwrapOrElse`. Returns the contained `Some` value or computes it from an async closure.
 
@@ -1060,7 +1060,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **unzip**\<`T`, `U`\>(`this`): \[[`Option`](../type-aliases/Option.md)\<`T`\>, [`Option`](../type-aliases/Option.md)\<`U`\>\]
 
-Defined in: [option.ts:321](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L321)
+Defined in: [option.ts:321](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L321)
 
 Unzips an `Option` containing a tuple of two values.
 
@@ -1097,7 +1097,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **xor**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:246](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/option.ts#L246)
+Defined in: [option.ts:246](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L246)
 
 Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
 

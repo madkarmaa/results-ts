@@ -10,7 +10,7 @@
 
 > **catchUnwindAsync**\<`T`, `Args`\>(`fn`, `onThrow?`): (...`args`) => [`AsyncResult`](../interfaces/AsyncResult.md)\<`T`, `unknown`\>
 
-Defined in: [async-result.ts:407](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-result.ts#L407)
+Defined in: [async-result.ts:407](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-result.ts#L407)
 
 Async counterpart of `catchUnwind`. Invokes a function, capturing the cause of a thrown
 error or rejected `Promise` if one occurs.
@@ -61,7 +61,7 @@ A function returning `AsyncResult<T, E>` that never throws.
 
 > **catchUnwindAsync**\<`T`, `Args`, `E`\>(`fn`, `onThrow`): (...`args`) => [`AsyncResult`](../interfaces/AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [async-result.ts:411](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-result.ts#L411)
+Defined in: [async-result.ts:411](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-result.ts#L411)
 
 Async counterpart of `catchUnwind`. Invokes a function, capturing the cause of a thrown
 error or rejected `Promise` if one occurs.

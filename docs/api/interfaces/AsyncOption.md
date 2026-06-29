@@ -6,7 +6,7 @@
 
 # Interface: AsyncOption\<T\>
 
-Defined in: [async-option.ts:17](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L17)
+Defined in: [async-option.ts:17](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L17)
 
 An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
 but also carries all chainable `Option` methods.
@@ -35,7 +35,7 @@ the underlying `Option` doesn't exist yet. Use `await` to resolve first, then mu
 
 > **and**\<`U`\>(`optb`): `AsyncOption`\<`U`\>
 
-Defined in: [async-option.ts:125](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L125)
+Defined in: [async-option.ts:125](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L125)
 
 Returns `None` if the option is `None`, otherwise returns `optb`.
 
@@ -61,7 +61,7 @@ Returns `None` if the option is `None`, otherwise returns `optb`.
 
 > **andThen**\<`U`\>(`f`): `AsyncOption`\<`U`\>
 
-Defined in: [async-option.ts:130](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L130)
+Defined in: [async-option.ts:130](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L130)
 
 Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
 
@@ -87,7 +87,7 @@ Returns `None` if the option is `None`, otherwise calls `f` with the wrapped val
 
 > **andThenAsync**\<`U`\>(`f`): `AsyncOption`\<`U`\>
 
-Defined in: [async-option.ts:135](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L135)
+Defined in: [async-option.ts:135](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L135)
 
 Async version of `andThen`. Returns `None` if the option is `None`, otherwise calls async `f` with the wrapped value and returns the result.
 
@@ -113,7 +113,7 @@ Async version of `andThen`. Returns `None` if the option is `None`, otherwise ca
 
 > **expect**(`msg`): `Promise`\<`T`\>
 
-Defined in: [async-option.ts:43](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L43)
+Defined in: [async-option.ts:43](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L43)
 
 Returns the contained `Some` value.
 
@@ -137,7 +137,7 @@ Rejects with `PanicError` if the value is a `None` with a custom panic message p
 
 > **filter**(`predicate`): `AsyncOption`\<`T`\>
 
-Defined in: [async-option.ts:142](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L142)
+Defined in: [async-option.ts:142](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L142)
 
 Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
 
@@ -160,7 +160,7 @@ Returns `None` if the option is `None`, otherwise calls `predicate` with the wra
 
 > **filterAsync**(`predicate`): `AsyncOption`\<`T`\>
 
-Defined in: [async-option.ts:149](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L149)
+Defined in: [async-option.ts:149](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L149)
 
 Async version of `filter`. Returns `None` if the option is `None`, otherwise calls async `predicate` with the wrapped value and returns:
 
@@ -183,7 +183,7 @@ Async version of `filter`. Returns `None` if the option is `None`, otherwise cal
 
 > **flatten**\<`U`\>(`this`): `AsyncOption`\<`U`\>
 
-Defined in: [async-option.ts:177](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L177)
+Defined in: [async-option.ts:177](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L177)
 
 Converts from `AsyncOption<Option<T>>` to `AsyncOption<T>`.
 
@@ -212,7 +212,7 @@ with `FlattenError` rather than a synchronous throw.
 
 > **inspect**(`f`): `AsyncOption`\<`T`\>
 
-Defined in: [async-option.ts:82](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L82)
+Defined in: [async-option.ts:82](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L82)
 
 Calls the provided closure with a reference to the contained value (if `Some`).
 
@@ -234,7 +234,7 @@ Returns the original option.
 
 > **inspectAsync**(`f`): `AsyncOption`\<`T`\>
 
-Defined in: [async-option.ts:87](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L87)
+Defined in: [async-option.ts:87](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L87)
 
 Async version of `inspect`. Calls the provided async closure with a reference to the contained value (if `Some`), then returns the original option.
 
@@ -254,7 +254,7 @@ Async version of `inspect`. Calls the provided async closure with a reference to
 
 > **isNone**(): `Promise`\<`boolean`\>
 
-Defined in: [async-option.ts:31](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L31)
+Defined in: [async-option.ts:31](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L31)
 
 Returns a `Promise` that resolves to `true` if the option is a `None` value.
 
@@ -268,7 +268,7 @@ Returns a `Promise` that resolves to `true` if the option is a `None` value.
 
 > **isNoneOr**(`f`): `Promise`\<`boolean`\>
 
-Defined in: [async-option.ts:36](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L36)
+Defined in: [async-option.ts:36](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L36)
 
 Returns a `Promise` that resolves to `true` if the option is a `None` or the value inside matches a predicate.
 
@@ -288,7 +288,7 @@ Returns a `Promise` that resolves to `true` if the option is a `None` or the val
 
 > **isSome**(): `Promise`\<`boolean`\>
 
-Defined in: [async-option.ts:21](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L21)
+Defined in: [async-option.ts:21](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L21)
 
 Returns a `Promise` that resolves to `true` if the option is a `Some` value.
 
@@ -302,7 +302,7 @@ Returns a `Promise` that resolves to `true` if the option is a `Some` value.
 
 > **isSomeAnd**(`f`): `Promise`\<`boolean`\>
 
-Defined in: [async-option.ts:26](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L26)
+Defined in: [async-option.ts:26](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L26)
 
 Returns a `Promise` that resolves to `true` if the option is a `Some` and the value inside matches a predicate.
 
@@ -322,7 +322,7 @@ Returns a `Promise` that resolves to `true` if the option is a `Some` and the va
 
 > **map**\<`U`\>(`f`): `AsyncOption`\<`U`\>
 
-Defined in: [async-option.ts:70](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L70)
+Defined in: [async-option.ts:70](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L70)
 
 Maps an `AsyncOption<T>` to `AsyncOption<U>` by applying a function to a contained value.
 
@@ -348,7 +348,7 @@ Maps an `AsyncOption<T>` to `AsyncOption<U>` by applying a function to a contain
 
 > **mapAsync**\<`U`\>(`f`): `AsyncOption`\<`U`\>
 
-Defined in: [async-option.ts:75](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L75)
+Defined in: [async-option.ts:75](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L75)
 
 Async version of `map`. Maps an `AsyncOption<T>` to `AsyncOption<U>` by applying an async function to a contained value.
 
@@ -374,7 +374,7 @@ Async version of `map`. Maps an `AsyncOption<T>` to `AsyncOption<U>` by applying
 
 > **mapOr**\<`U`\>(`defaultVal`, `f`): `Promise`\<`U`\>
 
-Defined in: [async-option.ts:92](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L92)
+Defined in: [async-option.ts:92](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L92)
 
 Returns the provided default result (if none), or applies a function to the contained value (if any).
 
@@ -404,7 +404,7 @@ Returns the provided default result (if none), or applies a function to the cont
 
 > **mapOrElse**\<`U`\>(`defaultF`, `f`): `Promise`\<`U`\>
 
-Defined in: [async-option.ts:97](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L97)
+Defined in: [async-option.ts:97](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L97)
 
 Computes a default function result (if none), or applies a different function to the contained value (if any).
 
@@ -434,7 +434,7 @@ Computes a default function result (if none), or applies a different function to
 
 > **mapOrElseAsync**\<`U`\>(`defaultF`, `f`): `Promise`\<`U`\>
 
-Defined in: [async-option.ts:102](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L102)
+Defined in: [async-option.ts:102](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L102)
 
 Async version of `mapOrElse`. Computes a default async function result (if none), or applies a different async function to the contained value (if any).
 
@@ -464,7 +464,7 @@ Async version of `mapOrElse`. Computes a default async function result (if none)
 
 > **match**\<`U`\>(`handlers`): `Promise`\<`U`\>
 
-Defined in: [async-option.ts:198](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L198)
+Defined in: [async-option.ts:198](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L198)
 
 Matches the `Option` with two functions, one for each variant.
 
@@ -496,7 +496,7 @@ Matches the `Option` with two functions, one for each variant.
 
 > **okOr**\<`E`\>(`err`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [async-option.ts:110](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L110)
+Defined in: [async-option.ts:110](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L110)
 
 Transforms the `AsyncOption<T>` into an `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 
@@ -522,7 +522,7 @@ Transforms the `AsyncOption<T>` into an `AsyncResult<T, E>`, mapping `Some(v)` t
 
 > **okOrElse**\<`E`\>(`errF`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [async-option.ts:115](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L115)
+Defined in: [async-option.ts:115](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L115)
 
 Transforms the `AsyncOption<T>` into an `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
 
@@ -548,7 +548,7 @@ Transforms the `AsyncOption<T>` into an `AsyncResult<T, E>`, mapping `Some(v)` t
 
 > **okOrElseAsync**\<`E`\>(`errF`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [async-option.ts:120](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L120)
+Defined in: [async-option.ts:120](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L120)
 
 Async version of `okOrElse`. Transforms the `AsyncOption<T>` into an `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
 
@@ -574,7 +574,7 @@ Async version of `okOrElse`. Transforms the `AsyncOption<T>` into an `AsyncResul
 
 > **or**\<`T2`\>(`optb`): `AsyncOption`\<`T` \| `T2`\>
 
-Defined in: [async-option.ts:154](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L154)
+Defined in: [async-option.ts:154](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L154)
 
 Returns the option if it contains a value, otherwise returns `optb`.
 
@@ -600,7 +600,7 @@ Returns the option if it contains a value, otherwise returns `optb`.
 
 > **orElse**\<`T2`\>(`f`): `AsyncOption`\<`T` \| `T2`\>
 
-Defined in: [async-option.ts:159](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L159)
+Defined in: [async-option.ts:159](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L159)
 
 Returns the option if it contains a value, otherwise calls `f` and returns the result.
 
@@ -626,7 +626,7 @@ Returns the option if it contains a value, otherwise calls `f` and returns the r
 
 > **orElseAsync**\<`T2`\>(`f`): `AsyncOption`\<`T` \| `T2`\>
 
-Defined in: [async-option.ts:164](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L164)
+Defined in: [async-option.ts:164](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L164)
 
 Async version of `orElse`. Returns the option if it contains a value, otherwise calls async `f` and returns the result.
 
@@ -652,7 +652,7 @@ Async version of `orElse`. Returns the option if it contains a value, otherwise 
 
 > **transpose**\<`T`, `E`\>(`this`): [`AsyncResult`](AsyncResult.md)\<[`Option`](../type-aliases/Option.md)\<`T`\>, `E`\>
 
-Defined in: [async-option.ts:185](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L185)
+Defined in: [async-option.ts:185](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L185)
 
 Transposes an `AsyncOption` of a `Result` into an `AsyncResult` of an `Option`.
 
@@ -685,7 +685,7 @@ with `TransposeError` rather than a synchronous throw.
 
 > **unwrap**(): `Promise`\<`T`\>
 
-Defined in: [async-option.ts:50](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L50)
+Defined in: [async-option.ts:50](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L50)
 
 Returns the contained `Some` value.
 
@@ -703,7 +703,7 @@ Rejects with `PanicError` if the self value equals `None`.
 
 > **unwrapOr**(`defaultVal`): `Promise`\<`T`\>
 
-Defined in: [async-option.ts:55](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L55)
+Defined in: [async-option.ts:55](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L55)
 
 Returns the contained `Some` value or a provided default.
 
@@ -723,7 +723,7 @@ Returns the contained `Some` value or a provided default.
 
 > **unwrapOrElse**(`f`): `Promise`\<`T`\>
 
-Defined in: [async-option.ts:60](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L60)
+Defined in: [async-option.ts:60](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L60)
 
 Returns the contained `Some` value or computes it from a closure.
 
@@ -743,7 +743,7 @@ Returns the contained `Some` value or computes it from a closure.
 
 > **unwrapOrElseAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [async-option.ts:65](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L65)
+Defined in: [async-option.ts:65](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L65)
 
 Async version of `unwrapOrElse`. Returns the contained `Some` value or computes it from an async closure.
 
@@ -763,7 +763,7 @@ Async version of `unwrapOrElse`. Returns the contained `Some` value or computes 
 
 > **unzip**\<`T`, `U`\>(`this`): \[`AsyncOption`\<`T`\>, `AsyncOption`\<`U`\>\]
 
-Defined in: [async-option.ts:193](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L193)
+Defined in: [async-option.ts:193](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L193)
 
 Unzips an `AsyncOption` containing a tuple of two values.
 
@@ -796,7 +796,7 @@ Otherwise, `(AsyncOption(None), AsyncOption(None))` is returned.
 
 > **xor**\<`T2`\>(`optb`): `AsyncOption`\<`T` \| `T2`\>
 
-Defined in: [async-option.ts:169](https://github.com/madkarmaa/results-ts/blob/c93f915aad76fbf39d3a97769171f41ebb1619b3/src/async-option.ts#L169)
+Defined in: [async-option.ts:169](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/async-option.ts#L169)
 
 Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
 
