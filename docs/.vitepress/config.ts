@@ -92,6 +92,8 @@ export default defineConfig({
             provider: 'local'
         },
 
+        outline: [2, 3],
+
         sidebar: {
             '/api/': [
                 {
