@@ -10,6 +10,11 @@ on:
 permissions:
     id-token: write
     contents: write
+    pages: write
+
+concurrency:
+    group: pages
+    cancel-in-progress: false
 
 jobs:
     release:
@@ -70,6 +75,43 @@ jobs:
             - name: Publish to npm registry
               if: steps.prev.outputs.version != steps.next.outputs.version
               run: bunx npm@latest publish --access public
+
+            - name: Run benchmarks
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: bun run bench:publish
+
+            - name: Build docs
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: bun run docs:build
+
+            - name: Format
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: bun run format
+
+            - name: Commit generated files
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add BENCHMARKS.md
+                  git commit -m "chore: update benchmarks for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
+                  git add docs/api
+                  git commit -m "chore: update API docs for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
+                  git push
+
+            - name: Setup GitHub Pages
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              uses: actions/configure-pages@v6
+
+            - name: Upload GitHub Pages artifact
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              uses: actions/upload-pages-artifact@v5
+              with:
+                  path: docs/.vitepress/dist
+
+            - name: Deploy to GitHub Pages
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              uses: actions/deploy-pages@v5
 
     canary:
         name: Canary Release

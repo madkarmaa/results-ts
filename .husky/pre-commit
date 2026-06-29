@@ -12,4 +12,7 @@ if [ ! -s "$STAGED_FILES_FILE" ]; then
 fi
 
 xargs -0 bunx prettier --write --ignore-unknown -- < "$STAGED_FILES_FILE"
-xargs -0 git add -- < "$STAGED_FILES_FILE"
+
+if ! xargs -0 git diff --quiet -- < "$STAGED_FILES_FILE"; then
+    xargs -0 git add -- < "$STAGED_FILES_FILE"
+fi
