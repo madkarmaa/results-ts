@@ -1,3 +1,13 @@
+## [4.2.2](https://github.com/madkarmaa/results-ts/compare/v4.2.1...v4.2.2) (2026-06-29)
+
+### Bug Fixes
+
+- shorten website url ([9655297](https://github.com/madkarmaa/results-ts/commit/9655297ad0b810274341b7bb0e7068caa523c30c))
+
+### Documentation
+
+- **fix:** also show methods in website sidebar ([79cc492](https://github.com/madkarmaa/results-ts/commit/79cc4925bb369e47185133b7a5a57daa8a64d21b))
+
 ## [4.2.1](https://github.com/madkarmaa/results-ts/compare/v4.2.0...v4.2.1) (2026-06-29)
 
 ### Bug Fixes
