@@ -80,6 +80,15 @@ jobs:
               if: steps.prev.outputs.version != steps.next.outputs.version
               run: bun run docs:build
 
+            - name: Commit generated API docs
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add docs/api
+                  git commit -m "docs: regenerate for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
+                  git push
+
             - name: Setup GitHub Pages
               if: steps.prev.outputs.version != steps.next.outputs.version
               uses: actions/configure-pages@v6
