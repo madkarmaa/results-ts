@@ -88,22 +88,15 @@ jobs:
               if: steps.prev.outputs.version != steps.next.outputs.version
               run: bun run format
 
-            - name: Commit benchmark report
+            - name: Commit generated files
               if: steps.prev.outputs.version != steps.next.outputs.version
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                   git add BENCHMARKS.md
-                  git commit -m "chore(bench): update benchmarks for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
-                  git push
-
-            - name: Commit generated API docs
-              if: steps.prev.outputs.version != steps.next.outputs.version
-              run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git commit -m "chore: update benchmarks for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
                   git add docs/api
-                  git commit -m "docs: regenerate for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
+                  git commit -m "chore: update API docs for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
                   git push
 
             - name: Setup GitHub Pages
