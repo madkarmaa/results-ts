@@ -15,7 +15,7 @@ This library mimics the Rust `Result` and `Option` enums and includes some of th
         <img src="https://img.shields.io/npm/v/results-ts/canary?labelColor=yellow&color=grey" alt="npm canary version" />
     </a>
     <a href="https://madkarmaa.github.io/results-ts/">
-        <img src="https://img.shields.io/badge/docs-website?labelColor=purple&color=grey" alt="documentation" />
+        <img src="https://img.shields.io/badge/docs-website?logo=readthedocs&labelColor=fe640b&color=grey" alt="documentation" />
     </a>
     <a href="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml">
         <img src="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml/badge.svg" alt="Release workflow" />
