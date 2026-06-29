@@ -10,6 +10,11 @@ on:
 permissions:
     id-token: write
     contents: write
+    pages: write
+
+concurrency:
+    group: pages
+    cancel-in-progress: false
 
 jobs:
     release:
@@ -70,6 +75,24 @@ jobs:
             - name: Publish to npm registry
               if: steps.prev.outputs.version != steps.next.outputs.version
               run: bunx npm@latest publish --access public
+
+            - name: Build docs
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: bun run docs:build
+
+            - name: Setup GitHub Pages
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              uses: actions/configure-pages@v6
+
+            - name: Upload GitHub Pages artifact
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              uses: actions/upload-pages-artifact@v5
+              with:
+                  path: docs/.vitepress/dist
+
+            - name: Deploy to GitHub Pages
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              uses: actions/deploy-pages@v5
 
     canary:
         name: Canary Release
