@@ -16,6 +16,7 @@ import {
 } from '../src/result';
 import { type AsyncOption } from '../src/async-option';
 import { type AsyncResult, catchUnwindAsync } from '../src/async-result';
+import { tryBlock, tryBlockAsync } from '../src/try-block';
 
 describe('Option types', () => {
     test('Some and None constructors map correctly to Option<T>', () => {
@@ -226,6 +227,33 @@ describe('Result types', () => {
             (n: number) => Result<number, string>
         >();
     });
+
+    test('tryBlock infers return and propagated error types', () => {
+        type ParseError = { readonly code: 'PARSE'; readonly input: string };
+        type LookupError = { readonly code: 'LOOKUP'; readonly id: number };
+
+        const parseId = (input: string): Result<number, ParseError> =>
+            input.length > 0 ? Ok(input.length) : Err({ code: 'PARSE', input });
+        const lookupName = (id: number): Result<string, LookupError> =>
+            id > 0 ? Ok('Alice') : Err({ code: 'LOOKUP', id });
+
+        const result = tryBlock(function* ($) {
+            const id = yield* $(parseId('1'));
+            id satisfies number;
+
+            const name = yield* $(lookupName(id));
+            name satisfies string;
+
+            return { id, name } as const;
+        });
+
+        expectTypeOf(result).toEqualTypeOf<
+            Result<
+                { readonly id: number; readonly name: string },
+                ParseError | LookupError
+            >
+        >();
+    });
 });
 
 describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
@@ -333,6 +361,35 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
 
         expectTypeOf(safe).toEqualTypeOf<
             (n: number) => AsyncResult<number, string>
+        >();
+    });
+
+    test('tryBlockAsync infers return and propagated error types', () => {
+        type ParseError = { readonly code: 'PARSE'; readonly input: string };
+        type LookupError = { readonly code: 'LOOKUP'; readonly id: number };
+
+        const parseId = (input: string): Result<number, ParseError> =>
+            input.length > 0 ? Ok(input.length) : Err({ code: 'PARSE', input });
+        const lookupName = (id: number): Result<string, LookupError> =>
+            id > 0 ? Ok('Alice') : Err({ code: 'LOOKUP', id });
+
+        const result = tryBlockAsync(async function* ($) {
+            const id = yield* $(parseId('1'));
+            id satisfies number;
+
+            const name = yield* $(Promise.resolve(lookupName(id)));
+            name satisfies string;
+
+            return { id, name } as const;
+        });
+
+        expectTypeOf(result).toEqualTypeOf<
+            Promise<
+                Result<
+                    { readonly id: number; readonly name: string },
+                    ParseError | LookupError
+                >
+            >
         >();
     });
 });

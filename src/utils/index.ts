@@ -1,5 +1,18 @@
 export * from './either';
 
+import { type Result } from '../result';
+
+export function isResult<T = unknown, E = unknown>(
+    value: unknown
+): value is Result<T, E> {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        '_isOk' in value &&
+        typeof value._isOk === 'boolean'
+    );
+}
+
 // Shared, stateless iterator used for the empty `iter()` path (`Err`/`None`).
 // Returning this constant instead of entering a generator avoids allocating a
 // generator object on every call when there is nothing to yield. Typed as
