@@ -1,6 +1,7 @@
 import { bench, do_not_optimize, group } from 'mitata';
 import { Ok, Err, type Result } from '../src/result';
 import { catchUnwindAsync } from '../src/async-result';
+import { tryBlockAsync } from '../src/try-block';
 import {
     ok,
     err,
@@ -114,6 +115,42 @@ group('Async Result - then() wrapping', () => {
 
     bench('AsyncResult.then (await)', async () => {
         do_not_optimize(await okAsync);
+    }).gc('once');
+});
+
+// ---------------------------------------------------------------------------
+// Async Result - tryBlockAsync
+// ---------------------------------------------------------------------------
+group('Async Result - tryBlockAsync', () => {
+    bench('tryBlockAsync (Ok path)', async () => {
+        do_not_optimize(
+            await tryBlockAsync(async function* ($) {
+                const a = yield* $(ok);
+                const b = yield* $(Promise.resolve(Ok(a + 1)));
+
+                return b + 1;
+            })
+        );
+    }).gc('once');
+    bench('tryBlockAsync (first Err)', async () => {
+        do_not_optimize(
+            await tryBlockAsync(async function* ($) {
+                const a = yield* $(err);
+                const b = yield* $(Promise.resolve(Ok(a + 1)));
+
+                return b + 1;
+            })
+        );
+    }).gc('once');
+    bench('tryBlockAsync (second Err)', async () => {
+        do_not_optimize(
+            await tryBlockAsync(async function* ($) {
+                const a = yield* $(ok);
+                const b = yield* $(Promise.resolve(Err(a + 1)));
+
+                return b + 1;
+            })
+        );
     }).gc('once');
 });
 

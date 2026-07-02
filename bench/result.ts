@@ -1,6 +1,7 @@
 import { bench, do_not_optimize, group } from 'mitata';
 import { Ok, Err, catchUnwind, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
+import { tryBlock } from '../src/try-block';
 import { ok, err, inc, gt0, safeInc, thrower, safeThower } from './fixtures';
 
 // ---------------------------------------------------------------------------
@@ -201,6 +202,42 @@ group('Result - iter', () => {
     bench('Err.iter', () => {
         for (const v of err.iter()) do_not_optimize(v);
     });
+});
+
+// ---------------------------------------------------------------------------
+// Result - tryBlock
+// ---------------------------------------------------------------------------
+group('Result - tryBlock', () => {
+    bench('tryBlock (Ok path)', () => {
+        do_not_optimize(
+            tryBlock(function* ($) {
+                const a = yield* $(ok);
+                const b = yield* $(Ok(a + 1));
+
+                return b + 1;
+            })
+        );
+    }).gc('once');
+    bench('tryBlock (first Err)', () => {
+        do_not_optimize(
+            tryBlock(function* ($) {
+                const a = yield* $(err);
+                const b = yield* $(Ok(a + 1));
+
+                return b + 1;
+            })
+        );
+    }).gc('once');
+    bench('tryBlock (second Err)', () => {
+        do_not_optimize(
+            tryBlock(function* ($) {
+                const a = yield* $(ok);
+                const b = yield* $(Err(a + 1));
+
+                return b + 1;
+            })
+        );
+    }).gc('once');
 });
 
 // ---------------------------------------------------------------------------
