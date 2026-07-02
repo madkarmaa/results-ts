@@ -11,7 +11,9 @@ import {
     isLeft,
     isRight,
     EMPTY_ITERATOR,
-    OneItemIterator
+    OneItemIterator,
+    isOption,
+    isResult
 } from './utils';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -575,7 +577,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     and<U, E2>(res: Result<U, E2>): Result<U, E | E2> {
-        if (typeof res._isOk !== 'boolean')
+        if (!isResult(res))
             throw new InvalidArgumentError('Argument must be a Result');
 
         const state = this.#state;
@@ -612,7 +614,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     }
 
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
-        if (typeof res._isOk !== 'boolean')
+        if (!isResult(res))
             throw new InvalidArgumentError('Argument must be a Result');
 
         const state = this.#state;
@@ -677,7 +679,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         if (isLeft(state)) return new ResultImpl(Left(state.left));
 
-        if (typeof state.right._isOk !== 'boolean')
+        if (!isResult(state.right))
             throw new FlattenError(
                 'flatten can only be called on Result<Result<T, E>, E>'
             );
@@ -691,7 +693,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         if (isLeft(state)) return Some(Err(state.left));
 
-        if (typeof state.right._isSome !== 'boolean')
+        if (!isOption(state.right))
             throw new TransposeError(
                 'transpose can only be called on Result<Option<T>, E>'
             );

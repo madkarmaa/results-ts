@@ -1,6 +1,16 @@
 export * from './either';
 
+import { type Option } from '../option';
 import { type Result } from '../result';
+
+export function isOption<T = unknown>(value: unknown): value is Option<T> {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        '_isSome' in value &&
+        typeof value._isSome === 'boolean'
+    );
+}
 
 export function isResult<T = unknown, E = unknown>(
     value: unknown
