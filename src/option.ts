@@ -11,7 +11,9 @@ import {
     isLeft,
     isRight,
     EMPTY_ITERATOR,
-    OneItemIterator
+    OneItemIterator,
+    isOption,
+    isResult
 } from './utils';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
@@ -553,7 +555,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     and<U>(optb: Option<U>): Option<U> {
-        if (typeof optb._isSome !== 'boolean')
+        if (!isOption(optb))
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
@@ -618,7 +620,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     or<T2>(optb: Option<T2>): Option<T | T2> {
-        if (typeof optb._isSome !== 'boolean')
+        if (!isOption(optb))
             throw new InvalidArgumentError('Argument must be an Option');
 
         const state = this.#state;
@@ -646,7 +648,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     xor<T2>(optb: Option<T2>): Option<T | T2> {
-        if (typeof optb._isSome !== 'boolean')
+        if (!isOption(optb))
             throw new InvalidArgumentError('Argument must be an Option');
 
         const thisIsSome = isRight(this.#state);
@@ -794,7 +796,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const _this = this as OptionImpl<Option<U>>;
         const state = _this.#state;
 
-        if (!isRight(state) || typeof state.right._isSome !== 'boolean')
+        if (!isRight(state) || !isOption(state.right))
             throw new FlattenError(
                 'flatten can only be called on Option<Option<T>>'
             );
@@ -808,7 +810,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const _this = this as OptionImpl<Result<T, E>>;
         const state = _this.#state;
 
-        if (!isRight(state) || typeof state.right._isOk !== 'boolean')
+        if (!isRight(state) || !isResult(state.right))
             throw new TransposeError(
                 'transpose can only be called on Option<Result<T, E>>'
             );
