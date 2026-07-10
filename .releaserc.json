@@ -1,22 +1,30 @@
 {
-    "branches": ["main"],
+    "branches": [
+        "main",
+        {
+            "name": "dev",
+            "channel": "canary",
+            "prerelease": "canary"
+        }
+    ],
     "plugins": [
-        "@semantic-release/commit-analyzer",
+        [
+            "@semantic-release/commit-analyzer",
+            {
+                "releaseRules": [
+                    {
+                        "type": "chore",
+                        "scope": null,
+                        "subject": "update deps",
+                        "release": "patch"
+                    }
+                ]
+            }
+        ],
         [
             "@semantic-release/release-notes-generator",
             {
-                "preset": "conventionalcommits",
-                "presetConfig": {
-                    "types": [
-                        { "type": "feat", "section": "Features" },
-                        { "type": "fix", "section": "Bug Fixes" },
-                        {
-                            "type": "perf",
-                            "section": "Performance Improvements"
-                        },
-                        { "type": "docs", "section": "Documentation" }
-                    ]
-                }
+                "config": "./release-notes.config.mjs"
             }
         ],
         [
@@ -28,7 +36,7 @@
         [
             "@semantic-release/npm",
             {
-                "npmPublish": false
+                "npmPublish": true
             }
         ],
         [

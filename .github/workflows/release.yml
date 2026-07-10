@@ -10,7 +10,9 @@ on:
 permissions:
     id-token: write
     contents: write
+    issues: write
     pages: write
+    pull-requests: write
 
 concurrency:
     group: pages
@@ -35,7 +37,6 @@ jobs:
               with:
                   path: '**/node_modules'
                   key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-                  restore-keys: ${{ runner.os }}-bun-
 
             - name: Install Node.js # required for tsdown, see https://github.com/rolldown/tsdown/releases/tag/v0.22.0
               uses: actions/setup-node@v6
@@ -65,16 +66,12 @@ jobs:
 
             - name: Semantic release
               env:
-                  GITHUB_TOKEN: ${{ secrets.SR_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: bun run release
 
             - name: Get new version
               id: next
               run: echo "version=$(bun pm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
-
-            - name: Publish to npm registry
-              if: steps.prev.outputs.version != steps.next.outputs.version
-              run: bunx npm@latest publish --access public
 
             - name: Run benchmarks
               if: steps.prev.outputs.version != steps.next.outputs.version
@@ -121,13 +118,16 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+                  persist-credentials: true
+                  token: ${{ secrets.SR_TOKEN }}
 
             - name: Cache dependencies
               uses: actions/cache@v5
               with:
                   path: '**/node_modules'
                   key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-                  restore-keys: ${{ runner.os }}-bun-
 
             - name: Install Node.js
               uses: actions/setup-node@v6
@@ -151,10 +151,7 @@ jobs:
             - name: Build
               run: bun run build
 
-            - name: Bump prerelease version
-              run: |
-                  VERSION=$(bun pm pkg get version | tr -d '"')
-                  bun pm version $VERSION-canary.$(git rev-parse --short HEAD) --no-git-tag-version --allow-same-version
-
-            - name: Publish to npm registry (canary)
-              run: bunx npm@latest publish --access public --tag canary
+            - name: Semantic release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: bun run release
