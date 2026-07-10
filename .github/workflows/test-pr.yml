@@ -18,7 +18,6 @@ jobs:
               with:
                   path: '**/node_modules'
                   key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-                  restore-keys: ${{ runner.os }}-bun-
 
             - name: Install Bun
               uses: oven-sh/setup-bun@v2

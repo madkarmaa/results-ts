@@ -35,7 +35,6 @@ jobs:
               with:
                   path: '**/node_modules'
                   key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-                  restore-keys: ${{ runner.os }}-bun-
 
             - name: Install Node.js # required for tsdown, see https://github.com/rolldown/tsdown/releases/tag/v0.22.0
               uses: actions/setup-node@v6
@@ -127,7 +126,6 @@ jobs:
               with:
                   path: '**/node_modules'
                   key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-                  restore-keys: ${{ runner.os }}-bun-
 
             - name: Install Node.js
               uses: actions/setup-node@v6
