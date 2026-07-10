@@ -10,7 +10,9 @@ on:
 permissions:
     id-token: write
     contents: write
+    issues: write
     pages: write
+    pull-requests: write
 
 concurrency:
     group: pages
@@ -64,7 +66,7 @@ jobs:
 
             - name: Semantic release
               env:
-                  GITHUB_TOKEN: ${{ secrets.SR_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: bun run release
 
             - name: Get new version
@@ -151,5 +153,5 @@ jobs:
 
             - name: Semantic release
               env:
-                  GITHUB_TOKEN: ${{ secrets.SR_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: bun run release
