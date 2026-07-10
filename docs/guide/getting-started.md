@@ -133,7 +133,7 @@ Note that `None` is a **function** - always call it as `None()` (optionally type
 
 ## Browser (no bundler)
 
-`results-ts` is an ES module, so in the browser import it from a CDN inside a `<script type="module">`:
+This library is an ES module, so in the browser import it from a CDN inside a `<script type="module">`:
 
 > [!IMPORTANT]
 > The `type="module"` attribute is required, since this is an ES module.

@@ -1,6 +1,6 @@
 # Async results and options
 
-`results-ts` ships two awaitable wrappers around `Result` and `Option` so you can use the same chainable API with `Promise`s:
+This library ships two awaitable wrappers around `Result` and `Option` so you can use the same chainable API with `Promise`s:
 
 - `AsyncResult<T, E>` - wraps `PromiseLike<Result<T, E>>`
 - `AsyncOption<T>` - wraps `PromiseLike<Option<T>>`
