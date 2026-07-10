@@ -1,3 +1,9 @@
+## [4.2.3-canary.3](https://github.com/madkarmaa/results-ts/compare/v4.2.3-canary.2...v4.2.3-canary.3) (2026-07-10)
+
+### Dependency Updates
+
+- update deps ([f34f431](https://github.com/madkarmaa/results-ts/commit/f34f4313622fe554980129a498e23df812d74510))
+
 ## [4.2.3-canary.2](https://github.com/madkarmaa/results-ts/compare/v4.2.3-canary.1...v4.2.3-canary.2) (2026-07-10)
 
 ## [4.2.3-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.2...v4.2.3-canary.1) (2026-07-10)
