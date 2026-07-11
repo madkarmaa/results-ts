@@ -1,6 +1,6 @@
 [**results-ts**](../index.md)
 
----
+***
 
 [results-ts](../index.md) / None
 
@@ -8,7 +8,7 @@
 
 > **None**\<`T`\>(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:863](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L863)
+Defined in: [option.ts:863](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L863)
 
 No value.
 

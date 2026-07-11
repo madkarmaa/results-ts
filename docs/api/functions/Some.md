@@ -1,6 +1,6 @@
 [**results-ts**](../index.md)
 
----
+***
 
 [results-ts](../index.md) / Some
 
@@ -8,7 +8,7 @@
 
 > **Some**\<`T`\>(`value`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:855](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L855)
+Defined in: [option.ts:855](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L855)
 
 Some value of type `T`.
 

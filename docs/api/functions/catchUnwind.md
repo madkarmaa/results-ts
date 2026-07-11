@@ -1,6 +1,6 @@
 [**results-ts**](../index.md)
 
----
+***
 
 [results-ts](../index.md) / catchUnwind
 
@@ -10,7 +10,7 @@
 
 > **catchUnwind**\<`T`, `Args`\>(`fn`, `onThrow?`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `unknown`\>
 
-Defined in: [result.ts:760](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/result.ts#L760)
+Defined in: [result.ts:760](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/result.ts#L760)
 
 Invokes a function, capturing the cause of a thrown error if one occurs.
 
@@ -34,7 +34,7 @@ in an `Err`, allowing the error type to be narrowed and normalized.
 
 #### Args
 
-`Args` _extends_ `unknown`[]
+`Args` *extends* `unknown`[]
 
 ### Parameters
 
@@ -60,7 +60,7 @@ A function returning `Result<T, E>` that never throws.
 
 > **catchUnwind**\<`T`, `Args`, `E`\>(`fn`, `onThrow`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:764](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/result.ts#L764)
+Defined in: [result.ts:764](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/result.ts#L764)
 
 Invokes a function, capturing the cause of a thrown error if one occurs.
 
@@ -84,7 +84,7 @@ in an `Err`, allowing the error type to be narrowed and normalized.
 
 #### Args
 
-`Args` _extends_ `unknown`[]
+`Args` *extends* `unknown`[]
 
 #### E
 

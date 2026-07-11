@@ -1,6 +1,6 @@
 [**results-ts**](../index.md)
 
----
+***
 
 [results-ts](../index.md) / Err
 
@@ -8,7 +8,7 @@
 
 > **Err**\<`E`\>(`error`): [`Result`](../type-aliases/Result.md)\<`never`, `E`\>
 
-Defined in: [result.ts:737](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/result.ts#L737)
+Defined in: [result.ts:737](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/result.ts#L737)
 
 Contains the error value.
 

@@ -1,12 +1,12 @@
 [**results-ts**](../index.md)
 
----
+***
 
 [results-ts](../index.md) / OptionMethods
 
 # Interface: OptionMethods\<T\>
 
-Defined in: [option.ts:39](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L39)
+Defined in: [option.ts:39](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L39)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [option.ts:39](https://github.com/madkarmaa/results-ts/blob/63e69981
 
 > **and**\<`U`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:186](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L186)
+Defined in: [option.ts:186](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L186)
 
 Returns `None` if the option is `None`, otherwise returns `optb`.
 
@@ -44,13 +44,13 @@ Returns `None` if the option is `None`, otherwise returns `optb`.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### andThen()
 
 > **andThen**\<`U`\>(`f`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:193](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L193)
+Defined in: [option.ts:193](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L193)
 
 Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
 
@@ -74,13 +74,13 @@ Returns `None` if the option is `None`, otherwise calls `f` with the wrapped val
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### andThenAsync()
 
 > **andThenAsync**\<`U`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:200](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L200)
+Defined in: [option.ts:200](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L200)
 
 Async version of `andThen`. Returns `None` if the option is `None`, otherwise calls async `f` with the wrapped value and returns the result.
 
@@ -104,13 +104,13 @@ Async version of `andThen`. Returns `None` if the option is `None`, otherwise ca
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### expect()
 
 > **expect**(`msg`): `T`
 
-Defined in: [option.ts:73](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L73)
+Defined in: [option.ts:73](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L73)
 
 Returns the contained `Some` value.
 
@@ -132,16 +132,15 @@ Panics if the value is a `None` with a custom panic message provided by `msg`.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### filter()
 
 > **filter**(`predicate`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:209](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L209)
+Defined in: [option.ts:209](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L209)
 
 Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
-
 - `Some(t)` if `predicate` returns `true` (where `t` is the wrapped value), and
 - `None` if `predicate` returns `false`.
 
@@ -159,16 +158,15 @@ Returns `None` if the option is `None`, otherwise calls `predicate` with the wra
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### filterAsync()
 
 > **filterAsync**(`predicate`): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [option.ts:218](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L218)
+Defined in: [option.ts:218](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L218)
 
 Async version of `filter`. Returns `None` if the option is `None`, otherwise calls async `predicate` with the wrapped value and returns:
-
 - `Some(t)` if `predicate` resolves to `true` (where `t` is the wrapped value), and
 - `None` if `predicate` resolves to `false`.
 
@@ -186,13 +184,13 @@ Async version of `filter`. Returns `None` if the option is `None`, otherwise cal
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### flatten()
 
 > **flatten**\<`U`\>(`this`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:301](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L301)
+Defined in: [option.ts:301](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L301)
 
 Converts from `Option<Option<T>>` to `Option<T>`.
 
@@ -216,13 +214,13 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### getOrInsert()
 
 > **getOrInsert**(`value`): `T`
 
-Defined in: [option.ts:260](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L260)
+Defined in: [option.ts:260](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L260)
 
 Inserts `value` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -240,13 +238,13 @@ Inserts `value` into the option if it is `None`, then returns a reference to the
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### getOrInsertWith()
 
 > **getOrInsertWith**(`f`): `T`
 
-Defined in: [option.ts:267](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L267)
+Defined in: [option.ts:267](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L267)
 
 Inserts a value computed from `f` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -264,13 +262,13 @@ Inserts a value computed from `f` into the option if it is `None`, then returns 
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### getOrInsertWithAsync()
 
 > **getOrInsertWithAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [option.ts:274](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L274)
+Defined in: [option.ts:274](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L274)
 
 Async version of `getOrInsertWith`. Inserts a value computed from async `f` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -288,13 +286,13 @@ Async version of `getOrInsertWith`. Inserts a value computed from async `f` into
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### insert()
 
 > **insert**(`value`): `T`
 
-Defined in: [option.ts:253](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L253)
+Defined in: [option.ts:253](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L253)
 
 Inserts `value` into the option, then returns a reference to it.
 
@@ -312,13 +310,13 @@ Inserts `value` into the option, then returns a reference to it.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### inspect()
 
 > **inspect**(`f`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:122](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L122)
+Defined in: [option.ts:122](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L122)
 
 Calls the provided closure with a reference to the contained value (if `Some`).
 
@@ -336,13 +334,13 @@ Calls the provided closure with a reference to the contained value (if `Some`).
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### inspectAsync()
 
 > **inspectAsync**(`f`): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [option.ts:129](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L129)
+Defined in: [option.ts:129](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L129)
 
 Async version of `inspect`. Calls the provided async closure with a reference to the contained value (if `Some`), then returns the original option.
 
@@ -360,13 +358,13 @@ Async version of `inspect`. Calls the provided async closure with a reference to
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### isNone()
 
 > **isNone**(): `this is NoneOption<T>`
 
-Defined in: [option.ts:58](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L58)
+Defined in: [option.ts:58](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L58)
 
 Returns `true` if the option is a `None` value.
 
@@ -374,13 +372,13 @@ Returns `true` if the option is a `None` value.
 
 `this is NoneOption<T>`
 
----
+***
 
 ### isNoneOr()
 
 > **isNoneOr**(`f`): `boolean`
 
-Defined in: [option.ts:65](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L65)
+Defined in: [option.ts:65](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L65)
 
 Returns `true` if the option is a `None` or the value inside of it matches a predicate.
 
@@ -398,13 +396,13 @@ Returns `true` if the option is a `None` or the value inside of it matches a pre
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### isSome()
 
 > **isSome**(): `this is SomeOption<T>`
 
-Defined in: [option.ts:45](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L45)
+Defined in: [option.ts:45](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L45)
 
 Returns `true` if the option is a `Some` value.
 
@@ -412,7 +410,7 @@ Returns `true` if the option is a `Some` value.
 
 `this is SomeOption<T>`
 
----
+***
 
 ### isSomeAnd()
 
@@ -420,7 +418,7 @@ Returns `true` if the option is a `Some` value.
 
 > **isSomeAnd**\<`U`\>(`f`): `this is SomeOption<U>`
 
-Defined in: [option.ts:52](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L52)
+Defined in: [option.ts:52](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L52)
 
 Returns `true` if the option is a `Some` and the value inside of it matches a predicate.
 
@@ -448,7 +446,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **isSomeAnd**(`f`): `this is SomeOption<T>`
 
-Defined in: [option.ts:53](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L53)
+Defined in: [option.ts:53](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L53)
 
 ##### Parameters
 
@@ -460,13 +458,13 @@ Defined in: [option.ts:53](https://github.com/madkarmaa/results-ts/blob/63e69981
 
 `this is SomeOption<T>`
 
----
+***
 
 ### iter()
 
 > **iter**(): `IterableIterator`\<`T`\>
 
-Defined in: [option.ts:179](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L179)
+Defined in: [option.ts:179](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L179)
 
 Returns an iterator over the possibly contained value.
 
@@ -474,13 +472,13 @@ Returns an iterator over the possibly contained value.
 
 `IterableIterator`\<`T`\>
 
----
+***
 
 ### map()
 
 > **map**\<`U`\>(`f`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:108](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L108)
+Defined in: [option.ts:108](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L108)
 
 Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
@@ -504,13 +502,13 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### mapAsync()
 
 > **mapAsync**\<`U`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:115](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L115)
+Defined in: [option.ts:115](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L115)
 
 Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an async function to a contained value.
 
@@ -534,13 +532,13 @@ Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an a
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### mapOr()
 
 > **mapOr**\<`U`\>(`defaultVal`, `f`): `U`
 
-Defined in: [option.ts:136](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L136)
+Defined in: [option.ts:136](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L136)
 
 Returns the provided default result (if none), or applies a function to the contained value (if any).
 
@@ -568,13 +566,13 @@ Returns the provided default result (if none), or applies a function to the cont
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### mapOrElse()
 
 > **mapOrElse**\<`U`\>(`defaultF`, `f`): `U`
 
-Defined in: [option.ts:143](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L143)
+Defined in: [option.ts:143](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L143)
 
 Computes a default function result (if none), or applies a different function to the contained value (if any).
 
@@ -602,13 +600,13 @@ Computes a default function result (if none), or applies a different function to
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### mapOrElseAsync()
 
 > **mapOrElseAsync**\<`U`\>(`defaultF`, `f`): `Promise`\<`U`\>
 
-Defined in: [option.ts:150](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L150)
+Defined in: [option.ts:150](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L150)
 
 Async version of `mapOrElse`. Computes a default async function result (if none), or applies a different async function to the contained value (if any).
 
@@ -636,13 +634,13 @@ Async version of `mapOrElse`. Computes a default async function result (if none)
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### match()
 
 > **match**\<`U`\>(`handlers`): `U`
 
-Defined in: [option.ts:328](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L328)
+Defined in: [option.ts:328](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L328)
 
 Matches the `Option` with two functions, one for each variant.
 
@@ -672,13 +670,13 @@ Matches the `Option` with two functions, one for each variant.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### okOr()
 
 > **okOr**\<`E`\>(`err`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [option.ts:160](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L160)
+Defined in: [option.ts:160](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L160)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 
@@ -702,13 +700,13 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### okOrElse()
 
 > **okOrElse**\<`E`\>(`errF`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [option.ts:167](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L167)
+Defined in: [option.ts:167](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L167)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
 
@@ -732,13 +730,13 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### okOrElseAsync()
 
 > **okOrElseAsync**\<`E`\>(`errF`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [option.ts:174](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L174)
+Defined in: [option.ts:174](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L174)
 
 Async version of `okOrElse`. Transforms the `Option<T>` into a `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
 
@@ -762,13 +760,13 @@ Async version of `okOrElse`. Transforms the `Option<T>` into a `AsyncResult<T, E
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### or()
 
 > **or**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:225](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L225)
+Defined in: [option.ts:225](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L225)
 
 Returns the option if it contains a value, otherwise returns `optb`.
 
@@ -792,13 +790,13 @@ Returns the option if it contains a value, otherwise returns `optb`.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### orElse()
 
 > **orElse**\<`T2`\>(`f`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:232](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L232)
+Defined in: [option.ts:232](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L232)
 
 Returns the option if it contains a value, otherwise calls `f` and returns the result.
 
@@ -822,13 +820,13 @@ Returns the option if it contains a value, otherwise calls `f` and returns the r
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### orElseAsync()
 
 > **orElseAsync**\<`T2`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:239](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L239)
+Defined in: [option.ts:239](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L239)
 
 Async version of `orElse`. Returns the option if it contains a value, otherwise calls async `f` and returns the result.
 
@@ -852,13 +850,13 @@ Async version of `orElse`. Returns the option if it contains a value, otherwise 
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### replace()
 
 > **replace**(`value`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:294](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L294)
+Defined in: [option.ts:294](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L294)
 
 Replaces the actual value in the option by the value given in parameter, returning the old value if present,
 leaving a `Some` in its place.
@@ -877,13 +875,13 @@ leaving a `Some` in its place.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### take()
 
 > **take**(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:279](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L279)
+Defined in: [option.ts:279](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L279)
 
 Takes the value out of the option, leaving a `None` in its place.
 
@@ -891,13 +889,13 @@ Takes the value out of the option, leaving a `None` in its place.
 
 [`Option`](../type-aliases/Option.md)\<`T`\>
 
----
+***
 
 ### takeIf()
 
 > **takeIf**(`predicate`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:286](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L286)
+Defined in: [option.ts:286](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L286)
 
 Takes the value out of the option, but only if the predicate evaluates to `true` on the value.
 
@@ -915,25 +913,25 @@ Takes the value out of the option, but only if the predicate evaluates to `true`
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### toString()
 
 > **toString**(): `string`
 
-Defined in: [option.ts:40](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L40)
+Defined in: [option.ts:40](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L40)
 
 #### Returns
 
 `string`
 
----
+***
 
 ### transpose()
 
 > **transpose**\<`T`, `E`\>(`this`): [`Result`](../type-aliases/Result.md)\<[`Option`](../type-aliases/Option.md)\<`T`\>, `E`\>
 
-Defined in: [option.ts:311](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L311)
+Defined in: [option.ts:311](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L311)
 
 Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
@@ -964,13 +962,13 @@ will be mapped to `Ok(None)`.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### unwrap()
 
 > **unwrap**(): `T`
 
-Defined in: [option.ts:80](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L80)
+Defined in: [option.ts:80](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L80)
 
 Returns the contained `Some` value.
 
@@ -982,13 +980,13 @@ Returns the contained `Some` value.
 
 Panics if the self value equals `None`.
 
----
+***
 
 ### unwrapOr()
 
 > **unwrapOr**(`defaultVal`): `T`
 
-Defined in: [option.ts:87](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L87)
+Defined in: [option.ts:87](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L87)
 
 Returns the contained `Some` value or a provided default.
 
@@ -1006,13 +1004,13 @@ Returns the contained `Some` value or a provided default.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### unwrapOrElse()
 
 > **unwrapOrElse**(`f`): `T`
 
-Defined in: [option.ts:94](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L94)
+Defined in: [option.ts:94](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L94)
 
 Returns the contained `Some` value or computes it from a closure.
 
@@ -1030,13 +1028,13 @@ Returns the contained `Some` value or computes it from a closure.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### unwrapOrElseAsync()
 
 > **unwrapOrElseAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [option.ts:101](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L101)
+Defined in: [option.ts:101](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L101)
 
 Async version of `unwrapOrElse`. Returns the contained `Some` value or computes it from an async closure.
 
@@ -1054,13 +1052,13 @@ Async version of `unwrapOrElse`. Returns the contained `Some` value or computes 
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### unzip()
 
 > **unzip**\<`T`, `U`\>(`this`): \[[`Option`](../type-aliases/Option.md)\<`T`\>, [`Option`](../type-aliases/Option.md)\<`U`\>\]
 
-Defined in: [option.ts:321](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L321)
+Defined in: [option.ts:321](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L321)
 
 Unzips an `Option` containing a tuple of two values.
 
@@ -1091,13 +1089,13 @@ is returned.
 
 If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
 
----
+***
 
 ### xor()
 
 > **xor**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:246](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L246)
+Defined in: [option.ts:246](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L246)
 
 Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
 

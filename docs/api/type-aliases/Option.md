@@ -1,6 +1,6 @@
 [**results-ts**](../index.md)
 
----
+***
 
 [results-ts](../index.md) / Option
 
@@ -8,7 +8,7 @@
 
 > **Option**\<`T`\> = [`SomeOption`](SomeOption.md)\<`T`\> \| [`NoneOption`](NoneOption.md)\<`T`\>
 
-Defined in: [option.ts:37](https://github.com/madkarmaa/results-ts/blob/63e6998172f2ca5bcca54ec05a8622d9cbc18a33/src/option.ts#L37)
+Defined in: [option.ts:37](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L37)
 
 Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
 
