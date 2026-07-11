@@ -8,7 +8,7 @@
 
 > **NoneOption**\<`T`\> = [`OptionMethods`](../interfaces/OptionMethods.md)\<`T`\> & `object`
 
-Defined in: [option.ts:28](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/option.ts#L28)
+Defined in: [option.ts:28](https://github.com/madkarmaa/results-ts/blob/69dbeda020c136d7f8bf05062654be6a9c550f2b/src/option.ts#L28)
 
 Represents the absence of a value of type `T`.
 

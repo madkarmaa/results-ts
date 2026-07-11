@@ -8,7 +8,7 @@
 
 > **Result**\<`T`, `E`\> = [`OkResult`](OkResult.md)\<`T`, `E`\> \| [`ErrResult`](ErrResult.md)\<`T`, `E`\>
 
-Defined in: [result.ts:44](https://github.com/madkarmaa/results-ts/blob/308c7befe63602b4fe4ff69c21e5960a5b068ec0/src/result.ts#L44)
+Defined in: [result.ts:44](https://github.com/madkarmaa/results-ts/blob/69dbeda020c136d7f8bf05062654be6a9c550f2b/src/result.ts#L44)
 
 `Result<T, E>` is the type used for returning and propagating errors.
 
