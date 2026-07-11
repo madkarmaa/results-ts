@@ -1,3 +1,9 @@
+## [4.2.5-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.4...v4.2.5-canary.1) (2026-07-11)
+
+### Performance Improvements
+
+- remove PanicError's stack trace ([031e8de](https://github.com/madkarmaa/results-ts/commit/031e8deb4411775c34dbeca77a0261ac498cfe4f))
+
 ## [4.2.4](https://github.com/madkarmaa/results-ts/compare/v4.2.3...v4.2.4) (2026-07-11)
 
 ### Dependency Updates
