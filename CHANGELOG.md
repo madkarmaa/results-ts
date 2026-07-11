@@ -1,3 +1,9 @@
+## [4.2.4](https://github.com/madkarmaa/results-ts/compare/v4.2.3...v4.2.4) (2026-07-11)
+
+### Dependency Updates
+
+- update deps ([e06d87f](https://github.com/madkarmaa/results-ts/commit/e06d87f4712f84aa3ce77c0017af1c5cbf61db14))
+
 ## [4.2.3](https://github.com/madkarmaa/results-ts/compare/v4.2.2...v4.2.3) (2026-07-10)
 
 ### Dependency Updates
