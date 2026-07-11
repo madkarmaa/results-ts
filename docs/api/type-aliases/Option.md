@@ -8,7 +8,7 @@
 
 > **Option**\<`T`\> = [`SomeOption`](SomeOption.md)\<`T`\> \| [`NoneOption`](NoneOption.md)\<`T`\>
 
-Defined in: [option.ts:37](https://github.com/madkarmaa/results-ts/blob/69dbeda020c136d7f8bf05062654be6a9c550f2b/src/option.ts#L37)
+Defined in: [option.ts:37](https://github.com/madkarmaa/results-ts/blob/9bc2a1fbb0ca214c2fd725d9617029e74bc7fed1/src/option.ts#L37)
 
 Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
 
