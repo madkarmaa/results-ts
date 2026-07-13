@@ -1,3 +1,19 @@
+## [4.2.5-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.4...v4.2.5-canary.1) (2026-07-13)
+
+### Bug Fixes
+
+- **docs:** keep guide navigation active ([614b079](https://github.com/madkarmaa/results-ts/commit/614b079a68a4d46ea491310398fa17d4da59babe))
+
+### Dependency Updates
+
+- update deps ([7c9e783](https://github.com/madkarmaa/results-ts/commit/7c9e783c99f55ddbefd66a6493753d55f70dc8c2))
+
+### Documentation
+
+- eliminate spaces in badge links in README ([#50](https://github.com/madkarmaa/results-ts/issues/50)) ([1410bac](https://github.com/madkarmaa/results-ts/commit/1410bacd93f27de4bcc090ec4c43cdc3c2f9b5df))
+- **guide:** restructure introductory content ([e52b190](https://github.com/madkarmaa/results-ts/commit/e52b190fa6e757220a2c419a9cab228adea8e044))
+- update readme ([1e090ec](https://github.com/madkarmaa/results-ts/commit/1e090ecd3a1c2063ae92a4e61818b54dec9c17e2))
+
 ## [4.2.4](https://github.com/madkarmaa/results-ts/compare/v4.2.3...v4.2.4) (2026-07-11)
 
 ### Dependency Updates
