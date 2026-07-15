@@ -8,7 +8,7 @@
 
 > **SomeOption**\<`T`\> = [`OptionMethods`](../interfaces/OptionMethods.md)\<`T`\> & `object`
 
-Defined in: [option.ts:23](https://github.com/madkarmaa/results-ts/blob/9bc2a1fbb0ca214c2fd725d9617029e74bc7fed1/src/option.ts#L23)
+Defined in: [option.ts:23](https://github.com/madkarmaa/results-ts/blob/02f33abda914ca13428fe3b923550f23f8d71980/src/option.ts#L23)
 
 Represents some value of type `T`.
 

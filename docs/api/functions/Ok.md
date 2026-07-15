@@ -8,7 +8,7 @@
 
 > **Ok**\<`T`\>(`value`): [`Result`](../type-aliases/Result.md)\<`T`, `never`\>
 
-Defined in: [result.ts:727](https://github.com/madkarmaa/results-ts/blob/9bc2a1fbb0ca214c2fd725d9617029e74bc7fed1/src/result.ts#L727)
+Defined in: [result.ts:727](https://github.com/madkarmaa/results-ts/blob/02f33abda914ca13428fe3b923550f23f8d71980/src/result.ts#L727)
 
 Contains the success value.
 
