@@ -4,20 +4,20 @@ This library distinguishes two kinds of failure. Understanding both keeps your c
 
 ## Panics
 
-Some methods intentionally panic, mirroring Rust. They throw a `PanicError` synchronously - or, on the async wrappers, reject the returned `Promise` with one:
+Some methods intentionally panic, mirroring Rust. They throw an internal `PanicError` synchronously - or, on the async wrappers, reject the returned `Promise` with one:
 
-| Method           | Available on                                     | Panics when                          |
-| ---------------- | ------------------------------------------------ | ------------------------------------ |
-| `unwrap`         | `Result`, `Option`, `AsyncResult`, `AsyncOption` | the value is absent (`Err` / `None`) |
-| `expect(msg)`    | `Result`, `Option`, `AsyncResult`, `AsyncOption` | the value is absent                  |
-| `unwrapErr`      | `Result`, `AsyncResult`                          | the value is `Ok`                    |
-| `expectErr(msg)` | `Result`, `AsyncResult`                          | the value is `Ok`                    |
+| Method                                                                                                                                                                                                                                                                     | Panics when                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [`Result.unwrap()`](../api/interfaces/ResultMethods.md#unwrap)<br>[`Option.unwrap()`](../api/interfaces/OptionMethods.md#unwrap)<br>[`AsyncResult.unwrap()`](../api/interfaces/AsyncResult.md#unwrap)<br>[`AsyncOption.unwrap()`](../api/interfaces/AsyncOption.md#unwrap) | the outcome is [`Err`](../api/functions/Err.md) or [`None`](../api/functions/None.md) |
+| [`Result.expect()`](../api/interfaces/ResultMethods.md#expect)<br>[`Option.expect()`](../api/interfaces/OptionMethods.md#expect)<br>[`AsyncResult.expect()`](../api/interfaces/AsyncResult.md#expect)<br>[`AsyncOption.expect()`](../api/interfaces/AsyncOption.md#expect) | the outcome is [`Err`](../api/functions/Err.md) or [`None`](../api/functions/None.md) |
+| [`Result.unwrapErr()`](../api/interfaces/ResultMethods.md#unwraperr)<br>[`AsyncResult.unwrapErr()`](../api/interfaces/AsyncResult.md#unwraperr)                                                                                                                            | the value is [`Ok`](../api/functions/Ok.md)                                           |
+| [`Result.expectErr()`](../api/interfaces/ResultMethods.md#expecterr)<br>[`AsyncResult.expectErr()`](../api/interfaces/AsyncResult.md#expecterr)                                                                                                                            | the value is [`Ok`](../api/functions/Ok.md)                                           |
 
-Panics are meant for situations where the absence of a value is a programmer error - you have already established (or are willing to assert) that the value is present. Prefer the non-panicking combinators whenever the failure case is recoverable:
+Use a panic only when reaching an [`Err`](../api/functions/Err.md) or [`None`](../api/functions/None.md) would mean a bug - for example, after earlier logic has guaranteed success or the presence of a value. When failure or missing data is an expected outcome, handle it explicitly with a non-panicking combinator:
 
-- `unwrapOr(fallback)` - a default value;
-- `unwrapOrElse((err) => fallback)` - a lazily-computed default;
-- `match({ Ok, Err })` / `match({ Some, None })` - explicit branching.
+- [`Result.unwrapOr(fallback)`](../api/interfaces/ResultMethods.md#unwrapor) / [`Option.unwrapOr(fallback)`](../api/interfaces/OptionMethods.md#unwrapor) - a default value;
+- [`Result.unwrapOrElse((err) => fallback)`](../api/interfaces/ResultMethods.md#unwraporelse) / [`Option.unwrapOrElse(() => fallback)`](../api/interfaces/OptionMethods.md#unwraporelse) - a lazily-computed default;
+- [`Result.match({ Ok, Err })`](../api/interfaces/ResultMethods.md#match) / [`Option.match({ Some, None })`](../api/interfaces/OptionMethods.md#match) - explicit branching.
 
 ```typescript
 import { Ok, Err } from 'results-ts';
@@ -33,24 +33,24 @@ const bad = Err('oops').unwrap(); // throws PanicError
 
 ## Misuse errors
 
-Almost every method validates its arguments at runtime. Calling methods with invalid arguments, or with invalid internal state, throws actual JavaScript errors.
-
-These errors signal a bug at the call site (garbage data, type-system bypass, or invalid runtime input), **not** a normal control-flow path. Fix the call site rather than catching them.
+Almost every method validates its arguments at runtime. If untyped JavaScript or an unsafe type assertion passes a value that violates a method's contract, the method throws a JavaScript error. These errors signal a bug at the call site, **not** a normal control-flow path.
 
 ## Error classes are not exported
 
-Error classes are intentionally **not** exported from the package. This encourages treating thrown JavaScript errors as unexpected behavior rather than a control-flow mechanism you wrap in `try/catch`. The `Result` / `Option` types are the intended error-handling API.
-
-If you ever get a non-panic JavaScript error from this library, that usually means invalid runtime data was passed in (library misuse, type-system bypass, or garbage input), and the call site should be fixed.
+Internal error classes like `PanicError` and `InvalidArgumentError` are intentionally **not** exported. Thrown errors report broken assumptions or invalid calls; [`Result`](../api/type-aliases/Result.md) and [`Option`](../api/type-aliases/Option.md) are the public APIs for expected failures and absent values.
 
 ## catchUnwind
 
-When you genuinely need to interop with code that throws (e.g. parsing, third-party functions, JSON), use `catchUnwind` (sync) or `catchUnwindAsync` (async). They turn a throw into an `Err`, with an optional `onThrow` handler to normalize the thrown value into a typed error.
+Existing or third-party code often throws exceptions or rejects promises. [`catchUnwind`](../api/functions/catchUnwind.md) and [`catchUnwindAsync`](../api/functions/catchUnwindAsync.md) provide a gentle boundary between that code and a [`Result`](../api/type-aliases/Result.md) pipeline. New code whose failures are expected should usually return [`Result`](../api/type-aliases/Result.md) directly.
+
+[`catchUnwind`](../api/functions/catchUnwind.md) wraps a synchronous function and turns a throw into an [`Err`](../api/functions/Err.md). Its optional [`onThrow`](../api/functions/catchUnwind.md#onthrow) handler can normalize JavaScript's `unknown` thrown value into a typed error.
 
 ```typescript
 import { catchUnwind } from 'results-ts';
 
-const safeParse = catchUnwind(JSON.parse, (thrown) =>
+const parseJson = (text: string): unknown => JSON.parse(text);
+
+const safeParse = catchUnwind(parseJson, (thrown) =>
     thrown instanceof Error ? thrown.message : 'parse error'
 );
 
@@ -58,13 +58,48 @@ safeParse('{"a":1}'); // Ok({ a: 1 })
 safeParse('{bad'); // Err('Unexpected token ...')
 ```
 
-`catchUnwind` is not a general-purpose replacement for `try/catch`. The `Result` type is more appropriate for functions that fail regularly - reach for `catchUnwind` only if you genuinely can't avoid the throw.
+Without an [`onThrow`](../api/functions/catchUnwind.md#onthrow) handler, the caught error type remains `unknown`, because JavaScript allows throwing any value:
+
+```typescript
+import { catchUnwind } from 'results-ts';
+
+const unsafe = catchUnwind(() => {
+    throw 'literal string';
+});
+
+const result = unsafe();
+//    ^? Result<never, unknown>
+```
+
+[`catchUnwindAsync`](../api/functions/catchUnwindAsync.md) captures both synchronous throws and rejected promises and returns an [`AsyncResult`](../api/interfaces/AsyncResult.md):
+
+```typescript
+import { catchUnwindAsync } from 'results-ts';
+
+const readJson = async (response: Response): Promise<unknown> =>
+    response.json();
+
+const safeFetch = catchUnwindAsync(
+    async (url: string) => {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return readJson(response);
+    },
+    (thrown) => (thrown instanceof Error ? thrown.message : 'request failed')
+);
+
+const result = await safeFetch('https://api.example.com');
+//    ^? Result<unknown, string>
+```
 
 > [!NOTE]
-> The `onThrow` handler receives the thrown value **and** the original call arguments: `(thrown, ...args) => E`.
-
-See the [getting started guide](./getting-started.md#catchunwind) for the basics and the [API reference](../api/index.md) for the full signatures.
+> The [`onThrow`](../api/functions/catchUnwind.md#onthrow) handler receives the thrown value **and** the original call arguments: [`(thrown, ...args) => E`](../api/functions/catchUnwind.md#onthrow).
 
 ## How this differs from Rust
 
-Rust uses the `match` keyword syntax; this library provides a `.match()` method on both `Result` and `Option` to achieve the same branching style in TypeScript. Everything else - panics, `unwrap` semantics, and the `Ok` / `Err` / `Some` / `None` naming - follows the Rust originals closely. For the canonical method behavior, refer to the [official Rust docs](https://doc.rust-lang.org/std/result/enum.Result.html) or the JSDocs in your editor.
+Rust uses the <code>match</code> keyword syntax; this library provides [`Result.match()`](../api/interfaces/ResultMethods.md#match) and [`Option.match()`](../api/interfaces/OptionMethods.md#match) methods to achieve the same branching style in TypeScript. The panic and unwrap semantics, plus the [`Ok`](../api/functions/Ok.md) / [`Err`](../api/functions/Err.md) / [`Some`](../api/functions/Some.md) / [`None`](../api/functions/None.md) naming, follow the Rust originals closely. See the [results-ts API reference](../api/index.md) for this library's behavior and the [official Rust docs](https://doc.rust-lang.org/std/) for Rust's standard library.
+
+## Next steps
+
+- [Async guide](./async.md) - use the same pipeline style with asynchronous work.
+- [API reference](../api/index.md) - complete signatures and method documentation.

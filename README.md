@@ -5,21 +5,13 @@
 
 ---
 
-This library mimics the Rust `Result` and `Option` enums and includes some of their chainable methods adapted for TypeScript, with full type safety. For full documentation on the usage of the available methods, please refer to the official Rust docs (or read the JSDocs directly in your editor).
+This library brings Rust's [`Result`](./docs/api/type-aliases/Result.md) and [`Option`](./docs/api/type-aliases/Option.md) enums and their chainable methods to TypeScript with full type safety. See the [results-ts API reference](https://results-ts.madkarma.top/api/) for complete method documentation. The API follows Rust's [Result](https://doc.rust-lang.org/std/result/enum.Result.html) and [Option](https://doc.rust-lang.org/std/option/enum.Option.html) types closely.
 
 <p align="center">
-    <a href="https://npmx.dev/package/results-ts/v/latest">
-        <img src="https://img.shields.io/npm/v/results-ts?labelColor=blue&color=grey" alt="npm version" />
-    </a>
-    <a href="https://npmx.dev/package/results-ts/v/canary">
-        <img src="https://img.shields.io/npm/v/results-ts/canary?labelColor=yellow&color=grey" alt="npm canary version" />
-    </a>
-    <a href="https://results-ts.madkarma.top/">
-        <img src="https://img.shields.io/badge/docs-website?logo=readthedocs&labelColor=fe640b&color=grey" alt="documentation" />
-    </a>
-    <a href="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml">
-        <img src="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml/badge.svg" alt="Release workflow" />
-    </a>
+    <a href="https://npmx.dev/package/results-ts/v/latest"><img src="https://img.shields.io/npm/v/results-ts?labelColor=blue&color=grey" alt="npm version" /></a>
+    <a href="https://npmx.dev/package/results-ts/v/canary"><img src="https://img.shields.io/npm/v/results-ts/canary?labelColor=yellow&color=grey" alt="npm canary version" /></a>
+    <a href="https://results-ts.madkarma.top/"><img src="https://img.shields.io/badge/docs-website?logo=readthedocs&labelColor=fe640b&color=grey" alt="documentation" /></a>
+    <a href="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml"><img src="https://github.com/madkarmaa/results-ts/actions/workflows/release.yml/badge.svg" alt="Release workflow" /></a>
 </p>
 
 ## Installation
@@ -38,7 +30,7 @@ yarn add results-ts
 
 ## Usage
 
-A quick taste of the `Result` type:
+A quick taste of the [`Result`](./docs/api/type-aliases/Result.md) type:
 
 ```typescript
 import { Ok, Err } from 'results-ts';

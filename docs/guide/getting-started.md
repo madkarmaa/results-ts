@@ -1,6 +1,6 @@
-# Getting Started
+# Getting started
 
-This library brings Rust's `Result` and `Option` types to TypeScript with full type safety. Methods are chainable, the API closely mirrors the Rust originals, and there is (_almost_) no runtime overhead - see the [benchmarks](https://github.com/madkarmaa/results-ts/blob/main/BENCHMARKS.md).
+This library brings Rust's [`Result`](../api/type-aliases/Result.md) and [`Option`](../api/type-aliases/Option.md) types to TypeScript with full type safety. This page first covers setup, then introduces both types through small examples.
 
 ## Installation
 
@@ -16,9 +16,31 @@ deno add results-ts
 yarn add results-ts
 ```
 
+### Browser without a bundler
+
+This library is an ES module. To use it directly in a browser, import it from a CDN inside a `<script type="module">`:
+
+> [!IMPORTANT]
+> The `type="module"` attribute is required.
+
+```html
+<script type="module">
+    import { Ok } from 'https://unpkg.com/results-ts/dist/index.js';
+    console.log(
+        Ok(1)
+            .map((x) => x + 1)
+            .unwrap()
+    ); // 2
+</script>
+```
+
+## Core concepts
+
+Use [`Result`](../api/type-aliases/Result.md) when an operation can fail with a useful error. Use [`Option`](../api/type-aliases/Option.md) when a value may be absent and no error details are needed. Both types make each possible outcome explicit, without exceptions or repeated `null` checks.
+
 ## Result
 
-`Result<T, E>` represents either a success (`Ok`) carrying a value of type `T`, or a failure (`Err`) carrying an error of type `E`. Use it instead of throwing when failures are expected and recoverable.
+[`Result<T, E>`](../api/type-aliases/Result.md) represents either a success ([`Ok`](../api/functions/Ok.md)) carrying a value of type `T`, or a failure ([`Err`](../api/functions/Err.md)) carrying an error of type `E`. Use it instead of throwing when failures are expected and recoverable.
 
 ```typescript
 import { Ok, Err } from 'results-ts';
@@ -58,59 +80,11 @@ const message = parseUserId('10')
 ```
 
 > [!NOTE]
-> Methods like `unwrap`, `expect`, `unwrapErr`, and `expectErr` intentionally **panic** to mirror Rust. See the [Error handling guide](./error-handling.md) for the full story - and prefer `unwrapOr` / `unwrapOrElse` / `match` when the failure case is recoverable.
-
-### catchUnwind
-
-`catchUnwind` wraps a function that might throw and turns the throw into an `Err`. Pass an optional `onThrow` handler to normalize the thrown value into a typed error.
-
-```typescript
-import { catchUnwind } from 'results-ts';
-
-const safeParse = catchUnwind(JSON.parse, (thrown) =>
-    thrown instanceof Error ? thrown.message : 'parse error'
-);
-
-const result = safeParse('{"a":1}'); // Ok({ a: 1 })
-const error = safeParse('{bad'); //     Err('Unexpected token ...')
-```
-
-Without an `onThrow` handler, the thrown value is caught as-is and the error type defaults to `unknown` (since JavaScript allows throwing anything):
-
-```typescript
-const unsafe = catchUnwind(() => {
-    throw 'literal string';
-});
-
-const result = unsafe();
-//    ^? Result<never, unknown>
-```
-
-### catchUnwindAsync
-
-`catchUnwindAsync` is the async counterpart: it captures both synchronous throws and rejected promises, and returns an `AsyncResult`.
-
-```typescript
-import { catchUnwindAsync } from 'results-ts';
-
-const safeFetch = catchUnwindAsync(
-    async (url: string) => {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-    },
-    (thrown) => (thrown instanceof Error ? thrown.message : 'request failed')
-);
-
-const result = await safeFetch('https://api.example.com');
-//    ^? AsyncResult<unknown, string>
-```
-
-`AsyncResult` is awaitable - `await`ing it gives you back a `Result`. See the [Async guide](./async.md) for the full async API.
+> Methods like [`Result.unwrap()`](../api/interfaces/ResultMethods.md#unwrap), [`Result.expect()`](../api/interfaces/ResultMethods.md#expect), [`Result.unwrapErr()`](../api/interfaces/ResultMethods.md#unwraperr), and [`Result.expectErr()`](../api/interfaces/ResultMethods.md#expecterr) intentionally **panic** to mirror Rust. See the [Error handling guide](./error-handling.md) for the full story - and prefer [`Result.unwrapOr()`](../api/interfaces/ResultMethods.md#unwrapor), [`Result.unwrapOrElse()`](../api/interfaces/ResultMethods.md#unwraporelse), or [`Result.match()`](../api/interfaces/ResultMethods.md#match) when the failure case is recoverable.
 
 ## Option
 
-`Option<T>` represents either the presence of a value (`Some`) or its absence (`None`). Use it instead of `null` / `undefined` checks.
+[`Option<T>`](../api/type-aliases/Option.md) represents either the presence of a value ([`Some`](../api/functions/Some.md)) or its absence ([`None`](../api/functions/None.md)). Use it instead of `null` / `undefined` checks.
 
 ```typescript
 import { Some, None } from 'results-ts';
@@ -129,28 +103,10 @@ const displayName = parseNickname('  Ada  ')
     });
 ```
 
-Note that `None` is a **function** - always call it as `None()` (optionally typed, e.g. `None<number>()`). Convert an `Option` back to a `Result` with `okOr(err)` or `okOrElse(() => err)`.
-
-## Browser (no bundler)
-
-This library is an ES module, so in the browser import it from a CDN inside a `<script type="module">`:
-
-> [!IMPORTANT]
-> The `type="module"` attribute is required, since this is an ES module.
-
-```html
-<script type="module">
-    import { Ok } from 'https://unpkg.com/results-ts/dist/index.js';
-    console.log(
-        Ok(1)
-            .map((x) => x + 1)
-            .unwrap()
-    ); // 2
-</script>
-```
+Note that [`None`](../api/functions/None.md) is a **function** - always call it as [`None()`](../api/functions/None.md) (optionally typed, e.g. [`None<number>()`](../api/functions/None.md)). Convert an [`Option`](../api/type-aliases/Option.md) back to a [`Result`](../api/type-aliases/Result.md) with [`Option.okOr(err)`](../api/interfaces/OptionMethods.md#okor) or [`Option.okOrElse(() => err)`](../api/interfaces/OptionMethods.md#okorelse).
 
 ## Next steps
 
-- [Async guide](./async.md) - working with `AsyncResult` and `AsyncOption`.
-- [Error handling guide](./error-handling.md) - panics, misuse errors, and `catchUnwind`.
+- [Error handling guide](./error-handling.md) - panics, misuse errors, and [`catchUnwind`](../api/functions/catchUnwind.md).
+- [Async guide](./async.md) - working with [`AsyncResult`](../api/interfaces/AsyncResult.md) and [`AsyncOption`](../api/interfaces/AsyncOption.md).
 - [API reference](../api/index.md) - every type and method, generated from the source.

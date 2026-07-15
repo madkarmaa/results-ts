@@ -4,7 +4,7 @@ layout: home
 hero:
     name: results-ts
     text: Rust's Result and Option types, for TypeScript.
-    tagline: Full type safety, (<i>almost</i>) zero overhead.
+    tagline: Make every outcome explicit and type-safe.
     actions:
         - theme: brand
           text: Get Started

@@ -47,7 +47,11 @@ export default defineConfig({
 
     themeConfig: {
         nav: [
-            { text: 'Guide', link: '/guide' },
+            {
+                text: 'Guide',
+                link: '/guide',
+                activeMatch: '^/guide(?:/|\\.html|$)'
+            },
             { text: 'API', link: '/api/' },
             {
                 text: `<span style="color: var(--vp-c-brand)">v${pkg.version}</span>`,
@@ -82,16 +86,16 @@ export default defineConfig({
                     text: 'Guide',
                     items: [
                         {
-                            text: 'Getting Started',
+                            text: 'Getting started',
                             link: '/guide/getting-started'
-                        },
-                        {
-                            text: 'Async',
-                            link: '/guide/async'
                         },
                         {
                             text: 'Error handling',
                             link: '/guide/error-handling'
+                        },
+                        {
+                            text: 'Async',
+                            link: '/guide/async'
                         }
                     ]
                 }
