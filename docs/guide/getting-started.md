@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 This library brings Rust's [`Result`](../api/type-aliases/Result.md) and [`Option`](../api/type-aliases/Option.md) types to TypeScript with full type safety. This page first covers setup, then introduces both types through small examples.
 
