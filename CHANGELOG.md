@@ -1,3 +1,9 @@
+## [4.2.6](https://github.com/madkarmaa/results-ts/compare/v4.2.5...v4.2.6) (2026-07-16)
+
+### Bug Fixes
+
+- restore PanicError stack traces ([dda7b6a](https://github.com/madkarmaa/results-ts/commit/dda7b6ac869af9653d4ce23c0598937527949fc1))
+
 ## [4.2.5](https://github.com/madkarmaa/results-ts/compare/v4.2.4...v4.2.5) (2026-07-15)
 
 ### Bug Fixes
