@@ -8,7 +8,7 @@
 
 > **Err**\<`E`\>(`error`): [`Result`](../type-aliases/Result.md)\<`never`, `E`\>
 
-Defined in: [result.ts:737](https://github.com/madkarmaa/results-ts/blob/02f33abda914ca13428fe3b923550f23f8d71980/src/result.ts#L737)
+Defined in: [result.ts:737](https://github.com/madkarmaa/results-ts/blob/990a1004b07298f39a3f92f94e12914041d212d2/src/result.ts#L737)
 
 Contains the error value.
 
