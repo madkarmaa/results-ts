@@ -3,11 +3,7 @@ import { resolve } from 'node:path';
 
 const docsDirectory = resolve(new URL(import.meta.url).pathname, '..', '..');
 const apiDirectory = resolve(docsDirectory, 'api');
-const apiGroupOrder: readonly string[] = [
-    'interfaces',
-    'type-aliases',
-    'functions'
-];
+const apiGroupOrder = ['interfaces', 'type-aliases', 'functions'];
 
 export const guidePages = [
     {
@@ -31,15 +27,12 @@ const getApiGroups = () =>
             const leftIndex = apiGroupOrder.indexOf(left.name);
             const rightIndex = apiGroupOrder.indexOf(right.name);
 
-            if (leftIndex === -1 && rightIndex === -1) {
+            if (leftIndex === -1 && rightIndex === -1)
                 return left.name.localeCompare(right.name);
-            }
-            if (leftIndex === -1) {
-                return 1;
-            }
-            if (rightIndex === -1) {
-                return -1;
-            }
+
+            if (leftIndex === -1) return 1;
+
+            if (rightIndex === -1) return -1;
 
             return leftIndex - rightIndex;
         })
