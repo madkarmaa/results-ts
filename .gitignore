@@ -6,6 +6,7 @@ out
 dist
 *.tgz
 cache
+docs/public/llms.txt
 
 # code coverage
 coverage
