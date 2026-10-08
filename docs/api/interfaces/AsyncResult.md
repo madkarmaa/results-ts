@@ -6,10 +6,13 @@
 
 # Interface: AsyncResult\<T, E\>
 
-Defined in: [async-result.ts:13](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L13)
+Defined in: [async-result.ts:17](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L17)
 
 An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
 but also carries all chainable `Result` methods.
+
+`and` and `or` accept sync or promise-like operands. Async operands resolve
+concurrently with the receiver; either rejection propagates.
 
 **Error behavior in async context:** Methods that throw synchronously on `Result`
 (e.g. `unwrap` on `Err`, `flatten` on non-nested) will produce a rejected `Promise`.
@@ -34,7 +37,7 @@ but also carries all chainable `Result` methods.
 
 > **and**\<`U`, `E2`\>(`res`): `AsyncResult`\<`U`, `E` \| `E2`\>
 
-Defined in: [async-result.ts:151](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L151)
+Defined in: [async-result.ts:155](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L155)
 
 Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -54,7 +57,7 @@ Arguments passed to `and` are eagerly evaluated; if you are passing the result o
 
 ##### res
 
-[`Result`](../type-aliases/Result.md)\<`U`, `E2`\>
+[`Result`](../type-aliases/Result.md)\<`U`, `E2`\> \| `PromiseLike`\<[`Result`](../type-aliases/Result.md)\<`U`, `E2`\>\>
 
 #### Returns
 
@@ -66,7 +69,7 @@ Arguments passed to `and` are eagerly evaluated; if you are passing the result o
 
 > **andThen**\<`U`, `F`\>(`f`): `AsyncResult`\<`U`, `E` \| `F`\>
 
-Defined in: [async-result.ts:158](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L158)
+Defined in: [async-result.ts:164](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L164)
 
 Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -98,7 +101,7 @@ This function can be used for control flow based on `Result` values.
 
 > **andThenAsync**\<`U`, `F`\>(`f`): `AsyncResult`\<`U`, `E` \| `F`\>
 
-Defined in: [async-result.ts:163](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L163)
+Defined in: [async-result.ts:169](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L169)
 
 Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -128,7 +131,7 @@ Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise 
 
 > **err**(): [`AsyncOption`](AsyncOption.md)\<`E`\>
 
-Defined in: [async-result.ts:46](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L46)
+Defined in: [async-result.ts:50](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L50)
 
 Converts from `AsyncResult<T, E>` to `AsyncOption<E>`.
 
@@ -144,7 +147,7 @@ Returns `Some` for `Err` and `None` for `Ok`.
 
 > **expect**(`msg`): `Promise`\<`T`\>
 
-Defined in: [async-result.ts:123](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L123)
+Defined in: [async-result.ts:127](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L127)
 
 Returns the contained `Ok` value.
 
@@ -168,7 +171,7 @@ Rejects with `PanicError` if the value is an `Err`, with a panic message includi
 
 > **expectErr**(`msg`): `Promise`\<`E`\>
 
-Defined in: [async-result.ts:137](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L137)
+Defined in: [async-result.ts:141](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L141)
 
 Returns the contained `Err` value.
 
@@ -192,7 +195,7 @@ Rejects with `PanicError` if the value is an `Ok`, with a panic message includin
 
 > **flatten**\<`U`, `F`\>(`this`): `AsyncResult`\<`U`, `E` \| `F`\>
 
-Defined in: [async-result.ts:211](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L211)
+Defined in: [async-result.ts:219](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L219)
 
 Converts from `AsyncResult<Result<T, E>, E>` to `AsyncResult<T, E>`.
 
@@ -225,7 +228,7 @@ with `FlattenError` rather than a synchronous throw.
 
 > **inspect**(`f`): `AsyncResult`\<`T`, `E`\>
 
-Defined in: [async-result.ts:99](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L99)
+Defined in: [async-result.ts:103](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L103)
 
 Calls a function with a reference to the contained value if `Ok`.
 
@@ -247,7 +250,7 @@ Returns the original result.
 
 > **inspectAsync**(`f`): `AsyncResult`\<`T`, `E`\>
 
-Defined in: [async-result.ts:104](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L104)
+Defined in: [async-result.ts:108](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L108)
 
 Async version of `inspect`. Calls an async function with a reference to the contained value if `Ok`, then returns the original result.
 
@@ -267,7 +270,7 @@ Async version of `inspect`. Calls an async function with a reference to the cont
 
 > **inspectErr**(`f`): `AsyncResult`\<`T`, `E`\>
 
-Defined in: [async-result.ts:111](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L111)
+Defined in: [async-result.ts:115](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L115)
 
 Calls a function with a reference to the contained value if `Err`.
 
@@ -289,7 +292,7 @@ Returns the original result.
 
 > **inspectErrAsync**(`f`): `AsyncResult`\<`T`, `E`\>
 
-Defined in: [async-result.ts:116](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L116)
+Defined in: [async-result.ts:120](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L120)
 
 Async version of `inspectErr`. Calls an async function with a reference to the contained value if `Err`, then returns the original result.
 
@@ -309,7 +312,7 @@ Async version of `inspectErr`. Calls an async function with a reference to the c
 
 > **isErr**(): `Promise`\<`boolean`\>
 
-Defined in: [async-result.ts:27](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L27)
+Defined in: [async-result.ts:31](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L31)
 
 Returns a `Promise` that resolves to `true` if the result is `Err`.
 
@@ -323,7 +326,7 @@ Returns a `Promise` that resolves to `true` if the result is `Err`.
 
 > **isErrAnd**(`f`): `Promise`\<`boolean`\>
 
-Defined in: [async-result.ts:32](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L32)
+Defined in: [async-result.ts:36](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L36)
 
 Returns a `Promise` that resolves to `true` if the result is `Err` and the error inside matches a predicate.
 
@@ -343,7 +346,7 @@ Returns a `Promise` that resolves to `true` if the result is `Err` and the error
 
 > **isOk**(): `Promise`\<`boolean`\>
 
-Defined in: [async-result.ts:17](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L17)
+Defined in: [async-result.ts:21](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L21)
 
 Returns a `Promise` that resolves to `true` if the result is `Ok`.
 
@@ -357,7 +360,7 @@ Returns a `Promise` that resolves to `true` if the result is `Ok`.
 
 > **isOkAnd**(`f`): `Promise`\<`boolean`\>
 
-Defined in: [async-result.ts:22](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L22)
+Defined in: [async-result.ts:26](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L26)
 
 Returns a `Promise` that resolves to `true` if the result is `Ok` and the value inside matches a predicate.
 
@@ -377,7 +380,7 @@ Returns a `Promise` that resolves to `true` if the result is `Ok` and the value 
 
 > **map**\<`U`\>(`f`): `AsyncResult`\<`U`, `E`\>
 
-Defined in: [async-result.ts:53](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L53)
+Defined in: [async-result.ts:57](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L57)
 
 Maps an `AsyncResult<T, E>` to `AsyncResult<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
 
@@ -405,7 +408,7 @@ This function can be used to compose the results of two functions.
 
 > **mapAsync**\<`U`\>(`f`): `AsyncResult`\<`U`, `E`\>
 
-Defined in: [async-result.ts:58](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L58)
+Defined in: [async-result.ts:62](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L62)
 
 Async version of `map`. Maps an `AsyncResult<T, E>` to `AsyncResult<U, E>` by applying an async function to a contained `Ok` value, leaving an `Err` value untouched.
 
@@ -431,7 +434,7 @@ Async version of `map`. Maps an `AsyncResult<T, E>` to `AsyncResult<U, E>` by ap
 
 > **mapErr**\<`F`\>(`f`): `AsyncResult`\<`T`, `F`\>
 
-Defined in: [async-result.ts:87](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L87)
+Defined in: [async-result.ts:91](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L91)
 
 Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
 
@@ -459,7 +462,7 @@ This function can be used to pass through a successful result while handling an 
 
 > **mapErrAsync**\<`F`\>(`f`): `AsyncResult`\<`T`, `F`\>
 
-Defined in: [async-result.ts:92](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L92)
+Defined in: [async-result.ts:96](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L96)
 
 Async version of `mapErr`. Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying an async function to a contained `Err` value, leaving an `Ok` value untouched.
 
@@ -485,7 +488,7 @@ Async version of `mapErr`. Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by
 
 > **mapOr**\<`U`\>(`fallback`, `f`): `Promise`\<`U`\>
 
-Defined in: [async-result.ts:65](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L65)
+Defined in: [async-result.ts:69](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L69)
 
 Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
 
@@ -517,7 +520,7 @@ Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result
 
 > **mapOrElse**\<`U`\>(`fallbackFn`, `f`): `Promise`\<`U`\>
 
-Defined in: [async-result.ts:72](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L72)
+Defined in: [async-result.ts:76](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L76)
 
 Maps an `AsyncResult<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
 
@@ -549,7 +552,7 @@ This function can be used to unpack a successful result while handling an error.
 
 > **mapOrElseAsync**\<`U`\>(`fallbackFn`, `f`): `Promise`\<`U`\>
 
-Defined in: [async-result.ts:77](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L77)
+Defined in: [async-result.ts:81](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L81)
 
 Async version of `mapOrElse`. Maps an `AsyncResult<T, E>` to `Promise<U>` by applying async fallback function `fallbackFn` to a contained `Err` value, or async function `f` to a contained `Ok` value.
 
@@ -579,7 +582,7 @@ Async version of `mapOrElse`. Maps an `AsyncResult<T, E>` to `Promise<U>` by app
 
 > **match**\<`U`\>(`handlers`): `Promise`\<`U`\>
 
-Defined in: [async-result.ts:224](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L224)
+Defined in: [async-result.ts:232](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L232)
 
 Matches the `Result` with two functions, one for each variant.
 
@@ -611,7 +614,7 @@ Matches the `Result` with two functions, one for each variant.
 
 > **ok**(): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [async-result.ts:39](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L39)
+Defined in: [async-result.ts:43](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L43)
 
 Converts from `AsyncResult<T, E>` to `AsyncOption<T>`.
 
@@ -627,7 +630,7 @@ Returns `Some` for `Ok` and `None` for `Err`.
 
 > **or**\<`T2`, `F`\>(`res`): `AsyncResult`\<`T` \| `T2`, `F`\>
 
-Defined in: [async-result.ts:172](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L172)
+Defined in: [async-result.ts:178](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L178)
 
 Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -647,7 +650,7 @@ Arguments passed to `or` are eagerly evaluated; if you are passing the result of
 
 ##### res
 
-[`Result`](../type-aliases/Result.md)\<`T2`, `F`\>
+[`Result`](../type-aliases/Result.md)\<`T2`, `F`\> \| `PromiseLike`\<[`Result`](../type-aliases/Result.md)\<`T2`, `F`\>\>
 
 #### Returns
 
@@ -659,7 +662,7 @@ Arguments passed to `or` are eagerly evaluated; if you are passing the result of
 
 > **orElse**\<`T2`, `F`\>(`f`): `AsyncResult`\<`T` \| `T2`, `F`\>
 
-Defined in: [async-result.ts:179](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L179)
+Defined in: [async-result.ts:187](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L187)
 
 Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -691,7 +694,7 @@ This function can be used for control flow based on result values.
 
 > **orElseAsync**\<`T2`, `F`\>(`f`): `AsyncResult`\<`T` \| `T2`, `F`\>
 
-Defined in: [async-result.ts:184](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L184)
+Defined in: [async-result.ts:192](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L192)
 
 Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -721,7 +724,7 @@ Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise 
 
 > **transpose**\<`T`, `E`\>(`this`): [`AsyncOption`](AsyncOption.md)\<[`Result`](../type-aliases/Result.md)\<`T`, `E`\>\>
 
-Defined in: [async-result.ts:219](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L219)
+Defined in: [async-result.ts:227](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L227)
 
 Transposes an `AsyncResult` of an `Option` into an `AsyncOption` of a `Result`.
 
@@ -754,7 +757,7 @@ with `TransposeError` rather than a synchronous throw.
 
 > **unwrap**(): `Promise`\<`T`\>
 
-Defined in: [async-result.ts:130](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L130)
+Defined in: [async-result.ts:134](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L134)
 
 Returns the contained `Ok` value.
 
@@ -772,7 +775,7 @@ Rejects with `PanicError` if the value is an `Err`, with a panic message provide
 
 > **unwrapErr**(): `Promise`\<`E`\>
 
-Defined in: [async-result.ts:144](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L144)
+Defined in: [async-result.ts:148](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L148)
 
 Returns the contained `Err` value.
 
@@ -790,7 +793,7 @@ Rejects with `PanicError` if the value is an `Ok`, with a custom panic message p
 
 > **unwrapOr**\<`T2`\>(`fallback`): `Promise`\<`T` \| `T2`\>
 
-Defined in: [async-result.ts:193](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L193)
+Defined in: [async-result.ts:201](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L201)
 
 Returns the contained `Ok` value or a provided default.
 
@@ -818,7 +821,7 @@ Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the res
 
 > **unwrapOrElse**\<`T2`\>(`f`): `Promise`\<`T` \| `T2`\>
 
-Defined in: [async-result.ts:198](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L198)
+Defined in: [async-result.ts:206](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L206)
 
 Returns the contained `Ok` value or computes it from a closure.
 
@@ -844,7 +847,7 @@ Returns the contained `Ok` value or computes it from a closure.
 
 > **unwrapOrElseAsync**\<`T2`\>(`f`): `Promise`\<`T` \| `T2`\>
 
-Defined in: [async-result.ts:203](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/async-result.ts#L203)
+Defined in: [async-result.ts:211](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/async-result.ts#L211)
 
 Async version of `unwrapOrElse`. Returns the contained `Ok` value or computes it from an async closure.
 

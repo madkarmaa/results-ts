@@ -10,7 +10,7 @@
 
 > **catchUnwind**\<`T`, `Args`\>(`fn`, `onThrow?`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `unknown`\>
 
-Defined in: [result.ts:758](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/result.ts#L758)
+Defined in: [result.ts:808](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L808)
 
 Invokes a function, capturing the cause of a thrown error if one occurs.
 
@@ -60,7 +60,7 @@ A function returning `Result<T, E>` that never throws.
 
 > **catchUnwind**\<`T`, `Args`, `E`\>(`fn`, `onThrow`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:762](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/result.ts#L762)
+Defined in: [result.ts:812](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L812)
 
 Invokes a function, capturing the cause of a thrown error if one occurs.
 

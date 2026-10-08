@@ -8,7 +8,7 @@
 
 > **Some**\<`T`\>(`value`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:849](https://github.com/madkarmaa/results-ts/blob/534376a45fb16841a26eb649dd9226fda0f160b8/src/option.ts#L849)
+Defined in: [option.ts:953](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/option.ts#L953)
 
 Some value of type `T`.
 
