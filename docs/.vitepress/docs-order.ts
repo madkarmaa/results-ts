@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const docsDirectory = resolve(new URL(import.meta.url).pathname, '..', '..');
+const docsDirectory = resolve(import.meta.dirname, '..');
 const apiDirectory = resolve(docsDirectory, 'api');
 const apiGroupOrder = ['interfaces', 'type-aliases', 'functions'];
 
