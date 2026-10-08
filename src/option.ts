@@ -813,15 +813,14 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         insertion.promise = insertPromise;
 
-        void insertPromise
-            .finally(() => {
-                if (
-                    insertion.token === pendingToken &&
-                    insertion.promise === insertPromise
-                )
-                    insertion.promise = undefined;
-            })
-            .catch(() => {});
+        const clearPending = () => {
+            if (
+                insertion.token === pendingToken &&
+                insertion.promise === insertPromise
+            )
+                insertion.promise = undefined;
+        };
+        void insertPromise.then(clearPending, clearPending);
 
         return insertPromise;
     }
