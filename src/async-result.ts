@@ -8,6 +8,9 @@ import { isPromiseLike } from './utils';
  * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
  * but also carries all chainable `Result` methods.
  *
+ * `and` and `or` accept sync or promise-like operands. Async operands resolve
+ * concurrently with the receiver; either rejection propagates.
+ *
  * **Error behavior in async context:** Methods that throw synchronously on `Result`
  * (e.g. `unwrap` on `Err`, `flatten` on non-nested) will produce a rejected `Promise`.
  */

@@ -39,6 +39,9 @@ export type ErrResult<T, E> = ResultMethods<T, E> & {
  *
  * Functions return `Result` whenever errors are expected and recoverable.
  *
+ * `and` and `or` return an `AsyncResult` for promise-like operands. They resolve
+ * the operand even when its value is unused; operand rejections propagate.
+ *
  * @template T - Contains the success value.
  * @template E - Contains the error value.
  */

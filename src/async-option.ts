@@ -7,6 +7,9 @@ import { isPromiseLike } from './utils';
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
  * but also carries all chainable `Option` methods.
  *
+ * `and`, `or`, `xor`, and `zip` accept sync or promise-like operands. Async
+ * operands resolve concurrently with the receiver; either rejection propagates.
+ *
  * **Intentionally omitted mutation methods:** `insert`, `getOrInsert`, `getOrInsertWith`,
  * `getOrInsertWithAsync`, `take`, `takeIf`, and `replace` are not available on `AsyncOption`.
  * These methods mutate the `Option` in-place, which is not meaningful on a pending async value -

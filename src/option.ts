@@ -33,6 +33,10 @@ export type NoneOption<T> = OptionMethods<T> & { readonly _isSome: false };
  *
  * `Option`s are commonly paired with pattern matching to query the presence of a value and take action, always accounting for the `None` case.
  *
+ * `and`, `or`, `xor`, and `zip` return an `AsyncOption` for promise-like operands.
+ * They capture the receiver's state at invocation and resolve the operand even
+ * when its value is unused; operand rejections propagate.
+ *
  * @template T Contains the type of the value that may be present in the `Option`.
  */
 export type Option<T> = SomeOption<T> | NoneOption<T>;
