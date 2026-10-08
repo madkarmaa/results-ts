@@ -5,11 +5,6 @@ import {
     TransposeError
 } from './errors';
 import {
-    type Either,
-    Left,
-    Right,
-    isLeft,
-    isRight,
     EMPTY_ITERATOR,
     OneItemIterator,
     isPromiseLike,
@@ -360,9 +355,14 @@ interface OptionMethods<T> {
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U;
 }
 
-const noneValue = { _tag: 'NoneValue' } as const;
+// Private identity keeps every user value, including undefined and symbols,
+// distinct from absence without allocating a separate state object.
+const noneValue = Symbol('None');
 type NoneValue = typeof noneValue;
-const noneEither = Left(noneValue); // immutable shared reference
+
+function isSomeValue<T>(value: T | NoneValue): value is T {
+    return value !== noneValue;
+}
 
 type PendingInsert<T> = {
     promise: Promise<T> | undefined;
@@ -371,11 +371,11 @@ type PendingInsert<T> = {
 };
 
 class OptionImpl<T> implements OptionMethods<T> {
-    #state: Either<NoneValue, T>;
+    #state: T | NoneValue;
     #insertion?: PendingInsert<T>;
 
     static name = 'Option';
-    constructor(state: Either<NoneValue, T>) {
+    constructor(state: T | NoneValue) {
         this.#state = state;
     }
 
@@ -388,21 +388,21 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     get _isSome(): boolean {
-        return isRight(this.#state);
+        return isSomeValue(this.#state);
     }
 
     get [Symbol.toStringTag]() {
-        return isRight(this.#state) ? `Option Some` : `Option None`;
+        return isSomeValue(this.#state) ? `Option Some` : `Option None`;
     }
 
     toString(): string {
         const state = this.#state;
-        if (isRight(state)) return `Some(${state.right})`;
+        if (isSomeValue(state)) return `Some(${state})`;
         return `None`;
     }
 
     isSome(): this is SomeOption<T> {
-        return isRight(this.#state);
+        return isSomeValue(this.#state);
     }
 
     isSomeAnd<U extends T>(f: (val: T) => val is U): this is SomeOption<U>;
@@ -412,11 +412,11 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        return isRight(state) && f(state.right);
+        return isSomeValue(state) && f(state);
     }
 
     isNone(): this is NoneOption<T> {
-        return isLeft(this.#state);
+        return !isSomeValue(this.#state);
     }
 
     isNoneOr(f: (val: T) => boolean): boolean {
@@ -424,8 +424,8 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isLeft(state)) return true;
-        return f(state.right);
+        if (!isSomeValue(state)) return true;
+        return f(state);
     }
 
     expect(msg: string): T {
@@ -433,20 +433,20 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a string');
 
         const state = this.#state;
-        if (isLeft(state)) throw new PanicError(msg);
-        return state.right;
+        if (!isSomeValue(state)) throw new PanicError(msg);
+        return state;
     }
 
     unwrap(): T {
         const state = this.#state;
-        if (isLeft(state))
+        if (!isSomeValue(state))
             throw new PanicError('called `Option.unwrap()` on a `None` value');
-        return state.right;
+        return state;
     }
 
     unwrapOr(defaultVal: T): T {
         const state = this.#state;
-        return isRight(state) ? state.right : defaultVal;
+        return isSomeValue(state) ? state : defaultVal;
     }
 
     unwrapOrElse(f: () => T): T {
@@ -454,7 +454,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        return isRight(state) ? state.right : f();
+        return isSomeValue(state) ? state : f();
     }
 
     unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T> {
@@ -462,8 +462,8 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        return isRight(state)
-            ? Promise.resolve(state.right)
+        return isSomeValue(state)
+            ? Promise.resolve(state)
             : Promise.resolve(f());
     }
 
@@ -472,7 +472,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return Some(f(state.right));
+        if (isSomeValue(state)) return Some(f(state));
 
         // None path: the wrapped value is unchanged, so reuse `this` to avoid an
         // extra allocation. The Some type is narrowed to `U` via a cast - safe
@@ -485,10 +485,10 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state))
+        if (isSomeValue(state))
             return new AsyncOptionImpl(
                 Promise.resolve()
-                    .then(() => f(state.right))
+                    .then(() => f(state))
                     .then(Some)
             );
 
@@ -500,7 +500,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) f(state.right);
+        if (isSomeValue(state)) f(state);
         return this;
     }
 
@@ -509,10 +509,10 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state))
+        if (isSomeValue(state))
             return new AsyncOptionImpl(
                 Promise.resolve()
-                    .then(() => f(state.right))
+                    .then(() => f(state))
                     .then(() => this)
             );
 
@@ -524,7 +524,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        return isRight(state) ? f(state.right) : defaultVal;
+        return isSomeValue(state) ? f(state) : defaultVal;
     }
 
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U {
@@ -537,7 +537,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
         const state = this.#state;
-        return isRight(state) ? f(state.right) : defaultF();
+        return isSomeValue(state) ? f(state) : defaultF();
     }
 
     mapOrElseAsync<U>(
@@ -553,14 +553,14 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError("Argument 'f' must be a function");
 
         const state = this.#state;
-        return isRight(state)
-            ? Promise.resolve(f(state.right))
+        return isSomeValue(state)
+            ? Promise.resolve(f(state))
             : Promise.resolve(defaultF());
     }
 
     okOr<E>(err: E): Result<T, E> {
         const state = this.#state;
-        if (isRight(state)) return Ok(state.right);
+        if (isSomeValue(state)) return Ok(state);
         return Err(err);
     }
 
@@ -569,7 +569,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return Ok(state.right);
+        if (isSomeValue(state)) return Ok(state);
         return Err(errF());
     }
 
@@ -578,16 +578,16 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state))
-            return new AsyncResultImpl(Promise.resolve(Ok(state.right)));
+        if (isSomeValue(state))
+            return new AsyncResultImpl(Promise.resolve(Ok(state)));
 
         return new AsyncResultImpl(Promise.resolve().then(errF).then(Err));
     }
 
     iter(): IterableIterator<T> {
         const state = this.#state;
-        if (isLeft(state)) return EMPTY_ITERATOR;
-        return new OneItemIterator(state.right);
+        if (!isSomeValue(state)) return EMPTY_ITERATOR;
+        return new OneItemIterator(state);
     }
 
     and<U>(optb: Option<U>): Option<U>;
@@ -607,7 +607,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         }
 
         const state = this.#state;
-        if (isRight(state)) return optb;
+        if (isSomeValue(state)) return optb;
 
         // None path: `this` is already `None`, so reuse it to avoid an extra
         // allocation. The Some type is narrowed to `U` via a cast - safe because
@@ -620,7 +620,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return f(state.right);
+        if (isSomeValue(state)) return f(state);
 
         // None path: `this` is already `None`, so reuse it to avoid an extra
         // allocation. The Some type is narrowed to `U` via a cast - safe because
@@ -633,10 +633,8 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state))
-            return new AsyncOptionImpl(
-                Promise.resolve().then(() => f(state.right))
-            );
+        if (isSomeValue(state))
+            return new AsyncOptionImpl(Promise.resolve().then(() => f(state)));
 
         return new AsyncOptionImpl(Promise.resolve(None()));
     }
@@ -647,8 +645,8 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
 
-        if (isLeft(state)) return this; // already `None`, reuse
-        if (predicate(state.right)) return this; // `Some` passes the filter, reuse
+        if (!isSomeValue(state)) return this; // already `None`, reuse
+        if (predicate(state)) return this; // `Some` passes the filter, reuse
         return None(); // `Some` fails the filter - must allocate
     }
 
@@ -657,10 +655,10 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state))
+        if (isSomeValue(state))
             return new AsyncOptionImpl(
                 Promise.resolve()
-                    .then(() => predicate(state.right))
+                    .then(() => predicate(state))
                     .then((pass) => (pass ? this : None()))
             );
 
@@ -684,7 +682,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         }
 
         const state = this.#state;
-        if (isRight(state)) return this;
+        if (isSomeValue(state)) return this;
         return optb;
     }
 
@@ -693,7 +691,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return this;
+        if (isSomeValue(state)) return this;
         return f();
     }
 
@@ -702,7 +700,8 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return new AsyncOptionImpl(Promise.resolve(this));
+        if (isSomeValue(state))
+            return new AsyncOptionImpl(Promise.resolve(this));
 
         return new AsyncOptionImpl(Promise.resolve().then(f));
     }
@@ -723,7 +722,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be an Option');
         }
 
-        const thisIsSome = isRight(this.#state);
+        const thisIsSome = isSomeValue(this.#state);
         const optbIsSome = optb._isSome;
 
         if (thisIsSome && !optbIsSome) return this;
@@ -736,7 +735,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
     insert(value: T): T {
         this.#invalidatePendingInsert();
-        this.#state = Right(value);
+        this.#state = value;
         return value;
     }
 
@@ -744,9 +743,9 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#invalidatePendingInsert();
 
         const state = this.#state;
-        if (isRight(state)) return state.right;
+        if (isSomeValue(state)) return state;
 
-        this.#state = Right(value);
+        this.#state = value;
         return value;
     }
 
@@ -757,10 +756,10 @@ class OptionImpl<T> implements OptionMethods<T> {
         this.#invalidatePendingInsert();
 
         const state = this.#state;
-        if (isRight(state)) return state.right;
+        if (isSomeValue(state)) return state;
 
         const value = f();
-        this.#state = Right(value);
+        this.#state = value;
         return value;
     }
 
@@ -769,7 +768,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             throw new InvalidArgumentError('Argument must be a function');
 
         const state = this.#state;
-        if (isRight(state)) return state.right;
+        if (isSomeValue(state)) return state;
 
         // Ordinary synchronous options need no insertion coordination state.
         const insertion = (this.#insertion ??= {
@@ -793,27 +792,27 @@ class OptionImpl<T> implements OptionMethods<T> {
                     insertion.token === pendingToken
                 ) {
                     insertion.version += 1;
-                    this.#state = Right(value);
+                    this.#state = value;
                     return value;
                 }
 
                 const current = this.#state;
-                if (isRight(current)) return current.right;
+                if (isSomeValue(current)) return current;
 
                 const pending = insertion.promise;
                 if (pending && insertion.token !== pendingToken) {
                     return pending.then(() => {
                         const latest = this.#state;
-                        if (isRight(latest)) return latest.right;
+                        if (isSomeValue(latest)) return latest;
 
                         insertion.version += 1;
-                        this.#state = Right(value);
+                        this.#state = value;
                         return value;
                     });
                 }
 
                 insertion.version += 1;
-                this.#state = Right(value);
+                this.#state = value;
                 return value;
             });
 
@@ -835,9 +834,9 @@ class OptionImpl<T> implements OptionMethods<T> {
     take(): Option<T> {
         this.#invalidatePendingInsert();
         const state = this.#state;
-        if (isRight(state)) {
-            this.#state = noneEither;
-            return Some(state.right);
+        if (isSomeValue(state)) {
+            this.#state = noneValue;
+            return Some(state);
         }
 
         return None();
@@ -849,9 +848,9 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         this.#invalidatePendingInsert();
         const state = this.#state;
-        if (isRight(state) && predicate(state.right)) {
-            this.#state = noneEither;
-            return Some(state.right);
+        if (isSomeValue(state) && predicate(state)) {
+            this.#state = noneValue;
+            return Some(state);
         }
 
         return None();
@@ -860,9 +859,9 @@ class OptionImpl<T> implements OptionMethods<T> {
     replace(value: T): Option<T> {
         this.#invalidatePendingInsert();
         const state = this.#state;
-        this.#state = Right(value);
+        this.#state = value;
 
-        if (isRight(state)) return Some(state.right);
+        if (isSomeValue(state)) return Some(state);
         return None();
     }
 
@@ -871,12 +870,12 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
 
-        if (!isRight(state) || typeof state.right._isSome !== 'boolean')
+        if (!isSomeValue(state) || typeof state._isSome !== 'boolean')
             throw new FlattenError(
                 'flatten can only be called on Option<Option<T>>'
             );
 
-        return state.right;
+        return state;
     }
 
     transpose<T, E>(this: OptionImpl<Result<T, E>>): Result<Option<T>, E> {
@@ -884,12 +883,12 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
 
-        if (!isRight(state) || typeof state.right._isOk !== 'boolean')
+        if (!isSomeValue(state) || typeof state._isOk !== 'boolean')
             throw new TransposeError(
                 'transpose can only be called on Option<Result<T, E>>'
             );
 
-        const inner = state.right;
+        const inner = state;
         return inner.isOk() ? Ok(Some(inner.unwrap())) : Err(inner.unwrapErr());
     }
 
@@ -910,17 +909,17 @@ class OptionImpl<T> implements OptionMethods<T> {
         }
 
         const state = this.#state;
-        if (isLeft(state) || !other._isSome) return None();
+        if (!isSomeValue(state) || !other._isSome) return None();
 
-        return Some<[T, U]>([state.right, other.unwrap()]);
+        return Some<[T, U]>([state, other.unwrap()]);
     }
 
     unzip<T, U>(this: OptionImpl<[T, U]>): [Option<T>, Option<U>] {
         const state = this.#state;
 
-        if (isLeft(state)) return [None(), None()];
+        if (!isSomeValue(state)) return [None(), None()];
 
-        const [a, b] = state.right;
+        const [a, b] = state;
         return [Some(a), Some(b)];
     }
 
@@ -929,7 +928,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         combine: (current: Option<T>, other: Option<U>) => Option<R>
     ): AsyncOption<R> {
         const state = this.#state;
-        const current = isRight(state) ? Some(state.right) : None<T>();
+        const current = isSomeValue(state) ? Some(state) : None<T>();
         const resolved = isAsyncOptionOperand(other)
             ? other
             : Promise.resolve(other);
@@ -954,7 +953,7 @@ class OptionImpl<T> implements OptionMethods<T> {
             );
 
         const state = this.#state;
-        return isRight(state) ? someHandler(state.right) : noneHandler();
+        return isSomeValue(state) ? someHandler(state) : noneHandler();
     }
 }
 
@@ -964,7 +963,7 @@ class OptionImpl<T> implements OptionMethods<T> {
  * @returns An `Option` representing the presence of a value.
  */
 export function Some<T>(value: T): Option<T> {
-    return new OptionImpl(Right(value));
+    return new OptionImpl<T>(value);
 }
 
 /**
@@ -972,5 +971,5 @@ export function Some<T>(value: T): Option<T> {
  * @returns An `Option` representing the absence of a value.
  */
 export function None<T = never>(): Option<T> {
-    return new OptionImpl(noneEither);
+    return new OptionImpl<T>(noneValue);
 }
