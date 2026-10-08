@@ -1,3 +1,9 @@
+# [4.3.0-canary.2](https://github.com/madkarmaa/results-ts/compare/v4.3.0-canary.1...v4.3.0-canary.2) (2026-10-08)
+
+### Features
+
+- **combinators:** support mixed sync and async operands ([e3c12fb](https://github.com/madkarmaa/results-ts/commit/e3c12fb00da68fffa932cbeb0c8ff52514fc0f4d))
+
 # [4.3.0-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.7...v4.3.0-canary.1) (2026-10-08)
 
 ### Features
