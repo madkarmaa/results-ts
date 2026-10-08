@@ -1,0 +1,121 @@
+import { describe, expect, test } from 'vitest';
+import { Some, None, type Option } from '../src/option';
+import { Ok, Err, type Result } from '../src/result';
+import { InvalidArgumentError } from '../src/errors';
+
+describe('private state and payload preservation', () => {
+    const values: readonly unknown[] = [
+        undefined,
+        null,
+        false,
+        0,
+        -0,
+        NaN,
+        '',
+        1n,
+        Symbol('None'),
+        { _tag: 'NoneValue' },
+        { _tag: 'Right', right: 3 },
+        () => 1,
+        new Proxy(
+            {},
+            {
+                get() {
+                    throw new Error('payload inspected');
+                }
+            }
+        )
+    ];
+
+    test('arbitrary payloads remain present and retain identity', () => {
+        for (const value of values) {
+            const option = Some(value);
+            expect(option.isSome()).toBe(true);
+            expect(option.unwrap()).toBe(value);
+            expect(option.map((item) => item).unwrap()).toBe(value);
+            expect(Ok(value).unwrap()).toBe(value);
+            expect(Err(value).unwrapErr()).toBe(value);
+            expect(option.replace(undefined).unwrap()).toBe(value);
+            expect(option.isSome()).toBe(true);
+            expect(option.take().unwrap()).toBeUndefined();
+            expect(option.isNone()).toBe(true);
+            expect(option.insert(value)).toBe(value);
+            expect(option.take().unwrap()).toBe(value);
+        }
+    });
+
+    test('state remains private and variant getters follow mutation', () => {
+        for (const value of [Some(1), None(), Ok(1), Err('error')]) {
+            expect(Reflect.ownKeys(value)).toEqual([]);
+            expect(JSON.stringify(value)).toBe('{}');
+        }
+        const option = None<number>();
+        expect(Object.prototype.toString.call(option)).toBe(
+            '[object Option None]'
+        );
+        option.insert(1);
+        expect(option._isSome).toBe(true);
+        expect(Object.prototype.toString.call(option)).toBe(
+            '[object Option Some]'
+        );
+        option.take();
+        expect(option._isSome).toBe(false);
+    });
+
+    test('takeIf keeps the original payload across reentrant mutation', () => {
+        const original = { id: 1 };
+        const replacement = { id: 2 };
+        const option = Some(original);
+        const taken = option.takeIf((value) => {
+            expect(value).toBe(original);
+            option.replace(replacement);
+            return true;
+        });
+        expect(taken.unwrap()).toBe(original);
+        expect(option.isNone()).toBe(true);
+        option.insert(original);
+        expect(
+            option
+                .takeIf(() => {
+                    option.insert(replacement);
+                    return false;
+                })
+                .isNone()
+        ).toBe(true);
+        expect(option.unwrap()).toBe(replacement);
+    });
+
+    test('unchanged branches retain the existing identity rules', () => {
+        const none = None<number>();
+        const some = Some(1);
+        const ok = Ok(1);
+        const err = Err('error');
+        expect(none.map(String)).toBe(none);
+        expect(none.andThen(() => Some('unused'))).toBe(none);
+        expect(some.filter(() => true)).toBe(some);
+        expect(err.map(String)).toBe(err);
+        expect(ok.mapErr(String)).toBe(ok);
+        expect(err.flatten()).not.toBe(err);
+        const nested: Option<Option<number>> = None();
+        expect(nested.flatten()).not.toBe(nested);
+        const result: Result<Option<number>, string> = Err('error');
+        expect(result.transpose().unwrap()).not.toBe(result);
+        expect(None()).not.toBe(None());
+    });
+
+    test('inactive branches still validate callbacks', () => {
+        const invalid = undefined as never;
+        const operations = [
+            () => None().map(invalid),
+            () => None().filter(invalid),
+            () => None().andThen(invalid),
+            () => Some(1).orElse(invalid),
+            () => Err('error').map(invalid),
+            () => Ok(1).mapErr(invalid),
+            () => Err('error').andThen(invalid),
+            () => Ok(1).orElse(invalid)
+        ];
+        for (const operation of operations)
+            expect(operation).toThrow(InvalidArgumentError);
+    });
+});
