@@ -17,6 +17,175 @@ import {
 import { type AsyncOption } from '../src/async-option';
 import { type AsyncResult, catchUnwindAsync } from '../src/async-result';
 
+describe('Mixed combinator operand types', () => {
+    const syncOption = Some(42);
+    const syncOther = Some('hello');
+    const asyncOption = syncOption.mapAsync(async (value) => value);
+    const asyncOther = syncOther.mapAsync(async (value) => value);
+
+    test('Option sync + sync', () => {
+        expectTypeOf(syncOption.and(syncOther)).toEqualTypeOf<Option<string>>();
+        expectTypeOf(syncOption.or(syncOther)).toEqualTypeOf<
+            Option<number | string>
+        >();
+        expectTypeOf(syncOption.xor(syncOther)).toEqualTypeOf<
+            Option<number | string>
+        >();
+        expectTypeOf(syncOption.zip(syncOther)).toEqualTypeOf<
+            Option<[number, string]>
+        >();
+    });
+
+    test('Option sync + async', () => {
+        expectTypeOf(syncOption.and(asyncOther)).toEqualTypeOf<
+            AsyncOption<string>
+        >();
+        expectTypeOf(syncOption.or(asyncOther)).toEqualTypeOf<
+            AsyncOption<number | string>
+        >();
+        expectTypeOf(syncOption.xor(asyncOther)).toEqualTypeOf<
+            AsyncOption<number | string>
+        >();
+        expectTypeOf(syncOption.zip(asyncOther)).toEqualTypeOf<
+            AsyncOption<[number, string]>
+        >();
+    });
+
+    test('Option async + sync', () => {
+        expectTypeOf(asyncOption.and(syncOther)).toEqualTypeOf<
+            AsyncOption<string>
+        >();
+        expectTypeOf(asyncOption.or(syncOther)).toEqualTypeOf<
+            AsyncOption<number | string>
+        >();
+        expectTypeOf(asyncOption.xor(syncOther)).toEqualTypeOf<
+            AsyncOption<number | string>
+        >();
+        expectTypeOf(asyncOption.zip(syncOther)).toEqualTypeOf<
+            AsyncOption<[number, string]>
+        >();
+    });
+
+    test('Option async + async', () => {
+        expectTypeOf(asyncOption.and(asyncOther)).toEqualTypeOf<
+            AsyncOption<string>
+        >();
+        expectTypeOf(asyncOption.or(asyncOther)).toEqualTypeOf<
+            AsyncOption<number | string>
+        >();
+        expectTypeOf(asyncOption.xor(asyncOther)).toEqualTypeOf<
+            AsyncOption<number | string>
+        >();
+        expectTypeOf(asyncOption.zip(asyncOther)).toEqualTypeOf<
+            AsyncOption<[number, string]>
+        >();
+    });
+
+    const syncResult: Result<number, Error> = Ok(42);
+    const syncOtherResult: Result<string, boolean> = Ok('hello');
+    const asyncResult = syncResult.mapAsync(async (value) => value);
+    const asyncOtherResult = syncOtherResult.mapAsync(async (value) => value);
+
+    test('Result sync + sync', () => {
+        expectTypeOf(syncResult.and(syncOtherResult)).toEqualTypeOf<
+            Result<string, Error | boolean>
+        >();
+        expectTypeOf(syncResult.or(syncOtherResult)).toEqualTypeOf<
+            Result<number | string, boolean>
+        >();
+    });
+
+    test('Result sync + async', () => {
+        expectTypeOf(syncResult.and(asyncOtherResult)).toEqualTypeOf<
+            AsyncResult<string, Error | boolean>
+        >();
+        expectTypeOf(syncResult.or(asyncOtherResult)).toEqualTypeOf<
+            AsyncResult<number | string, boolean>
+        >();
+    });
+
+    test('Result async + sync', () => {
+        expectTypeOf(asyncResult.and(syncOtherResult)).toEqualTypeOf<
+            AsyncResult<string, Error | boolean>
+        >();
+        expectTypeOf(asyncResult.or(syncOtherResult)).toEqualTypeOf<
+            AsyncResult<number | string, boolean>
+        >();
+    });
+
+    test('Result async + async', () => {
+        expectTypeOf(asyncResult.and(asyncOtherResult)).toEqualTypeOf<
+            AsyncResult<string, Error | boolean>
+        >();
+        expectTypeOf(asyncResult.or(asyncOtherResult)).toEqualTypeOf<
+            AsyncResult<number | string, boolean>
+        >();
+    });
+
+    test('native promises preserve the contained value and error types', () => {
+        expectTypeOf(syncOption.zip(Promise.resolve(syncOther))).toEqualTypeOf<
+            AsyncOption<[number, string]>
+        >();
+        expectTypeOf(
+            syncResult.and(Promise.resolve(syncOtherResult))
+        ).toEqualTypeOf<AsyncResult<string, Error | boolean>>();
+        expectTypeOf(
+            asyncResult.or(Promise.resolve(syncOtherResult))
+        ).toEqualTypeOf<AsyncResult<number | string, boolean>>();
+    });
+
+    test('union operands retain both possible return types on sync receivers', () => {
+        const optionOperand = (
+            async: boolean
+        ): Option<string> | AsyncOption<string> =>
+            async ? asyncOther : syncOther;
+        const resultOperand = (
+            async: boolean
+        ): Result<string, boolean> | AsyncResult<string, boolean> =>
+            async ? asyncOtherResult : syncOtherResult;
+        const other = optionOperand(true);
+        const otherResult = resultOperand(true);
+
+        expectTypeOf(syncOption.and(other)).toEqualTypeOf<
+            Option<string> | AsyncOption<string>
+        >();
+        expectTypeOf(syncOption.or(other)).toEqualTypeOf<
+            Option<number | string> | AsyncOption<number | string>
+        >();
+        expectTypeOf(syncOption.xor(other)).toEqualTypeOf<
+            Option<number | string> | AsyncOption<number | string>
+        >();
+        expectTypeOf(syncOption.zip(other)).toEqualTypeOf<
+            Option<[number, string]> | AsyncOption<[number, string]>
+        >();
+        expectTypeOf(syncResult.and(otherResult)).toEqualTypeOf<
+            | Result<string, Error | boolean>
+            | AsyncResult<string, Error | boolean>
+        >();
+        expectTypeOf(syncResult.or(otherResult)).toEqualTypeOf<
+            | Result<number | string, boolean>
+            | AsyncResult<number | string, boolean>
+        >();
+        expectTypeOf(asyncOption.zip(other)).toEqualTypeOf<
+            AsyncOption<[number, string]>
+        >();
+        expectTypeOf(asyncResult.and(otherResult)).toEqualTypeOf<
+            AsyncResult<string, Error | boolean>
+        >();
+    });
+
+    test('wrong operand kinds and payloads are rejected', () => {
+        // @ts-expect-error - Option combinators require Option operands
+        syncOption.and(asyncResult);
+        // @ts-expect-error - Result combinators require Result operands
+        syncResult.or(asyncOption);
+        // @ts-expect-error - async operands must resolve to an Option
+        syncOption.zip(Promise.resolve('hello'));
+        // @ts-expect-error - async operands must resolve to a Result
+        asyncResult.and(Promise.resolve(42));
+    });
+});
+
 describe('Option types', () => {
     test('Some and None constructors map correctly to Option<T>', () => {
         const someValue = Some(42);
