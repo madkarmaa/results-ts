@@ -365,15 +365,15 @@ function isSomeValue<T>(value: T | NoneValue): value is T {
     return value !== noneValue;
 }
 
-type PendingInsert<T> = {
+type AsyncInsertionState<T> = {
     promise: Promise<T> | undefined;
-    token: number;
-    version: number;
+    pendingToken: number;
+    mutationVersion: number;
 };
 
 class OptionImpl<T> implements OptionMethods<T> {
     #state: T | NoneValue;
-    #insertion?: PendingInsert<T>;
+    #insertion?: AsyncInsertionState<T>;
 
     static name = 'Option';
     constructor(state: T | NoneValue) {
@@ -383,8 +383,8 @@ class OptionImpl<T> implements OptionMethods<T> {
     #invalidatePendingInsert(): void {
         const insertion = this.#insertion;
         if (!insertion) return;
-        insertion.version += 1;
-        insertion.token += 1;
+        insertion.mutationVersion += 1;
+        insertion.pendingToken += 1;
         insertion.promise = undefined;
     }
 
@@ -770,23 +770,23 @@ class OptionImpl<T> implements OptionMethods<T> {
         // Ordinary synchronous options need no insertion coordination state.
         const insertion = (this.#insertion ??= {
             promise: undefined,
-            token: 0,
-            version: 0
+            pendingToken: 0,
+            mutationVersion: 0
         });
 
         if (insertion.promise) return insertion.promise;
 
-        const startVersion = insertion.version;
+        const startVersion = insertion.mutationVersion;
 
-        const pendingToken = insertion.token + 1;
-        insertion.token = pendingToken;
+        const pendingToken = insertion.pendingToken + 1;
+        insertion.pendingToken = pendingToken;
 
         const insertPromise = ASYNC_START.then(() => f()).then((value) => {
             if (
-                insertion.version === startVersion &&
-                insertion.token === pendingToken
+                insertion.mutationVersion === startVersion &&
+                insertion.pendingToken === pendingToken
             ) {
-                insertion.version += 1;
+                insertion.mutationVersion += 1;
                 this.#state = value;
                 return value;
             }
@@ -795,32 +795,32 @@ class OptionImpl<T> implements OptionMethods<T> {
             if (isSomeValue(current)) return current;
 
             const pending = insertion.promise;
-            if (pending && insertion.token !== pendingToken) {
+            if (pending && insertion.pendingToken !== pendingToken) {
                 return pending.then(() => {
                     const latest = this.#state;
                     if (isSomeValue(latest)) return latest;
 
-                    insertion.version += 1;
+                    insertion.mutationVersion += 1;
                     this.#state = value;
                     return value;
                 });
             }
 
-            insertion.version += 1;
+            insertion.mutationVersion += 1;
             this.#state = value;
             return value;
         });
 
         insertion.promise = insertPromise;
 
-        const clearPending = () => {
+        const clearPendingInsert = () => {
             if (
-                insertion.token === pendingToken &&
+                insertion.pendingToken === pendingToken &&
                 insertion.promise === insertPromise
             )
                 insertion.promise = undefined;
         };
-        void insertPromise.then(clearPending, clearPending);
+        void insertPromise.then(clearPendingInsert, clearPendingInsert);
 
         return insertPromise;
     }
