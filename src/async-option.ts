@@ -1,10 +1,14 @@
 import { type Option } from './option';
 import { type Result } from './result';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
+import { isOptionOperand, isAsyncOptionOperand } from './utils';
 
 /**
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
  * but also carries all chainable `Option` methods.
+ *
+ * `and`, `or`, `xor`, and `zip` accept sync or promise-like operands. Async
+ * operands resolve concurrently with the receiver; either rejection propagates.
  *
  * **Intentionally omitted mutation methods:** `insert`, `getOrInsert`, `getOrInsertWith`,
  * `getOrInsertWithAsync`, `take`, `takeIf`, and `replace` are not available on `AsyncOption`.
@@ -122,7 +126,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Returns `None` if the option is `None`, otherwise returns `optb`.
      */
-    and<U>(optb: Option<U>): AsyncOption<U>;
+    and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U>;
 
     /**
      * Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
@@ -151,7 +155,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
      */
-    or<T2>(optb: Option<T2>): AsyncOption<T | T2>;
+    or<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Returns the option if it contains a value, otherwise calls `f` and returns the result.
@@ -166,7 +170,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
      */
-    xor<T2>(optb: Option<T2>): AsyncOption<T | T2>;
+    xor<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Converts from `AsyncOption<Option<T>>` to `AsyncOption<T>`.
@@ -183,6 +187,13 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
      * with `TransposeError` rather than a synchronous throw.
      */
     transpose<T, E>(this: AsyncOption<Result<T, E>>): AsyncResult<Option<T>, E>;
+
+    /**
+     * Combines the resolved option with another option into a tuple of their values.
+     *
+     * Resolves to `Some([a, b])` if both options are `Some`, otherwise resolves to `None`.
+     */
+    zip<U>(other: Option<U> | PromiseLike<Option<U>>): AsyncOption<[T, U]>;
 
     /**
      * Unzips an `AsyncOption` containing a tuple of two values.
@@ -293,7 +304,9 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncResultImpl(this.then((opt) => opt.okOrElseAsync(errF)));
     }
 
-    and<U>(optb: Option<U>): AsyncOption<U> {
+    and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U> {
+        if (!isOptionOperand(optb))
+            return this.#combineAsync(optb, (left, right) => left.and(right));
         return new AsyncOptionImpl(this.then((opt) => opt.and(optb)));
     }
 
@@ -315,7 +328,9 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         );
     }
 
-    or<T2>(optb: Option<T2>): AsyncOption<T | T2> {
+    or<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2> {
+        if (!isOptionOperand(optb))
+            return this.#combineAsync(optb, (left, right) => left.or(right));
         return new AsyncOptionImpl(this.then((opt) => opt.or(optb)));
     }
 
@@ -327,7 +342,9 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncOptionImpl(this.then((opt) => opt.orElseAsync(f)));
     }
 
-    xor<T2>(optb: Option<T2>): AsyncOption<T | T2> {
+    xor<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2> {
+        if (!isOptionOperand(optb))
+            return this.#combineAsync(optb, (left, right) => left.xor(right));
         return new AsyncOptionImpl(this.then((opt) => opt.xor(optb)));
     }
 
@@ -339,6 +356,24 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         this: AsyncOptionImpl<Result<T, E>>
     ): AsyncResult<Option<T>, E> {
         return new AsyncResultImpl(this.then((opt) => opt.transpose()));
+    }
+
+    zip<U>(other: Option<U> | PromiseLike<Option<U>>): AsyncOption<[T, U]> {
+        if (!isOptionOperand(other))
+            return this.#combineAsync(other, (left, right) => left.zip(right));
+        return new AsyncOptionImpl(this.then((opt) => opt.zip(other)));
+    }
+
+    #combineAsync<U, R>(
+        other: PromiseLike<Option<U>>,
+        combine: (left: Option<T>, right: Option<U>) => Option<R>
+    ): AsyncOption<R> {
+        return new AsyncOptionImpl(
+            Promise.all([
+                this.promise,
+                isAsyncOptionOperand(other) ? other.promise : other
+            ]).then(([left, right]) => combine(left, right))
+        );
     }
 
     unzip<T, U>(

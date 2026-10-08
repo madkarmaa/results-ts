@@ -11,7 +11,10 @@ import {
     isLeft,
     isRight,
     EMPTY_ITERATOR,
-    OneItemIterator
+    OneItemIterator,
+    isPromiseLike,
+    isResultOperand,
+    isAsyncResultOperand
 } from './utils';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -37,6 +40,9 @@ export type ErrResult<T, E> = ResultMethods<T, E> & {
  * and `Err(E)`, representing error and containing an error value.
  *
  * Functions return `Result` whenever errors are expected and recoverable.
+ *
+ * `and` and `or` return an `AsyncResult` for promise-like operands. They resolve
+ * the operand even when its value is unused; operand rejections propagate.
  *
  * @template T - Contains the success value.
  * @template E - Contains the error value.
@@ -223,6 +229,10 @@ interface ResultMethods<T, E> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     and<U, E2>(res: Result<U, E2>): Result<U, E | E2>;
+    and<U, E2>(res: PromiseLike<Result<U, E2>>): AsyncResult<U, E | E2>;
+    and<U, E2>(
+        res: Result<U, E2> | PromiseLike<Result<U, E2>>
+    ): Result<U, E | E2> | AsyncResult<U, E | E2>;
 
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
@@ -250,6 +260,10 @@ interface ResultMethods<T, E> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F>;
+    or<T2, F>(res: PromiseLike<Result<T2, F>>): AsyncResult<T | T2, F>;
+    or<T2, F>(
+        res: Result<T2, F> | PromiseLike<Result<T2, F>>
+    ): Result<T | T2, F> | AsyncResult<T | T2, F>;
 
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
@@ -574,9 +588,21 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return state.left;
     }
 
-    and<U, E2>(res: Result<U, E2>): Result<U, E | E2> {
-        if (typeof res._isOk !== 'boolean')
+    and<U, E2>(res: Result<U, E2>): Result<U, E | E2>;
+    and<U, E2>(res: PromiseLike<Result<U, E2>>): AsyncResult<U, E | E2>;
+    and<U, E2>(
+        res: Result<U, E2> | PromiseLike<Result<U, E2>>
+    ): Result<U, E | E2> | AsyncResult<U, E | E2>;
+    and<U, E2>(
+        res: Result<U, E2> | PromiseLike<Result<U, E2>>
+    ): Result<U, E | E2> | AsyncResult<U, E | E2> {
+        if (!isResultOperand(res)) {
+            if (isPromiseLike(res))
+                return this.#combineAsync(res, (current, other) =>
+                    current.and(other)
+                );
             throw new InvalidArgumentError('Argument must be a Result');
+        }
 
         const state = this.#state;
         if (isRight(state)) return res;
@@ -611,9 +637,21 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return new AsyncResultImpl(Promise.resolve(Err(state.left)));
     }
 
-    or<T2, F>(res: Result<T2, F>): Result<T | T2, F> {
-        if (typeof res._isOk !== 'boolean')
+    or<T2, F>(res: Result<T2, F>): Result<T | T2, F>;
+    or<T2, F>(res: PromiseLike<Result<T2, F>>): AsyncResult<T | T2, F>;
+    or<T2, F>(
+        res: Result<T2, F> | PromiseLike<Result<T2, F>>
+    ): Result<T | T2, F> | AsyncResult<T | T2, F>;
+    or<T2, F>(
+        res: Result<T2, F> | PromiseLike<Result<T2, F>>
+    ): Result<T | T2, F> | AsyncResult<T | T2, F> {
+        if (!isResultOperand(res)) {
+            if (isPromiseLike(res))
+                return this.#combineAsync(res, (current, other) =>
+                    current.or(other)
+                );
             throw new InvalidArgumentError('Argument must be a Result');
+        }
 
         const state = this.#state;
         if (isLeft(state)) return res;
@@ -696,6 +734,18 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const inner = state.right;
         return inner.isSome() ? Some(Ok(inner.unwrap())) : None();
+    }
+
+    #combineAsync<U, F, R, G>(
+        other: PromiseLike<Result<U, F>>,
+        combine: (current: Result<T, E>, other: Result<U, F>) => Result<R, G>
+    ): AsyncResult<R, G> {
+        const resolved = isAsyncResultOperand(other)
+            ? other
+            : Promise.resolve(other);
+        return new AsyncResultImpl(
+            resolved.then((other) => combine(this, other))
+        );
     }
 
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U {

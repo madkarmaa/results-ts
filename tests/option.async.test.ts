@@ -1,7 +1,12 @@
 import { describe, test, expect } from 'vitest';
 import { Some, None, type Option } from '../src/option';
 import { type Result, Ok, Err } from '../src/result';
-import { FlattenError, PanicError, TransposeError } from '../src/errors';
+import {
+    FlattenError,
+    InvalidArgumentError,
+    PanicError,
+    TransposeError
+} from '../src/errors';
 
 describe('Option async methods', () => {
     test('mapAsync', async () => {
@@ -487,6 +492,56 @@ describe('Option async methods', () => {
         // @ts-expect-error - transpose should only be called on AsyncOption<Result<T, E>>
         await expect(invalid.transpose().unwrap()).rejects.toThrow(
             TransposeError
+        );
+    });
+
+    test('zip', async () => {
+        const some = Some(42).mapAsync(async (x) => x);
+        const none = None<number>().mapAsync(async (x) => x);
+
+        expect(await some.zip(Some('hello')).unwrap()).toEqual([42, 'hello']);
+        expect(await some.zip(None<string>()).isNone()).toBe(true);
+        expect(await none.zip(Some('hello')).isNone()).toBe(true);
+        expect(await none.zip(None<string>()).isNone()).toBe(true);
+        expect(
+            await Some(null)
+                .mapAsync(async (x) => x)
+                .zip(Some(undefined))
+                .unwrap()
+        ).toEqual([null, undefined]);
+    });
+
+    test('zip remains chainable and preserves both options', async () => {
+        const left = Some(42);
+        const right = Some('hello');
+        const zipped = left.mapAsync(async (x) => x).zip(right);
+        const [a, b] = zipped.unzip();
+
+        expect(await a.unwrap()).toBe(42);
+        expect(await b.unwrap()).toBe('hello');
+        expect(await zipped.map(([a, b]) => `${a}: ${b}`).unwrap()).toBe(
+            '42: hello'
+        );
+        expect(left.unwrap()).toBe(42);
+        expect(right.unwrap()).toBe('hello');
+    });
+
+    test('zip propagates source rejections and rejects invalid arguments', async () => {
+        const error = new Error('source failed');
+        const rejected = Some(42).mapAsync(async () => {
+            throw error;
+        });
+        await expect(rejected.zip(Some('hello')).unwrap()).rejects.toBe(error);
+
+        const some = Some(42).mapAsync(async (x) => x);
+        // @ts-expect-error - zip requires an Option
+        await expect(some.zip({}).unwrap()).rejects.toThrow(
+            InvalidArgumentError
+        );
+        const none = None<number>().mapAsync(async (x) => x);
+        // @ts-expect-error - zip requires a boolean discriminator
+        await expect(none.zip({ _isSome: 'yes' }).isNone()).rejects.toThrow(
+            InvalidArgumentError
         );
     });
 

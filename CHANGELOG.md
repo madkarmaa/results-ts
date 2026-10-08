@@ -1,3 +1,21 @@
+# [4.3.0-canary.3](https://github.com/madkarmaa/results-ts/compare/v4.3.0-canary.2...v4.3.0-canary.3) (2026-10-08)
+
+### Bug Fixes
+
+- **combinators:** preserve fast paths across realms ([fe835f5](https://github.com/madkarmaa/results-ts/commit/fe835f5be928adf4730208aa5cb4725b3e766d70))
+
+# [4.3.0-canary.2](https://github.com/madkarmaa/results-ts/compare/v4.3.0-canary.1...v4.3.0-canary.2) (2026-10-08)
+
+### Features
+
+- **combinators:** support mixed sync and async operands ([e3c12fb](https://github.com/madkarmaa/results-ts/commit/e3c12fb00da68fffa932cbeb0c8ff52514fc0f4d))
+
+# [4.3.0-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.7...v4.3.0-canary.1) (2026-10-08)
+
+### Features
+
+- **option:** add zip to sync and async options ([46c03ac](https://github.com/madkarmaa/results-ts/commit/46c03ac32e66aaeb460e18948baa8b9b7e81778a))
+
 ## [4.2.7](https://github.com/madkarmaa/results-ts/compare/v4.2.6...v4.2.7) (2026-10-08)
 
 ### Bug Fixes

@@ -8,6 +8,7 @@ import './result';
 import './option';
 import './result.async';
 import './option.async';
+import './combinators';
 
 // ---------------------------------------------------------------------------
 // Runner modes

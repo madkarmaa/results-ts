@@ -210,12 +210,18 @@ describe('Option', () => {
         // A duck-typed Option: carries the `_isSome` discriminator the
         // structural check looks for. Mimics an Option created in a different
         // realm / from a duplicate install where `instanceof` would fail.
-        const duckTypedSome = { _isSome: true } as unknown as ReturnType<
-            typeof Some<number>
-        >;
-        const duckTypedNone = { _isSome: false } as unknown as ReturnType<
-            typeof None<number>
-        >;
+        const duckTypedSome = {
+            _isSome: true,
+            get then() {
+                throw new Error('a sync Option must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Some<number>>;
+        const duckTypedNone = {
+            _isSome: false,
+            get then() {
+                throw new Error('a sync Option must not inspect then');
+            }
+        } as unknown as ReturnType<typeof None<number>>;
 
         test('and accepts a duck-typed Option', () => {
             expect(
@@ -237,6 +243,32 @@ describe('Option', () => {
                 (None().xor(duckTypedSome) as { _isSome: boolean })._isSome
             ).toBe(true);
             expect(Some(5).xor(duckTypedSome).isNone()).toBe(true);
+        });
+
+        test('and/or/xor/zip accept a duck-typed async Option', async () => {
+            const promise = Promise.resolve(Some(10));
+            const duckTypedAsyncSome = {
+                promise,
+                then: promise.then.bind(promise),
+                isSome: async () => true,
+                isNone: async () => false
+            };
+
+            expect(await Some(5).and(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await None().or(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await None().xor(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await Some(5).zip(duckTypedAsyncSome).unwrap()).toEqual([
+                5, 10
+            ]);
+
+            const some = Some(5).mapAsync(async (value) => value);
+            const none = None().mapAsync(async (value) => value);
+            expect(await some.and(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await none.or(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await none.xor(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await some.zip(duckTypedAsyncSome).unwrap()).toEqual([
+                5, 10
+            ]);
         });
 
         test('non-Option values are rejected', () => {
@@ -357,6 +389,60 @@ describe('Option', () => {
         ).toBe(true);
         // @ts-expect-error - transpose should only be called on Option<Result<T, E>>
         expect(() => Some(42).transpose()).toThrow(TransposeError);
+    });
+
+    test('zip', () => {
+        expect(Some(42).zip(Some('hello')).unwrap()).toEqual([42, 'hello']);
+        expect(Some(42).zip(None<string>()).isNone()).toBe(true);
+        expect(None<number>().zip(Some('hello')).isNone()).toBe(true);
+        expect(None<number>().zip(None<string>()).isNone()).toBe(true);
+        expect(Some(null).zip(Some(undefined)).unwrap()).toEqual([
+            null,
+            undefined
+        ]);
+    });
+
+    test('zip preserves both options and their value references', () => {
+        const value = { id: 42 };
+        const left = Some(value);
+        const right = Some('hello');
+        const zipped = left.zip(right);
+
+        expect(zipped.unwrap()[0]).toBe(value);
+        expect(left.unwrap()).toBe(value);
+        expect(right.unwrap()).toBe('hello');
+
+        const [a, b] = zipped.unzip();
+        expect(a.unwrap()).toBe(value);
+        expect(b.unwrap()).toBe('hello');
+
+        zipped.take();
+        expect(left.unwrap()).toBe(value);
+        expect(right.unwrap()).toBe('hello');
+    });
+
+    test('zip accepts a duck-typed Option and short-circuits None', () => {
+        const other = { _isSome: true, unwrap: () => 'hello' };
+        // @ts-expect-error - only the members used by zip are supplied
+        expect(Some(42).zip(other).unwrap()).toEqual([42, 'hello']);
+
+        const unreadable = {
+            _isSome: true,
+            unwrap: () => {
+                throw new Error('must not unwrap');
+            }
+        };
+        // @ts-expect-error - only the members used by zip are supplied
+        expect(None<number>().zip(unreadable).isNone()).toBe(true);
+    });
+
+    test('zip rejects invalid arguments', () => {
+        // @ts-expect-error - zip requires an Option
+        expect(() => Some(42).zip({})).toThrow(InvalidArgumentError);
+        // @ts-expect-error - zip requires a boolean discriminator
+        expect(() => None<number>().zip({ _isSome: 'yes' })).toThrow(
+            InvalidArgumentError
+        );
     });
 
     test('unzip', () => {
