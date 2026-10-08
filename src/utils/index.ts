@@ -1,5 +1,5 @@
-import { type Option } from '../option';
-import { type Result } from '../result';
+import type { Option } from '../option';
+import type { Result } from '../result';
 
 export * from './either';
 
