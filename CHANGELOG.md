@@ -1,3 +1,9 @@
+# [4.3.0-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.7...v4.3.0-canary.1) (2026-10-08)
+
+### Features
+
+- **option:** add zip to sync and async options ([46c03ac](https://github.com/madkarmaa/results-ts/commit/46c03ac32e66aaeb460e18948baa8b9b7e81778a))
+
 ## [4.2.7](https://github.com/madkarmaa/results-ts/compare/v4.2.6...v4.2.7) (2026-10-08)
 
 ### Bug Fixes
