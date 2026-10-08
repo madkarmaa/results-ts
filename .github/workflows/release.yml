@@ -4,7 +4,6 @@ on:
     workflow_dispatch:
     push:
         branches:
-            - main
             - dev
 
 permissions:
@@ -22,12 +21,13 @@ jobs:
     release:
         name: Release
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
 
         steps:
             - name: Checkout
               uses: actions/checkout@v6
               with:
+                  ref: main
                   fetch-depth: 0
                   persist-credentials: true
                   token: ${{ secrets.SR_TOKEN }}
@@ -95,6 +95,12 @@ jobs:
                   git add docs/api
                   git commit -m "chore: update API docs for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
                   git push
+
+            - name: Sync released main into dev
+              if: steps.prev.outputs.version != steps.next.outputs.version
+              run: |
+                  git fetch origin dev
+                  git push --force-with-lease=dev:$(git rev-parse origin/dev) origin main:dev
 
             - name: Setup GitHub Pages
               if: steps.prev.outputs.version != steps.next.outputs.version
