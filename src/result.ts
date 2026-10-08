@@ -10,6 +10,7 @@ import {
     Right,
     isLeft,
     isRight,
+    ASYNC_START,
     EMPTY_ITERATOR,
     OneItemIterator,
     isPromiseLike,
@@ -419,9 +420,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
             return new AsyncResultImpl(Promise.resolve(Err(state.left)));
 
         return new AsyncResultImpl(
-            Promise.resolve()
-                .then(() => f(state.right))
-                .then(Ok)
+            ASYNC_START.then(() => f(state.right)).then(Ok)
         );
     }
 
@@ -485,9 +484,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isLeft(state))
             return new AsyncResultImpl(
-                Promise.resolve()
-                    .then(() => f(state.left))
-                    .then((err) => Err(err))
+                ASYNC_START.then(() => f(state.left)).then(Err)
             );
 
         return new AsyncResultImpl(Promise.resolve(Ok(state.right)));
@@ -509,9 +506,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isRight(state))
             return new AsyncResultImpl(
-                Promise.resolve()
-                    .then(() => f(state.right))
-                    .then(() => this)
+                ASYNC_START.then(() => f(state.right)).then(() => this)
             );
 
         return new AsyncResultImpl(Promise.resolve(this));
@@ -533,9 +528,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isLeft(state))
             return new AsyncResultImpl(
-                Promise.resolve()
-                    .then(() => f(state.left))
-                    .then(() => this)
+                ASYNC_START.then(() => f(state.left)).then(() => this)
             );
 
         return new AsyncResultImpl(Promise.resolve(this));
@@ -630,9 +623,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state))
-            return new AsyncResultImpl(
-                Promise.resolve().then(() => f(state.right))
-            );
+            return new AsyncResultImpl(ASYNC_START.then(() => f(state.right)));
 
         return new AsyncResultImpl(Promise.resolve(Err(state.left)));
     }
@@ -679,9 +670,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state))
-            return new AsyncResultImpl(
-                Promise.resolve().then(() => f(state.left))
-            );
+            return new AsyncResultImpl(ASYNC_START.then(() => f(state.left)));
 
         return new AsyncResultImpl(Promise.resolve(Ok<T | T2>(state.right)));
     }

@@ -5,6 +5,7 @@ import {
     TransposeError
 } from './errors';
 import {
+    ASYNC_START,
     EMPTY_ITERATOR,
     OneItemIterator,
     isPromiseLike,
@@ -487,9 +488,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isSomeValue(state))
             return new AsyncOptionImpl(
-                Promise.resolve()
-                    .then(() => f(state))
-                    .then(Some)
+                ASYNC_START.then(() => f(state)).then(Some)
             );
 
         return new AsyncOptionImpl(Promise.resolve(None()));
@@ -511,9 +510,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isSomeValue(state))
             return new AsyncOptionImpl(
-                Promise.resolve()
-                    .then(() => f(state))
-                    .then(() => this)
+                ASYNC_START.then(() => f(state)).then(() => this)
             );
 
         return new AsyncOptionImpl(Promise.resolve(this));
@@ -581,7 +578,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (isSomeValue(state))
             return new AsyncResultImpl(Promise.resolve(Ok(state)));
 
-        return new AsyncResultImpl(Promise.resolve().then(errF).then(Err));
+        return new AsyncResultImpl(ASYNC_START.then(errF).then(Err));
     }
 
     iter(): IterableIterator<T> {
@@ -634,7 +631,7 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const state = this.#state;
         if (isSomeValue(state))
-            return new AsyncOptionImpl(Promise.resolve().then(() => f(state)));
+            return new AsyncOptionImpl(ASYNC_START.then(() => f(state)));
 
         return new AsyncOptionImpl(Promise.resolve(None()));
     }
@@ -657,9 +654,9 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isSomeValue(state))
             return new AsyncOptionImpl(
-                Promise.resolve()
-                    .then(() => predicate(state))
-                    .then((pass) => (pass ? this : None()))
+                ASYNC_START.then(() => predicate(state)).then((pass) =>
+                    pass ? this : None()
+                )
             );
 
         return new AsyncOptionImpl(Promise.resolve(None()));
@@ -703,7 +700,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (isSomeValue(state))
             return new AsyncOptionImpl(Promise.resolve(this));
 
-        return new AsyncOptionImpl(Promise.resolve().then(f));
+        return new AsyncOptionImpl(ASYNC_START.then(f));
     }
 
     xor<T2>(optb: Option<T2>): Option<T | T2>;
@@ -784,37 +781,35 @@ class OptionImpl<T> implements OptionMethods<T> {
         const pendingToken = insertion.token + 1;
         insertion.token = pendingToken;
 
-        const insertPromise = Promise.resolve()
-            .then(() => f())
-            .then((value) => {
-                if (
-                    insertion.version === startVersion &&
-                    insertion.token === pendingToken
-                ) {
-                    insertion.version += 1;
-                    this.#state = value;
-                    return value;
-                }
-
-                const current = this.#state;
-                if (isSomeValue(current)) return current;
-
-                const pending = insertion.promise;
-                if (pending && insertion.token !== pendingToken) {
-                    return pending.then(() => {
-                        const latest = this.#state;
-                        if (isSomeValue(latest)) return latest;
-
-                        insertion.version += 1;
-                        this.#state = value;
-                        return value;
-                    });
-                }
-
+        const insertPromise = ASYNC_START.then(() => f()).then((value) => {
+            if (
+                insertion.version === startVersion &&
+                insertion.token === pendingToken
+            ) {
                 insertion.version += 1;
                 this.#state = value;
                 return value;
-            });
+            }
+
+            const current = this.#state;
+            if (isSomeValue(current)) return current;
+
+            const pending = insertion.promise;
+            if (pending && insertion.token !== pendingToken) {
+                return pending.then(() => {
+                    const latest = this.#state;
+                    if (isSomeValue(latest)) return latest;
+
+                    insertion.version += 1;
+                    this.#state = value;
+                    return value;
+                });
+            }
+
+            insertion.version += 1;
+            this.#state = value;
+            return value;
+        });
 
         insertion.promise = insertPromise;
 
