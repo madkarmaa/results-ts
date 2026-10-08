@@ -61,8 +61,6 @@
         "test": "vitest run",
         "test:dev": "vitest watch",
         "bench": "bun --expose-gc run bench/index.ts",
-        "bench:combinators": "bun --expose-gc run bench/combinators.ts",
-        "bench:combinators:compare": "bun --expose-gc run bench/combinators.compare.ts",
         "bench:publish": "BENCH_PUBLISH=1 bun --expose-gc run bench/index.ts",
         "typecheck": "tsc --noEmit",
         "typecheck:dev": "tsc --noEmit --watch",
