@@ -2,21 +2,12 @@
 
 ## Core Requirements
 
-### 0. Read and Follow the "caveman" Skill First
+### Development Standards
 
-- Before performing any analysis, planning, implementation, refactoring, or code generation, locate and read the `caveman` skill if it exists in the available project instructions, repository documentation, or configured skill system.
-- Treat the `caveman` skill as a required prerequisite.
-- Apply its rules and constraints throughout execution.
-- If the `caveman` skill cannot be found or accessed:
-    - Do not assume its contents.
-    - Continue using the remaining instructions and explicitly state that the `caveman` skill was unavailable.
-- If there is a conflict:
-    - Follow system-level instructions first.
-    - Otherwise prioritize the `caveman` skill over general implementation preferences.
+- Keep README content concise and focused on installing, running, and using the app. Do not add unnecessary information, internal commit/release workflow documentation, or other maintainer process details.
+- Before introducing or refactoring main package APIs, consult their current official web documentation and migration guides, and check installed declarations for deprecations. Use supported modern APIs; do not suppress deprecated usage warnings. Dependency versions must satisfy the installed toolchain's peer requirements.
 
----
-
-### 1. TypeScript Type Safety Is Mandatory
+### TypeScript Type Safety Is Mandatory
 
 - Type safety is an absolute requirement.
 - Preserve and maximize static type guarantees at all times.
@@ -27,7 +18,7 @@
 
 ---
 
-### 2. `any` Is Strictly Prohibited
+### `any` Is Strictly Prohibited
 
 - Never introduce the `any` type unless there is no technically viable alternative.
 - Before using `any`, exhaust:
@@ -54,7 +45,7 @@ Avoid:
 
 ---
 
-### 3. Default Package Manager: Bun
+### Default Package Manager: Bun
 
 - Assume Bun is the package manager unless project files indicate otherwise.
 - Prefer Bun commands in all generated instructions and examples.
@@ -75,7 +66,7 @@ Only switch package managers when:
 
 ---
 
-### 4. Generate Only From Available Source Code
+### Generate Only From Available Source Code
 
 - All generated implementations must be derived from the existing source code and project structure.
 - Do not invent APIs, architecture, utilities, conventions, or behavior.
@@ -102,7 +93,7 @@ Forbidden:
 
 ---
 
-### 5. Prefer Native Filesystem and CLI Operations Over Manual Content Handling
+### Prefer Native Filesystem and CLI Operations Over Manual Content Handling
 
 - When performing file operations, always prefer built-in system tools and binaries over reading, rewriting, or reconstructing file contents in code or model output.
 - Use OS/environment tools when available:
@@ -141,3 +132,9 @@ Forbidden:
 - Produce production-ready code.
 - Generated code should be immediately usable.
 - Include imports and types only when justified by existing code.
+
+# Git standards
+
+- Use Conventional Commits.
+- Keep commit messages concise and spot on; do not overexplain.
+- Commit whenever a part of the requested work is complete. Keep each commit focused so the Git log reads like a pull request in progress.
