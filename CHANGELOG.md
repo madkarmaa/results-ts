@@ -1,3 +1,9 @@
+# [4.3.0-canary.3](https://github.com/madkarmaa/results-ts/compare/v4.3.0-canary.2...v4.3.0-canary.3) (2026-10-08)
+
+### Bug Fixes
+
+- **combinators:** preserve fast paths across realms ([fe835f5](https://github.com/madkarmaa/results-ts/commit/fe835f5be928adf4730208aa5cb4725b3e766d70))
+
 # [4.3.0-canary.2](https://github.com/madkarmaa/results-ts/compare/v4.3.0-canary.1...v4.3.0-canary.2) (2026-10-08)
 
 ### Features
