@@ -1,3 +1,18 @@
+## [4.2.7-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.2.6...v4.2.7-canary.1) (2026-10-08)
+
+### Bug Fixes
+
+- **docs:** resolve documentation paths on Windows ([9662b88](https://github.com/madkarmaa/results-ts/commit/9662b88f152bda56cedcc75b644941bab45dbe1f))
+
+### Dependency Updates
+
+- update deps ([a84c4bc](https://github.com/madkarmaa/results-ts/commit/a84c4bc6c4d81a6083c1840711c851b72a34d7d8))
+
+### Documentation
+
+- **agents:** update instructions ([8f5d45e](https://github.com/madkarmaa/results-ts/commit/8f5d45ebd75aa2560e6c94a4e5d2c01a888264bb))
+- auto-generate llms.txt ([#52](https://github.com/madkarmaa/results-ts/issues/52)) ([b0b146a](https://github.com/madkarmaa/results-ts/commit/b0b146a5207e44eabae51c84467d8f9683ddf177))
+
 ## [4.2.6](https://github.com/madkarmaa/results-ts/compare/v4.2.5...v4.2.6) (2026-07-16)
 
 ### Bug Fixes
