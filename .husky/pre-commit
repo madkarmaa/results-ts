@@ -1,18 +1,4 @@
 #!/bin/sh
+set -eu
 
-set -e
-
-STAGED_FILES_FILE="$(mktemp)"
-trap 'rm -f "$STAGED_FILES_FILE"' EXIT
-
-git diff --cached --name-only -z --diff-filter=ACMR > "$STAGED_FILES_FILE"
-
-if [ ! -s "$STAGED_FILES_FILE" ]; then
-    exit 0
-fi
-
-xargs -0 bunx prettier --write --ignore-unknown -- < "$STAGED_FILES_FILE"
-
-if ! xargs -0 git diff --quiet -- < "$STAGED_FILES_FILE"; then
-    xargs -0 git add -- < "$STAGED_FILES_FILE"
-fi
+bunx lint-staged
