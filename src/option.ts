@@ -11,7 +11,8 @@ import {
     isLeft,
     isRight,
     EMPTY_ITERATOR,
-    OneItemIterator
+    OneItemIterator,
+    isPromiseLike
 } from './utils';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
@@ -184,6 +185,10 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     and<U>(optb: Option<U>): Option<U>;
+    and<U>(optb: PromiseLike<Option<U>>): AsyncOption<U>;
+    and<U>(
+        optb: Option<U> | PromiseLike<Option<U>>
+    ): Option<U> | AsyncOption<U>;
 
     /**
      * Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
@@ -223,6 +228,10 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     or<T2>(optb: Option<T2>): Option<T | T2>;
+    or<T2>(optb: PromiseLike<Option<T2>>): AsyncOption<T | T2>;
+    or<T2>(
+        optb: Option<T2> | PromiseLike<Option<T2>>
+    ): Option<T | T2> | AsyncOption<T | T2>;
 
     /**
      * Returns the option if it contains a value, otherwise calls `f` and returns the result.
@@ -244,6 +253,10 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     xor<T2>(optb: Option<T2>): Option<T | T2>;
+    xor<T2>(optb: PromiseLike<Option<T2>>): AsyncOption<T | T2>;
+    xor<T2>(
+        optb: Option<T2> | PromiseLike<Option<T2>>
+    ): Option<T | T2> | AsyncOption<T | T2>;
 
     /**
      * Inserts `value` into the option, then returns a reference to it.
@@ -318,6 +331,10 @@ interface OptionMethods<T> {
      * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     zip<U>(other: Option<U>): Option<[T, U]>;
+    zip<U>(other: PromiseLike<Option<U>>): AsyncOption<[T, U]>;
+    zip<U>(
+        other: Option<U> | PromiseLike<Option<U>>
+    ): Option<[T, U]> | AsyncOption<[T, U]>;
 
     /**
      * Unzips an `Option` containing a tuple of two values.
@@ -561,7 +578,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return new OneItemIterator(state.right);
     }
 
-    and<U>(optb: Option<U>): Option<U> {
+    and<U>(optb: Option<U>): Option<U>;
+    and<U>(optb: PromiseLike<Option<U>>): AsyncOption<U>;
+    and<U>(
+        optb: Option<U> | PromiseLike<Option<U>>
+    ): Option<U> | AsyncOption<U>;
+    and<U>(
+        optb: Option<U> | PromiseLike<Option<U>>
+    ): Option<U> | AsyncOption<U> {
+        if (isPromiseLike(optb))
+            return this.#combineAsync(optb, (current, other) =>
+                current.and(other)
+            );
+
         if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
@@ -626,7 +655,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return new AsyncOptionImpl(Promise.resolve(None()));
     }
 
-    or<T2>(optb: Option<T2>): Option<T | T2> {
+    or<T2>(optb: Option<T2>): Option<T | T2>;
+    or<T2>(optb: PromiseLike<Option<T2>>): AsyncOption<T | T2>;
+    or<T2>(
+        optb: Option<T2> | PromiseLike<Option<T2>>
+    ): Option<T | T2> | AsyncOption<T | T2>;
+    or<T2>(
+        optb: Option<T2> | PromiseLike<Option<T2>>
+    ): Option<T | T2> | AsyncOption<T | T2> {
+        if (isPromiseLike(optb))
+            return this.#combineAsync(optb, (current, other) =>
+                current.or(other)
+            );
+
         if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
@@ -654,7 +695,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return new AsyncOptionImpl(Promise.resolve().then(f));
     }
 
-    xor<T2>(optb: Option<T2>): Option<T | T2> {
+    xor<T2>(optb: Option<T2>): Option<T | T2>;
+    xor<T2>(optb: PromiseLike<Option<T2>>): AsyncOption<T | T2>;
+    xor<T2>(
+        optb: Option<T2> | PromiseLike<Option<T2>>
+    ): Option<T | T2> | AsyncOption<T | T2>;
+    xor<T2>(
+        optb: Option<T2> | PromiseLike<Option<T2>>
+    ): Option<T | T2> | AsyncOption<T | T2> {
+        if (isPromiseLike(optb))
+            return this.#combineAsync(optb, (current, other) =>
+                current.xor(other)
+            );
+
         if (typeof optb._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
@@ -821,7 +874,19 @@ class OptionImpl<T> implements OptionMethods<T> {
         return inner.isOk() ? Ok(Some(inner.unwrap())) : Err(inner.unwrapErr());
     }
 
-    zip<U>(other: Option<U>): Option<[T, U]> {
+    zip<U>(other: Option<U>): Option<[T, U]>;
+    zip<U>(other: PromiseLike<Option<U>>): AsyncOption<[T, U]>;
+    zip<U>(
+        other: Option<U> | PromiseLike<Option<U>>
+    ): Option<[T, U]> | AsyncOption<[T, U]>;
+    zip<U>(
+        other: Option<U> | PromiseLike<Option<U>>
+    ): Option<[T, U]> | AsyncOption<[T, U]> {
+        if (isPromiseLike(other))
+            return this.#combineAsync(other, (current, other) =>
+                current.zip(other)
+            );
+
         if (typeof other._isSome !== 'boolean')
             throw new InvalidArgumentError('Argument must be an Option');
 
@@ -838,6 +903,19 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const [a, b] = state.right;
         return [Some(a), Some(b)];
+    }
+
+    #combineAsync<U, R>(
+        other: PromiseLike<Option<U>>,
+        combine: (current: Option<T>, other: Option<U>) => Option<R>
+    ): AsyncOption<R> {
+        const state = this.#state;
+        const current = isRight(state) ? Some(state.right) : None<T>();
+        return new AsyncOptionImpl(
+            Promise.resolve(other).then((resolved) =>
+                combine(current, resolved)
+            )
+        );
     }
 
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U {

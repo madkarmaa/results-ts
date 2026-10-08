@@ -1,5 +1,17 @@
 export * from './either';
 
+// Recognize native promises and structural thenables, including async wrappers.
+export function isPromiseLike<T>(
+    value: T | PromiseLike<T>
+): value is PromiseLike<T> {
+    return (
+        ((typeof value === 'object' && value !== null) ||
+            typeof value === 'function') &&
+        'then' in value &&
+        typeof value.then === 'function'
+    );
+}
+
 // Shared, stateless iterator used for the empty `iter()` path (`Err`/`None`).
 // Returning this constant instead of entering a generator avoids allocating a
 // generator object on every call when there is nothing to yield. Typed as

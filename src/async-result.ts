@@ -2,6 +2,7 @@ import { Ok, Err, type Result } from './result';
 import { type Option } from './option';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 import { InvalidArgumentError } from './errors';
+import { isPromiseLike } from './utils';
 
 /**
  * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
@@ -148,7 +149,9 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
      *
      * Arguments passed to `and` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `andThen`, which is lazily evaluated.
      */
-    and<U, E2>(res: Result<U, E2>): AsyncResult<U, E | E2>;
+    and<U, E2>(
+        res: Result<U, E2> | PromiseLike<Result<U, E2>>
+    ): AsyncResult<U, E | E2>;
 
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
@@ -169,7 +172,9 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
      *
      * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
      */
-    or<T2, F>(res: Result<T2, F>): AsyncResult<T | T2, F>;
+    or<T2, F>(
+        res: Result<T2, F> | PromiseLike<Result<T2, F>>
+    ): AsyncResult<T | T2, F>;
 
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
@@ -327,8 +332,17 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return this.then((res) => res.unwrapErr());
     }
 
-    and<U, E2>(res: Result<U, E2>): AsyncResult<U, E | E2> {
-        return new AsyncResultImpl(this.then((r) => r.and(res)));
+    and<U, E2>(
+        res: Result<U, E2> | PromiseLike<Result<U, E2>>
+    ): AsyncResult<U, E | E2> {
+        return new AsyncResultImpl(
+            isPromiseLike(res)
+                ? Promise.all([
+                      this.promise,
+                      res instanceof AsyncResultImpl ? res.promise : res
+                  ]).then(([value, resolved]) => value.and(resolved))
+                : this.then((value) => value.and(res))
+        );
     }
 
     andThen<U, F>(f: (val: T) => Result<U, F>): AsyncResult<U, E | F> {
@@ -341,8 +355,17 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.andThenAsync(f)));
     }
 
-    or<T2, F>(res: Result<T2, F>): AsyncResult<T | T2, F> {
-        return new AsyncResultImpl(this.then((r) => r.or(res)));
+    or<T2, F>(
+        res: Result<T2, F> | PromiseLike<Result<T2, F>>
+    ): AsyncResult<T | T2, F> {
+        return new AsyncResultImpl(
+            isPromiseLike(res)
+                ? Promise.all([
+                      this.promise,
+                      res instanceof AsyncResultImpl ? res.promise : res
+                  ]).then(([value, resolved]) => value.or(resolved))
+                : this.then((value) => value.or(res))
+        );
     }
 
     orElse<T2, F>(f: (err: E) => Result<T2, F>): AsyncResult<T | T2, F> {

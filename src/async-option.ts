@@ -1,6 +1,7 @@
 import { type Option } from './option';
 import { type Result } from './result';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
+import { isPromiseLike } from './utils';
 
 /**
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
@@ -122,7 +123,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Returns `None` if the option is `None`, otherwise returns `optb`.
      */
-    and<U>(optb: Option<U>): AsyncOption<U>;
+    and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U>;
 
     /**
      * Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
@@ -151,7 +152,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
      */
-    or<T2>(optb: Option<T2>): AsyncOption<T | T2>;
+    or<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Returns the option if it contains a value, otherwise calls `f` and returns the result.
@@ -166,7 +167,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
      */
-    xor<T2>(optb: Option<T2>): AsyncOption<T | T2>;
+    xor<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Converts from `AsyncOption<Option<T>>` to `AsyncOption<T>`.
@@ -189,7 +190,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
      *
      * Resolves to `Some([a, b])` if both options are `Some`, otherwise resolves to `None`.
      */
-    zip<U>(other: Option<U>): AsyncOption<[T, U]>;
+    zip<U>(other: Option<U> | PromiseLike<Option<U>>): AsyncOption<[T, U]>;
 
     /**
      * Unzips an `AsyncOption` containing a tuple of two values.
@@ -300,8 +301,15 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncResultImpl(this.then((opt) => opt.okOrElseAsync(errF)));
     }
 
-    and<U>(optb: Option<U>): AsyncOption<U> {
-        return new AsyncOptionImpl(this.then((opt) => opt.and(optb)));
+    and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U> {
+        return new AsyncOptionImpl(
+            isPromiseLike(optb)
+                ? Promise.all([
+                      this.promise,
+                      optb instanceof AsyncOptionImpl ? optb.promise : optb
+                  ]).then(([value, resolved]) => value.and(resolved))
+                : this.then((value) => value.and(optb))
+        );
     }
 
     andThen<U>(f: (val: T) => Option<U>): AsyncOption<U> {
@@ -322,8 +330,15 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         );
     }
 
-    or<T2>(optb: Option<T2>): AsyncOption<T | T2> {
-        return new AsyncOptionImpl(this.then((opt) => opt.or(optb)));
+    or<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2> {
+        return new AsyncOptionImpl(
+            isPromiseLike(optb)
+                ? Promise.all([
+                      this.promise,
+                      optb instanceof AsyncOptionImpl ? optb.promise : optb
+                  ]).then(([value, resolved]) => value.or(resolved))
+                : this.then((value) => value.or(optb))
+        );
     }
 
     orElse<T2>(f: () => Option<T2>): AsyncOption<T | T2> {
@@ -334,8 +349,15 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncOptionImpl(this.then((opt) => opt.orElseAsync(f)));
     }
 
-    xor<T2>(optb: Option<T2>): AsyncOption<T | T2> {
-        return new AsyncOptionImpl(this.then((opt) => opt.xor(optb)));
+    xor<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2> {
+        return new AsyncOptionImpl(
+            isPromiseLike(optb)
+                ? Promise.all([
+                      this.promise,
+                      optb instanceof AsyncOptionImpl ? optb.promise : optb
+                  ]).then(([value, resolved]) => value.xor(resolved))
+                : this.then((value) => value.xor(optb))
+        );
     }
 
     flatten<U>(this: AsyncOptionImpl<Option<U>>): AsyncOption<U> {
@@ -348,8 +370,15 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncResultImpl(this.then((opt) => opt.transpose()));
     }
 
-    zip<U>(other: Option<U>): AsyncOption<[T, U]> {
-        return new AsyncOptionImpl(this.then((opt) => opt.zip(other)));
+    zip<U>(other: Option<U> | PromiseLike<Option<U>>): AsyncOption<[T, U]> {
+        return new AsyncOptionImpl(
+            isPromiseLike(other)
+                ? Promise.all([
+                      this.promise,
+                      other instanceof AsyncOptionImpl ? other.promise : other
+                  ]).then(([value, resolved]) => value.zip(resolved))
+                : this.then((value) => value.zip(other))
+        );
     }
 
     unzip<T, U>(
