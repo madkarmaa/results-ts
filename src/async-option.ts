@@ -199,7 +199,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
 }
 
 export class AsyncOptionImpl<T> implements AsyncOption<T> {
-    constructor(private promise: PromiseLike<Option<T>>) {}
+    constructor(private readonly promise: PromiseLike<Option<T>>) {}
 
     then<TResult1 = Option<T>, TResult2 = never>(
         onfulfilled?:

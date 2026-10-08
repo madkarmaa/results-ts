@@ -318,7 +318,7 @@ interface ResultMethods<T, E> {
 }
 
 class ResultImpl<T, E> implements ResultMethods<T, E> {
-    #state: Either<E, T>;
+    readonly #state: Either<E, T>;
 
     static name = 'Result';
     constructor(state: Either<E, T>) {
@@ -671,9 +671,8 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
             : Promise.resolve(state.right);
     }
 
-    flatten<U, F>(this: Result<Result<U, F>, E>): Result<U, E | F> {
-        const _this = this as ResultImpl<Result<U, F>, E>;
-        const state = _this.#state;
+    flatten<U, F>(this: ResultImpl<Result<U, F>, E>): Result<U, E | F> {
+        const state = this.#state;
 
         if (isLeft(state)) return new ResultImpl(Left(state.left));
 
@@ -685,9 +684,8 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         return state.right;
     }
 
-    transpose<T, E>(this: Result<Option<T>, E>): Option<Result<T, E>> {
-        const _this = this as ResultImpl<Option<T>, E>;
-        const state = _this.#state;
+    transpose<T, E>(this: ResultImpl<Option<T>, E>): Option<Result<T, E>> {
+        const state = this.#state;
 
         if (isLeft(state)) return Some(Err(state.left));
 
@@ -768,14 +766,14 @@ export function catchUnwind<T, Args extends unknown[], E>(
 export function catchUnwind<T, Args extends unknown[], E>(
     fn: (...args: Args) => T,
     onThrow?: (thrown: unknown, ...args: Args) => E
-): (...args: Args) => Result<T, E | unknown> {
+): (...args: Args) => Result<T, unknown> {
     if (typeof fn !== 'function')
         throw new InvalidArgumentError("'fn' must be a function");
 
     if (onThrow !== undefined && typeof onThrow !== 'function')
         throw new InvalidArgumentError("'onThrow' must be a function");
 
-    return function (this: unknown, ...args: Args): Result<T, E | unknown> {
+    return function (this: unknown, ...args: Args): Result<T, unknown> {
         try {
             return Ok(fn.apply(this, args));
         } catch (thrown) {

@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { normalize, resolve } from 'node:path';
 import ts from 'typescript';
 import { describe, expect, test } from 'vitest';
 
@@ -16,7 +16,7 @@ const markdownFiles = [
         .filter((file) => file.endsWith('.md'))
         .map((file) => resolve(guideDir, file))
 ];
-const typescriptFence = /```(?:typescript|ts)\n([\s\S]*?)```/g;
+const typescriptFence = /```(?:typescript|ts)\r?\n([\s\S]*?)```/g;
 
 const examples = markdownFiles.flatMap((file): readonly Example[] => {
     const markdown = readFileSync(file, 'utf8');
@@ -50,7 +50,8 @@ const compileExamples = (): readonly ts.Diagnostic[] => {
     const getSourceFile = host.getSourceFile.bind(host);
 
     host.getSourceFile = (fileName, languageVersion, onError, shouldCreate) => {
-        const code = virtualFiles.get(fileName);
+        // TypeScript uses forward slashes even when resolve returns Windows paths.
+        const code = virtualFiles.get(normalize(fileName));
 
         return code !== undefined
             ? ts.createSourceFile(
@@ -63,9 +64,9 @@ const compileExamples = (): readonly ts.Diagnostic[] => {
             : getSourceFile(fileName, languageVersion, onError, shouldCreate);
     };
     host.fileExists = (fileName) =>
-        virtualFiles.has(fileName) || ts.sys.fileExists(fileName);
+        virtualFiles.has(normalize(fileName)) || ts.sys.fileExists(fileName);
     host.readFile = (fileName) =>
-        virtualFiles.get(fileName) ?? ts.sys.readFile(fileName);
+        virtualFiles.get(normalize(fileName)) ?? ts.sys.readFile(fileName);
 
     return ts.getPreEmitDiagnostics(
         ts.createProgram([...virtualFiles.keys()], compilerOptions, host)

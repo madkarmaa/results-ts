@@ -7,7 +7,7 @@ export * from './either';
 // `T` without a cast at the call site.
 export const EMPTY_ITERATOR: IterableIterator<never> = {
     next(): IteratorResult<never, undefined> {
-        return { value: undefined as never, done: true };
+        return { value: undefined, done: true };
     },
 
     [Symbol.iterator](): IterableIterator<never> {

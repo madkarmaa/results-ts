@@ -1,38 +1,6 @@
 import { defineConfig } from 'vitepress';
-import { readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
 import pkg from '../../package.json';
-
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
-const getApiSidebar = () => {
-    const apiDir = resolve(
-        new URL(import.meta.url).pathname,
-        '..',
-        '..',
-        'api'
-    );
-
-    const groups = readdirSync(apiDir, { withFileTypes: true })
-        .filter((info) => info.isDirectory())
-        .map((info) => info.name);
-
-    return groups.flatMap((group) => {
-        const groupDir = resolve(apiDir, group);
-        try {
-            const items = readdirSync(groupDir)
-                .filter((f) => f.endsWith('.md'))
-                .map((f) => ({
-                    text: f.replace('.md', ''),
-                    link: `/api/${group}/${f.replace('.md', '')}`
-                }));
-
-            return [{ text: capitalize(group), items, collapsed: false }];
-        } catch {
-            return [];
-        }
-    });
-};
+import { getApiSidebar, guidePages } from './docs-order';
 
 export default defineConfig({
     title: pkg.name,
@@ -84,20 +52,10 @@ export default defineConfig({
             '/guide/': [
                 {
                     text: 'Guide',
-                    items: [
-                        {
-                            text: 'Getting started',
-                            link: '/guide/getting-started'
-                        },
-                        {
-                            text: 'Error handling',
-                            link: '/guide/error-handling'
-                        },
-                        {
-                            text: 'Async',
-                            link: '/guide/async'
-                        }
-                    ]
+                    items: guidePages.map((page) => ({
+                        text: page.text,
+                        link: `/${page.path}`
+                    }))
                 }
             ]
         },

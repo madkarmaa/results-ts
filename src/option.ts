@@ -655,12 +655,9 @@ class OptionImpl<T> implements OptionMethods<T> {
         if (thisIsSome && !optbIsSome) return this;
         if (!thisIsSome && optbIsSome) return optb;
 
-        // Reaching here means both sides match. When both are `None`, `this` is
-        // already `None` and can be reused (cast narrows the Some type to
-        // `T | T2` - safe because the value is never read on a `None`). When both
-        // are `Some`, `xor` must yield `None` - a fresh allocation, since `this`
-        // holds a value and cannot represent `None`.
-        return thisIsSome ? None() : (this as unknown as OptionImpl<T | T2>);
+        // Matching variants yield None: reuse `this` when both are None,
+        // or allocate a fresh None when both are Some.
+        return thisIsSome ? None() : this;
     }
 
     insert(value: T): T {
@@ -788,11 +785,10 @@ class OptionImpl<T> implements OptionMethods<T> {
         return None();
     }
 
-    flatten<U>(this: Option<Option<U>>): Option<U> {
+    flatten<U>(this: OptionImpl<Option<U>>): Option<U> {
         if (this.isNone()) return None();
 
-        const _this = this as OptionImpl<Option<U>>;
-        const state = _this.#state;
+        const state = this.#state;
 
         if (!isRight(state) || typeof state.right._isSome !== 'boolean')
             throw new FlattenError(
@@ -802,11 +798,10 @@ class OptionImpl<T> implements OptionMethods<T> {
         return state.right;
     }
 
-    transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E> {
+    transpose<T, E>(this: OptionImpl<Result<T, E>>): Result<Option<T>, E> {
         if (this.isNone()) return Ok(None());
 
-        const _this = this as OptionImpl<Result<T, E>>;
-        const state = _this.#state;
+        const state = this.#state;
 
         if (!isRight(state) || typeof state.right._isOk !== 'boolean')
             throw new TransposeError(
@@ -817,9 +812,8 @@ class OptionImpl<T> implements OptionMethods<T> {
         return inner.isOk() ? Ok(Some(inner.unwrap())) : Err(inner.unwrapErr());
     }
 
-    unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>] {
-        const _this = this as OptionImpl<[T, U]>;
-        const state = _this.#state;
+    unzip<T, U>(this: OptionImpl<[T, U]>): [Option<T>, Option<U>] {
+        const state = this.#state;
 
         if (isLeft(state)) return [None(), None()];
 
