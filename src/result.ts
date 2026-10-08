@@ -13,7 +13,8 @@ import {
     EMPTY_ITERATOR,
     OneItemIterator,
     isPromiseLike,
-    isResultOperand
+    isResultOperand,
+    isAsyncResultOperand
 } from './utils';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -739,8 +740,11 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         other: PromiseLike<Result<U, F>>,
         combine: (current: Result<T, E>, other: Result<U, F>) => Result<R, G>
     ): AsyncResult<R, G> {
+        const resolved = isAsyncResultOperand(other)
+            ? other
+            : Promise.resolve(other);
         return new AsyncResultImpl(
-            Promise.resolve(other).then((other) => combine(this, other))
+            resolved.then((other) => combine(this, other))
         );
     }
 

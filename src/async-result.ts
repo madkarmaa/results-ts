@@ -2,7 +2,7 @@ import { Ok, Err, type Result } from './result';
 import { type Option } from './option';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 import { InvalidArgumentError } from './errors';
-import { isResultOperand } from './utils';
+import { isResultOperand, isAsyncResultOperand } from './utils';
 
 /**
  * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
@@ -366,9 +366,10 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         combine: (left: Result<T, E>, right: Result<U, F>) => Result<R, G>
     ): AsyncResult<R, G> {
         return new AsyncResultImpl(
-            Promise.all([this.promise, other]).then(([left, right]) =>
-                combine(left, right)
-            )
+            Promise.all([
+                this.promise,
+                isAsyncResultOperand(other) ? other.promise : other
+            ]).then(([left, right]) => combine(left, right))
         );
     }
 

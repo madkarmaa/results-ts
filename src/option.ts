@@ -13,7 +13,8 @@ import {
     EMPTY_ITERATOR,
     OneItemIterator,
     isPromiseLike,
-    isOptionOperand
+    isOptionOperand,
+    isAsyncOptionOperand
 } from './utils';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
@@ -916,8 +917,11 @@ class OptionImpl<T> implements OptionMethods<T> {
     ): AsyncOption<R> {
         const state = this.#state;
         const current = isRight(state) ? Some(state.right) : None<T>();
+        const resolved = isAsyncOptionOperand(other)
+            ? other
+            : Promise.resolve(other);
         return new AsyncOptionImpl(
-            Promise.resolve(other).then((other) => combine(current, other))
+            resolved.then((other) => combine(current, other))
         );
     }
 

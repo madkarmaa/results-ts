@@ -172,9 +172,13 @@ describe('combinator operand combinations', () => {
     test('native promises and structural thenables are supported', async () => {
         const optionPromise = Promise.resolve(Some(2));
         const resultPromise = Promise.resolve(Ok(2));
-        const optionThenable = { then: optionPromise.then.bind(optionPromise) };
+        const optionThenable = {
+            then: optionPromise.then.bind(optionPromise),
+            promise: Promise.resolve(None())
+        };
         const resultThenable = Object.assign(() => undefined, {
-            then: resultPromise.then.bind(resultPromise)
+            then: resultPromise.then.bind(resultPromise),
+            promise: Promise.resolve(Err('unrelated'))
         });
 
         for (const other of [optionPromise, optionThenable]) {

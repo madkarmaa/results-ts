@@ -1,7 +1,7 @@
 import { type Option } from './option';
 import { type Result } from './result';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
-import { isOptionOperand } from './utils';
+import { isOptionOperand, isAsyncOptionOperand } from './utils';
 
 /**
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
@@ -369,9 +369,10 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         combine: (left: Option<T>, right: Option<U>) => Option<R>
     ): AsyncOption<R> {
         return new AsyncOptionImpl(
-            Promise.all([this.promise, other]).then(([left, right]) =>
-                combine(left, right)
-            )
+            Promise.all([
+                this.promise,
+                isAsyncOptionOperand(other) ? other.promise : other
+            ]).then(([left, right]) => combine(left, right))
         );
     }
 

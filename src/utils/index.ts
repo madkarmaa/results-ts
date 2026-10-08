@@ -37,6 +37,39 @@ export function isPromiseLike<T>(
     );
 }
 
+type BackedAsyncOperand<T> = PromiseLike<T> & {
+    readonly promise: PromiseLike<T>;
+};
+
+// Recognize the async wrapper layout across realms and duplicate installs.
+export function isAsyncOptionOperand<T>(
+    value: PromiseLike<Option<T>>
+): value is BackedAsyncOperand<Option<T>> {
+    return (
+        isPromiseLike(value) &&
+        'isSome' in value &&
+        typeof value.isSome === 'function' &&
+        'isNone' in value &&
+        typeof value.isNone === 'function' &&
+        'promise' in value &&
+        isPromiseLike(value.promise)
+    );
+}
+
+export function isAsyncResultOperand<T, E>(
+    value: PromiseLike<Result<T, E>>
+): value is BackedAsyncOperand<Result<T, E>> {
+    return (
+        isPromiseLike(value) &&
+        'isOk' in value &&
+        typeof value.isOk === 'function' &&
+        'isErr' in value &&
+        typeof value.isErr === 'function' &&
+        'promise' in value &&
+        isPromiseLike(value.promise)
+    );
+}
+
 // Shared, stateless iterator used for the empty `iter()` path (`Err`/`None`).
 // Returning this constant instead of entering a generator avoids allocating a
 // generator object on every call when there is nothing to yield. Typed as
