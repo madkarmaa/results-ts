@@ -225,7 +225,7 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 }
 
 export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
-    constructor(private promise: PromiseLike<Result<T, E>>) {}
+    constructor(private readonly promise: PromiseLike<Result<T, E>>) {}
 
     then<TResult1 = Result<T, E>, TResult2 = never>(
         onfulfilled?:
@@ -415,18 +415,15 @@ export function catchUnwindAsync<T, Args extends unknown[], E>(
 export function catchUnwindAsync<T, Args extends unknown[], E>(
     fn: (...args: Args) => PromiseLike<T> | T,
     onThrow?: (thrown: unknown, ...args: Args) => E
-): (...args: Args) => AsyncResult<T, E | unknown> {
+): (...args: Args) => AsyncResult<T, unknown> {
     if (typeof fn !== 'function')
         throw new InvalidArgumentError("'fn' must be a function");
 
     if (onThrow !== undefined && typeof onThrow !== 'function')
         throw new InvalidArgumentError("'onThrow' must be a function");
 
-    return function (
-        this: unknown,
-        ...args: Args
-    ): AsyncResult<T, E | unknown> {
-        const handle = (thrown: unknown) =>
+    return function (this: unknown, ...args: Args): AsyncResult<T, unknown> {
+        const handleThrown = (thrown: unknown) =>
             Err(
                 onThrow === undefined
                     ? thrown
@@ -435,7 +432,7 @@ export function catchUnwindAsync<T, Args extends unknown[], E>(
 
         const result = Promise.resolve()
             .then(() => fn.apply(this, args))
-            .then(Ok, handle);
+            .then(Ok, handleThrown);
 
         return new AsyncResultImpl(result);
     };
