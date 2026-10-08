@@ -2,6 +2,15 @@ name: Benchmarks
 
 on:
     workflow_dispatch:
+        inputs:
+            compare-combinators:
+                description: Compare combinators against a baseline without publishing
+                type: boolean
+                default: false
+            baseline:
+                description: Baseline Git ref for combinator comparison
+                type: string
+                default: dev
 
 permissions:
     contents: write
@@ -9,6 +18,7 @@ permissions:
 jobs:
     bench:
         name: Run benchmarks
+        if: ${{ !inputs.compare-combinators }}
         runs-on: ubuntu-latest
 
         steps:
@@ -46,3 +56,54 @@ jobs:
                   git add BENCHMARKS.md
                   git commit -m "chore(bench): update benchmarks [skip ci]" || echo "no changes to commit"
                   git push
+
+    compare-combinators:
+        name: Compare combinator performance
+        if: ${{ inputs.compare-combinators }}
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        permissions:
+            contents: read
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+
+            - name: Install Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+
+            - name: Validate feature
+              run: |
+                  bun run typecheck
+                  bun run test
+                  bun run build
+
+            - name: Prepare baseline
+              env:
+                  BASELINE_REF: ${{ inputs.baseline }}
+              run: |
+                  mkdir -p .cache/combinator-baseline benchmark-results
+                  git rev-parse "${BASELINE_REF}^{commit}" > benchmark-results/baseline.txt
+                  git rev-parse HEAD > benchmark-results/current.txt
+                  git archive "$BASELINE_REF" src | tar -x -C .cache/combinator-baseline
+
+            - name: Compare on the same runner, alternating order
+              run: |
+                  for pass in 1 2 3; do
+                      BENCH_REVERSE=$((pass % 2 == 0)) bun --expose-gc run bench/combinators.compare.ts > "benchmark-results/comparison-$pass.json"
+                  done
+                  bun --expose-gc run bench/combinators.ts > benchmark-results/matrix.txt
+
+            - name: Upload benchmark results
+              uses: actions/upload-artifact@v7
+              with:
+                  name: combinator-benchmarks
+                  path: benchmark-results
+                  if-no-files-found: error
