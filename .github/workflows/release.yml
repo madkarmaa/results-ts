@@ -96,11 +96,15 @@ jobs:
                   git commit -m "chore: update API docs for v${{ steps.next.outputs.version }} [skip ci]" || echo "no changes to commit"
                   git push
 
-            - name: Sync released main into dev
+            - name: Sync dev with main
               if: steps.prev.outputs.version != steps.next.outputs.version
               run: |
-                  git fetch origin dev
-                  git push --force-with-lease=dev:$(git rev-parse origin/dev) origin main:dev
+                  git fetch origin main dev
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git switch -C dev origin/dev
+                  git merge --no-edit -m "chore: sync stable release to dev [skip ci]" origin/main
+                  git push origin dev
 
             - name: Setup GitHub Pages
               if: steps.prev.outputs.version != steps.next.outputs.version
