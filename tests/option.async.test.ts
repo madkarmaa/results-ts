@@ -108,6 +108,29 @@ describe('Option async methods', () => {
     });
 
     describe('getOrInsertWithAsync resolution cases', () => {
+        test('retries after a rejected initializer following sync mutations', async () => {
+            const option = None<number>();
+            option.insert(1);
+            option.take();
+            const error = new Error('initialization failed');
+            let calls = 0;
+            await expect(
+                option.getOrInsertWithAsync(() => {
+                    calls += 1;
+                    return Promise.reject(error);
+                })
+            ).rejects.toBe(error);
+            expect(option.isNone()).toBe(true);
+            expect(
+                await option.getOrInsertWithAsync(() => {
+                    calls += 1;
+                    return Promise.resolve(2);
+                })
+            ).toBe(2);
+            expect(calls).toBe(2);
+            expect(option.unwrap()).toBe(2);
+        });
+
         test('fast path returns existing value', async () => {
             let calls = 0;
             const optSome = Some(10);

@@ -364,11 +364,15 @@ const noneValue = { _tag: 'NoneValue' } as const;
 type NoneValue = typeof noneValue;
 const noneEither = Left(noneValue); // immutable shared reference
 
+type PendingInsert<T> = {
+    promise: Promise<T> | undefined;
+    token: number;
+    version: number;
+};
+
 class OptionImpl<T> implements OptionMethods<T> {
     #state: Either<NoneValue, T>;
-    #pendingInsert?: Promise<T>;
-    #pendingInsertToken = 0;
-    #mutationVersion = 0;
+    #insertion?: PendingInsert<T>;
 
     static name = 'Option';
     constructor(state: Either<NoneValue, T>) {
@@ -376,9 +380,11 @@ class OptionImpl<T> implements OptionMethods<T> {
     }
 
     #invalidatePendingInsert(): void {
-        this.#mutationVersion += 1;
-        this.#pendingInsertToken += 1;
-        this.#pendingInsert = undefined;
+        const insertion = this.#insertion;
+        if (!insertion) return;
+        insertion.version += 1;
+        insertion.token += 1;
+        insertion.promise = undefined;
     }
 
     get _isSome(): boolean {
@@ -765,21 +771,28 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isRight(state)) return state.right;
 
-        if (this.#pendingInsert) return this.#pendingInsert;
+        // Ordinary synchronous options need no insertion coordination state.
+        const insertion = (this.#insertion ??= {
+            promise: undefined,
+            token: 0,
+            version: 0
+        });
 
-        const startVersion = this.#mutationVersion;
+        if (insertion.promise) return insertion.promise;
 
-        const pendingToken = this.#pendingInsertToken + 1;
-        this.#pendingInsertToken = pendingToken;
+        const startVersion = insertion.version;
+
+        const pendingToken = insertion.token + 1;
+        insertion.token = pendingToken;
 
         const insertPromise = Promise.resolve()
             .then(() => f())
             .then((value) => {
                 if (
-                    this.#mutationVersion === startVersion &&
-                    this.#pendingInsertToken === pendingToken
+                    insertion.version === startVersion &&
+                    insertion.token === pendingToken
                 ) {
-                    this.#mutationVersion += 1;
+                    insertion.version += 1;
                     this.#state = Right(value);
                     return value;
                 }
@@ -787,32 +800,32 @@ class OptionImpl<T> implements OptionMethods<T> {
                 const current = this.#state;
                 if (isRight(current)) return current.right;
 
-                const pending = this.#pendingInsert;
-                if (pending && this.#pendingInsertToken !== pendingToken) {
+                const pending = insertion.promise;
+                if (pending && insertion.token !== pendingToken) {
                     return pending.then(() => {
                         const latest = this.#state;
                         if (isRight(latest)) return latest.right;
 
-                        this.#mutationVersion += 1;
+                        insertion.version += 1;
                         this.#state = Right(value);
                         return value;
                     });
                 }
 
-                this.#mutationVersion += 1;
+                insertion.version += 1;
                 this.#state = Right(value);
                 return value;
             });
 
-        this.#pendingInsert = insertPromise;
+        insertion.promise = insertPromise;
 
         void insertPromise
             .finally(() => {
                 if (
-                    this.#pendingInsertToken === pendingToken &&
-                    this.#pendingInsert === insertPromise
+                    insertion.token === pendingToken &&
+                    insertion.promise === insertPromise
                 )
-                    this.#pendingInsert = undefined;
+                    insertion.promise = undefined;
             })
             .catch(() => {});
 
