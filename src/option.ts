@@ -12,7 +12,8 @@ import {
     isRight,
     EMPTY_ITERATOR,
     OneItemIterator,
-    isPromiseLike
+    isPromiseLike,
+    isOptionOperand
 } from './utils';
 import { type Result, Ok, Err } from './result';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
@@ -590,13 +591,13 @@ class OptionImpl<T> implements OptionMethods<T> {
     and<U>(
         optb: Option<U> | PromiseLike<Option<U>>
     ): Option<U> | AsyncOption<U> {
-        if (!(optb instanceof OptionImpl) && isPromiseLike(optb))
-            return this.#combineAsync(optb, (current, other) =>
-                current.and(other)
-            );
-
-        if (typeof optb._isSome !== 'boolean')
+        if (!isOptionOperand(optb)) {
+            if (isPromiseLike(optb))
+                return this.#combineAsync(optb, (current, other) =>
+                    current.and(other)
+                );
             throw new InvalidArgumentError('Argument must be an Option');
+        }
 
         const state = this.#state;
         if (isRight(state)) return optb;
@@ -667,13 +668,13 @@ class OptionImpl<T> implements OptionMethods<T> {
     or<T2>(
         optb: Option<T2> | PromiseLike<Option<T2>>
     ): Option<T | T2> | AsyncOption<T | T2> {
-        if (!(optb instanceof OptionImpl) && isPromiseLike(optb))
-            return this.#combineAsync(optb, (current, other) =>
-                current.or(other)
-            );
-
-        if (typeof optb._isSome !== 'boolean')
+        if (!isOptionOperand(optb)) {
+            if (isPromiseLike(optb))
+                return this.#combineAsync(optb, (current, other) =>
+                    current.or(other)
+                );
             throw new InvalidArgumentError('Argument must be an Option');
+        }
 
         const state = this.#state;
         if (isRight(state)) return this;
@@ -707,13 +708,13 @@ class OptionImpl<T> implements OptionMethods<T> {
     xor<T2>(
         optb: Option<T2> | PromiseLike<Option<T2>>
     ): Option<T | T2> | AsyncOption<T | T2> {
-        if (!(optb instanceof OptionImpl) && isPromiseLike(optb))
-            return this.#combineAsync(optb, (current, other) =>
-                current.xor(other)
-            );
-
-        if (typeof optb._isSome !== 'boolean')
+        if (!isOptionOperand(optb)) {
+            if (isPromiseLike(optb))
+                return this.#combineAsync(optb, (current, other) =>
+                    current.xor(other)
+                );
             throw new InvalidArgumentError('Argument must be an Option');
+        }
 
         const thisIsSome = isRight(this.#state);
         const optbIsSome = optb._isSome;
@@ -886,13 +887,13 @@ class OptionImpl<T> implements OptionMethods<T> {
     zip<U>(
         other: Option<U> | PromiseLike<Option<U>>
     ): Option<[T, U]> | AsyncOption<[T, U]> {
-        if (!(other instanceof OptionImpl) && isPromiseLike(other))
-            return this.#combineAsync(other, (current, other) =>
-                current.zip(other)
-            );
-
-        if (typeof other._isSome !== 'boolean')
+        if (!isOptionOperand(other)) {
+            if (isPromiseLike(other))
+                return this.#combineAsync(other, (current, other) =>
+                    current.zip(other)
+                );
             throw new InvalidArgumentError('Argument must be an Option');
+        }
 
         const state = this.#state;
         if (isLeft(state) || !other._isSome) return None();
@@ -915,10 +916,8 @@ class OptionImpl<T> implements OptionMethods<T> {
     ): AsyncOption<R> {
         const state = this.#state;
         const current = isRight(state) ? Some(state.right) : None<T>();
-        const resolved =
-            other instanceof AsyncOptionImpl ? other : Promise.resolve(other);
         return new AsyncOptionImpl(
-            resolved.then((other) => combine(current, other))
+            Promise.resolve(other).then((other) => combine(current, other))
         );
     }
 

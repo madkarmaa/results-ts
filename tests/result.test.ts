@@ -302,12 +302,18 @@ describe('Result', () => {
         // A duck-typed Result: carries the `_isOk` discriminator the structural
         // check looks for. Mimics a Result created in a different realm / from
         // a duplicate install where `instanceof` would fail.
-        const duckTypedOk = { _isOk: true } as unknown as ReturnType<
-            typeof Ok<number>
-        >;
-        const duckTypedErr = { _isOk: false } as unknown as ReturnType<
-            typeof Err<{ code: string }>
-        >;
+        const duckTypedOk = {
+            _isOk: true,
+            get then() {
+                throw new Error('a sync Result must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Ok<number>>;
+        const duckTypedErr = {
+            _isOk: false,
+            get then() {
+                throw new Error('a sync Result must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Err<{ code: string }>>;
 
         test('and accepts a duck-typed Result', () => {
             expect((Ok(5).and(duckTypedOk) as { _isOk: boolean })._isOk).toBe(

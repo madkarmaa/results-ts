@@ -210,12 +210,18 @@ describe('Option', () => {
         // A duck-typed Option: carries the `_isSome` discriminator the
         // structural check looks for. Mimics an Option created in a different
         // realm / from a duplicate install where `instanceof` would fail.
-        const duckTypedSome = { _isSome: true } as unknown as ReturnType<
-            typeof Some<number>
-        >;
-        const duckTypedNone = { _isSome: false } as unknown as ReturnType<
-            typeof None<number>
-        >;
+        const duckTypedSome = {
+            _isSome: true,
+            get then() {
+                throw new Error('a sync Option must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Some<number>>;
+        const duckTypedNone = {
+            _isSome: false,
+            get then() {
+                throw new Error('a sync Option must not inspect then');
+            }
+        } as unknown as ReturnType<typeof None<number>>;
 
         test('and accepts a duck-typed Option', () => {
             expect(

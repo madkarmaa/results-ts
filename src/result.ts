@@ -12,7 +12,8 @@ import {
     isRight,
     EMPTY_ITERATOR,
     OneItemIterator,
-    isPromiseLike
+    isPromiseLike,
+    isResultOperand
 } from './utils';
 import { type Option, Some, None } from './option';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
@@ -594,13 +595,13 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     and<U, E2>(
         res: Result<U, E2> | PromiseLike<Result<U, E2>>
     ): Result<U, E | E2> | AsyncResult<U, E | E2> {
-        if (!(res instanceof ResultImpl) && isPromiseLike(res))
-            return this.#combineAsync(res, (current, other) =>
-                current.and(other)
-            );
-
-        if (typeof res._isOk !== 'boolean')
+        if (!isResultOperand(res)) {
+            if (isPromiseLike(res))
+                return this.#combineAsync(res, (current, other) =>
+                    current.and(other)
+                );
             throw new InvalidArgumentError('Argument must be a Result');
+        }
 
         const state = this.#state;
         if (isRight(state)) return res;
@@ -643,13 +644,13 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     or<T2, F>(
         res: Result<T2, F> | PromiseLike<Result<T2, F>>
     ): Result<T | T2, F> | AsyncResult<T | T2, F> {
-        if (!(res instanceof ResultImpl) && isPromiseLike(res))
-            return this.#combineAsync(res, (current, other) =>
-                current.or(other)
-            );
-
-        if (typeof res._isOk !== 'boolean')
+        if (!isResultOperand(res)) {
+            if (isPromiseLike(res))
+                return this.#combineAsync(res, (current, other) =>
+                    current.or(other)
+                );
             throw new InvalidArgumentError('Argument must be a Result');
+        }
 
         const state = this.#state;
         if (isLeft(state)) return res;
@@ -738,10 +739,8 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         other: PromiseLike<Result<U, F>>,
         combine: (current: Result<T, E>, other: Result<U, F>) => Result<R, G>
     ): AsyncResult<R, G> {
-        const resolved =
-            other instanceof AsyncResultImpl ? other : Promise.resolve(other);
         return new AsyncResultImpl(
-            resolved.then((other) => combine(this, other))
+            Promise.resolve(other).then((other) => combine(this, other))
         );
     }
 

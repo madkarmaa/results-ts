@@ -1,4 +1,29 @@
+import { type Option } from '../option';
+import { type Result } from '../result';
+
 export * from './either';
+
+export function isOptionOperand<T>(
+    value: Option<T> | PromiseLike<Option<T>>
+): value is Option<T> {
+    return (
+        ((typeof value === 'object' && value !== null) ||
+            typeof value === 'function') &&
+        '_isSome' in value &&
+        typeof value._isSome === 'boolean'
+    );
+}
+
+export function isResultOperand<T, E>(
+    value: Result<T, E> | PromiseLike<Result<T, E>>
+): value is Result<T, E> {
+    return (
+        ((typeof value === 'object' && value !== null) ||
+            typeof value === 'function') &&
+        '_isOk' in value &&
+        typeof value._isOk === 'boolean'
+    );
+}
 
 // Recognize native promises and structural thenables, including async wrappers.
 export function isPromiseLike<T>(
