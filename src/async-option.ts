@@ -185,6 +185,13 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     transpose<T, E>(this: AsyncOption<Result<T, E>>): AsyncResult<Option<T>, E>;
 
     /**
+     * Combines the resolved option with another option into a tuple of their values.
+     *
+     * Resolves to `Some([a, b])` if both options are `Some`, otherwise resolves to `None`.
+     */
+    zip<U>(other: Option<U>): AsyncOption<[T, U]>;
+
+    /**
      * Unzips an `AsyncOption` containing a tuple of two values.
      *
      * If `self` resolves to `Some((a, b))` this method returns `(AsyncOption(a), AsyncOption(b))`.
@@ -339,6 +346,10 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         this: AsyncOptionImpl<Result<T, E>>
     ): AsyncResult<Option<T>, E> {
         return new AsyncResultImpl(this.then((opt) => opt.transpose()));
+    }
+
+    zip<U>(other: Option<U>): AsyncOption<[T, U]> {
+        return new AsyncOptionImpl(this.then((opt) => opt.zip(other)));
     }
 
     unzip<T, U>(

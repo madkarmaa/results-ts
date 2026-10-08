@@ -311,6 +311,15 @@ interface OptionMethods<T> {
     transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E>;
 
     /**
+     * Combines two options into an option containing a tuple of their values.
+     *
+     * Returns `Some([a, b])` if both options are `Some`, otherwise returns `None`.
+     *
+     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     */
+    zip<U>(other: Option<U>): Option<[T, U]>;
+
+    /**
      * Unzips an `Option` containing a tuple of two values.
      *
      * If `self` is `Some((a, b))` this method returns `(Some(a), Some(b))`. Otherwise, `(None, None)`
@@ -810,6 +819,16 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         const inner = state.right;
         return inner.isOk() ? Ok(Some(inner.unwrap())) : Err(inner.unwrapErr());
+    }
+
+    zip<U>(other: Option<U>): Option<[T, U]> {
+        if (typeof other._isSome !== 'boolean')
+            throw new InvalidArgumentError('Argument must be an Option');
+
+        const state = this.#state;
+        if (isLeft(state) || !other._isSome) return None();
+
+        return Some<[T, U]>([state.right, other.unwrap()]);
     }
 
     unzip<T, U>(this: OptionImpl<[T, U]>): [Option<T>, Option<U>] {

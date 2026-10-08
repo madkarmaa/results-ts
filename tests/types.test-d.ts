@@ -101,6 +101,27 @@ describe('Option types', () => {
         Some(42).transpose();
     });
 
+    test('zip preserves the types and order of both values', () => {
+        const zipped = Some(42).zip(Some('hello'));
+
+        expectTypeOf(zipped).toEqualTypeOf<Option<[number, string]>>();
+        expectTypeOf(None<number>().zip(None<string>())).toEqualTypeOf<
+            Option<[number, string]>
+        >();
+        expectTypeOf(Some(null).zip(Some(undefined))).toEqualTypeOf<
+            Option<[null, undefined]>
+        >();
+        expectTypeOf(
+            Some<'left'>('left').zip(Some<'right'>('right'))
+        ).toEqualTypeOf<Option<['left', 'right']>>();
+        expectTypeOf(zipped.unzip()).toEqualTypeOf<
+            [Option<number>, Option<string>]
+        >();
+
+        // @ts-expect-error - zip requires another Option
+        Some(42).zip('hello');
+    });
+
     test('unzip splits Option<[T, U]> into a tuple of two Options', () => {
         const someTuple = Some([42, 'hello']) as Option<[number, string]>;
         const noneTuple = None<[number, string]>();
@@ -265,6 +286,30 @@ describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
         // flatten requires the inner value to be an Option
         // @ts-expect-error - flatten can only be called on AsyncOption<Option<T>>
         (({}) as AsyncOption<number>).flatten();
+    });
+
+    test('AsyncOption.zip preserves tuple types and chainability', () => {
+        const asyncOpt = Some(42).mapAsync(async (value) => value);
+        const zipped = asyncOpt.zip(Some('hello'));
+
+        expectTypeOf(zipped).toEqualTypeOf<AsyncOption<[number, string]>>();
+        expectTypeOf(zipped.unwrap()).toEqualTypeOf<
+            Promise<[number, string]>
+        >();
+        expectTypeOf(zipped.unzip()).toEqualTypeOf<
+            [AsyncOption<number>, AsyncOption<string>]
+        >();
+        expectTypeOf(
+            zipped.map(([number, string]) => string + number)
+        ).toEqualTypeOf<AsyncOption<string>>();
+        expectTypeOf(
+            None<number>()
+                .mapAsync(async (value) => value)
+                .zip(None<string>())
+        ).toEqualTypeOf<AsyncOption<[number, string]>>();
+
+        // @ts-expect-error - zip requires another Option
+        asyncOpt.zip('hello');
     });
 
     test('AsyncOption.unzip splits AsyncOption<[T, U]> into a tuple of two AsyncOptions', () => {
