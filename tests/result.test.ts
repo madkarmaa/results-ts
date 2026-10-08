@@ -302,12 +302,18 @@ describe('Result', () => {
         // A duck-typed Result: carries the `_isOk` discriminator the structural
         // check looks for. Mimics a Result created in a different realm / from
         // a duplicate install where `instanceof` would fail.
-        const duckTypedOk = { _isOk: true } as unknown as ReturnType<
-            typeof Ok<number>
-        >;
-        const duckTypedErr = { _isOk: false } as unknown as ReturnType<
-            typeof Err<{ code: string }>
-        >;
+        const duckTypedOk = {
+            _isOk: true,
+            get then() {
+                throw new Error('a sync Result must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Ok<number>>;
+        const duckTypedErr = {
+            _isOk: false,
+            get then() {
+                throw new Error('a sync Result must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Err<{ code: string }>>;
 
         test('and accepts a duck-typed Result', () => {
             expect((Ok(5).and(duckTypedOk) as { _isOk: boolean })._isOk).toBe(
@@ -329,6 +335,24 @@ describe('Result', () => {
                     ._isOk
             ).toBe(false);
             expect(Ok(5).or(duckTypedErr).isOk()).toBe(true);
+        });
+
+        test('and/or accept a duck-typed async Result', async () => {
+            const promise = Promise.resolve(Ok(10));
+            const duckTypedAsyncOk = {
+                promise,
+                then: promise.then.bind(promise),
+                isOk: async () => true,
+                isErr: async () => false
+            };
+
+            expect(await Ok(5).and(duckTypedAsyncOk).unwrap()).toBe(10);
+            expect(await Err('left').or(duckTypedAsyncOk).unwrap()).toBe(10);
+
+            const ok = Ok(5).mapAsync(async (value) => value);
+            const err = Err('left').mapAsync(async (value) => value);
+            expect(await ok.and(duckTypedAsyncOk).unwrap()).toBe(10);
+            expect(await err.or(duckTypedAsyncOk).unwrap()).toBe(10);
         });
 
         test('non-Result values are rejected', () => {

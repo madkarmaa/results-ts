@@ -2,7 +2,7 @@ import { Ok, Err, type Result } from './result';
 import { type Option } from './option';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 import { InvalidArgumentError } from './errors';
-import { isPromiseLike } from './utils';
+import { isResultOperand, isAsyncResultOperand } from './utils';
 
 /**
  * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
@@ -338,7 +338,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     and<U, E2>(
         res: Result<U, E2> | PromiseLike<Result<U, E2>>
     ): AsyncResult<U, E | E2> {
-        if (isPromiseLike(res))
+        if (!isResultOperand(res))
             return this.#combineAsync(res, (left, right) => left.and(right));
         return new AsyncResultImpl(this.then((r) => r.and(res)));
     }
@@ -356,7 +356,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     or<T2, F>(
         res: Result<T2, F> | PromiseLike<Result<T2, F>>
     ): AsyncResult<T | T2, F> {
-        if (isPromiseLike(res))
+        if (!isResultOperand(res))
             return this.#combineAsync(res, (left, right) => left.or(right));
         return new AsyncResultImpl(this.then((r) => r.or(res)));
     }
@@ -368,7 +368,7 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
         return new AsyncResultImpl(
             Promise.all([
                 this.promise,
-                other instanceof AsyncResultImpl ? other.promise : other
+                isAsyncResultOperand(other) ? other.promise : other
             ]).then(([left, right]) => combine(left, right))
         );
     }

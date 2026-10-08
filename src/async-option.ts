@@ -1,7 +1,7 @@
 import { type Option } from './option';
 import { type Result } from './result';
 import { type AsyncResult, AsyncResultImpl } from './async-result';
-import { isPromiseLike } from './utils';
+import { isOptionOperand, isAsyncOptionOperand } from './utils';
 
 /**
  * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
@@ -305,7 +305,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U> {
-        if (isPromiseLike(optb))
+        if (!isOptionOperand(optb))
             return this.#combineAsync(optb, (left, right) => left.and(right));
         return new AsyncOptionImpl(this.then((opt) => opt.and(optb)));
     }
@@ -329,7 +329,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     or<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2> {
-        if (isPromiseLike(optb))
+        if (!isOptionOperand(optb))
             return this.#combineAsync(optb, (left, right) => left.or(right));
         return new AsyncOptionImpl(this.then((opt) => opt.or(optb)));
     }
@@ -343,7 +343,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     xor<T2>(optb: Option<T2> | PromiseLike<Option<T2>>): AsyncOption<T | T2> {
-        if (isPromiseLike(optb))
+        if (!isOptionOperand(optb))
             return this.#combineAsync(optb, (left, right) => left.xor(right));
         return new AsyncOptionImpl(this.then((opt) => opt.xor(optb)));
     }
@@ -359,7 +359,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
     }
 
     zip<U>(other: Option<U> | PromiseLike<Option<U>>): AsyncOption<[T, U]> {
-        if (isPromiseLike(other))
+        if (!isOptionOperand(other))
             return this.#combineAsync(other, (left, right) => left.zip(right));
         return new AsyncOptionImpl(this.then((opt) => opt.zip(other)));
     }
@@ -371,7 +371,7 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
         return new AsyncOptionImpl(
             Promise.all([
                 this.promise,
-                other instanceof AsyncOptionImpl ? other.promise : other
+                isAsyncOptionOperand(other) ? other.promise : other
             ]).then(([left, right]) => combine(left, right))
         );
     }

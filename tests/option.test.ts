@@ -210,12 +210,18 @@ describe('Option', () => {
         // A duck-typed Option: carries the `_isSome` discriminator the
         // structural check looks for. Mimics an Option created in a different
         // realm / from a duplicate install where `instanceof` would fail.
-        const duckTypedSome = { _isSome: true } as unknown as ReturnType<
-            typeof Some<number>
-        >;
-        const duckTypedNone = { _isSome: false } as unknown as ReturnType<
-            typeof None<number>
-        >;
+        const duckTypedSome = {
+            _isSome: true,
+            get then() {
+                throw new Error('a sync Option must not inspect then');
+            }
+        } as unknown as ReturnType<typeof Some<number>>;
+        const duckTypedNone = {
+            _isSome: false,
+            get then() {
+                throw new Error('a sync Option must not inspect then');
+            }
+        } as unknown as ReturnType<typeof None<number>>;
 
         test('and accepts a duck-typed Option', () => {
             expect(
@@ -237,6 +243,32 @@ describe('Option', () => {
                 (None().xor(duckTypedSome) as { _isSome: boolean })._isSome
             ).toBe(true);
             expect(Some(5).xor(duckTypedSome).isNone()).toBe(true);
+        });
+
+        test('and/or/xor/zip accept a duck-typed async Option', async () => {
+            const promise = Promise.resolve(Some(10));
+            const duckTypedAsyncSome = {
+                promise,
+                then: promise.then.bind(promise),
+                isSome: async () => true,
+                isNone: async () => false
+            };
+
+            expect(await Some(5).and(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await None().or(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await None().xor(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await Some(5).zip(duckTypedAsyncSome).unwrap()).toEqual([
+                5, 10
+            ]);
+
+            const some = Some(5).mapAsync(async (value) => value);
+            const none = None().mapAsync(async (value) => value);
+            expect(await some.and(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await none.or(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await none.xor(duckTypedAsyncSome).unwrap()).toBe(10);
+            expect(await some.zip(duckTypedAsyncSome).unwrap()).toEqual([
+                5, 10
+            ]);
         });
 
         test('non-Option values are rejected', () => {
