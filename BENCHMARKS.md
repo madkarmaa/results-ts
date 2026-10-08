@@ -1,248 +1,248 @@
 # Benchmarks
 
-clk: ~4.18 GHz
-cpu: AMD EPYC 9V45 96-Core Processor
-runtime: bun 1.3.14 (x64-linux)
+clk: ~3.00 GHz
+cpu: AMD EPYC 7763 64-Core Processor
+runtime: bun 1.4.2 (x64-linux)
 
 | • constructors | avg              | min         | p75         | p99         | max         |
 | -------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok(1)          | `  4.11 ns/iter` | `  2.68 ns` | `  3.39 ns` | ` 22.39 ns` | `116.56 ns` |
-| Err(1)         | `  7.24 ns/iter` | `  3.53 ns` | `  7.05 ns` | ` 10.65 ns` | ` 72.84 ns` |
-| Some(1)        | ` 10.49 ns/iter` | `  6.89 ns` | ` 10.48 ns` | ` 60.29 ns` | `135.05 ns` |
-| None()         | `  6.79 ns/iter` | `  4.22 ns` | `  6.88 ns` | ` 12.20 ns` | `274.47 ns` |
+| Ok(1)          | `  6.66 ns/iter` | `  5.09 ns` | `  5.98 ns` | ` 53.36 ns` | `148.27 ns` |
+| Err(1)         | `  6.77 ns/iter` | `  4.96 ns` | `  6.01 ns` | ` 51.92 ns` | `108.33 ns` |
+| Some(1)        | `  8.65 ns/iter` | `  5.92 ns` | `  9.49 ns` | ` 56.73 ns` | `172.42 ns` |
+| None()         | `  7.26 ns/iter` | `  4.04 ns` | `  8.04 ns` | ` 21.07 ns` | ` 84.60 ns` |
 
 | • Result - queries  | avg              | min         | p75         | p99         | max         |
 | ------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.isOk()           | `  1.33 ns/iter` | `122.07 ps` | `  3.58 ns` | `  4.59 ns` | ` 12.17 ns` |
-| Err.isOk()          | `  4.15 ns/iter` | `  3.90 ns` | `  4.15 ns` | `  5.56 ns` | ` 16.70 ns` |
-| Ok.isErr()          | `  4.10 ns/iter` | `943.85 ps` | `  4.33 ns` | `  6.10 ns` | ` 15.06 ns` |
-| Err.isErr()         | `  4.60 ns/iter` | `  4.45 ns` | `  4.53 ns` | `  6.26 ns` | ` 14.31 ns` |
-| Ok.isOkAnd (true)   | `  3.37 ns/iter` | `  3.25 ns` | `  3.35 ns` | `  4.74 ns` | ` 17.60 ns` |
-| Err.isOkAnd         | `  4.23 ns/iter` | `  4.13 ns` | `  4.20 ns` | `  5.55 ns` | ` 19.31 ns` |
-| Ok.isErrAnd         | `  3.30 ns/iter` | `  2.94 ns` | `  3.43 ns` | `  4.63 ns` | ` 13.57 ns` |
-| Err.isErrAnd (true) | `  3.36 ns/iter` | `  3.24 ns` | `  3.36 ns` | `  4.69 ns` | ` 16.83 ns` |
+| Ok.isOk()           | `  6.33 ns/iter` | `  1.47 ns` | `  7.07 ns` | ` 15.97 ns` | ` 20.40 ns` |
+| Err.isOk()          | `  8.52 ns/iter` | `  7.98 ns` | `  8.30 ns` | ` 17.05 ns` | ` 23.15 ns` |
+| Ok.isErr()          | `  8.69 ns/iter` | `  8.29 ns` | `  8.37 ns` | ` 13.79 ns` | ` 25.12 ns` |
+| Err.isErr()         | `  9.38 ns/iter` | `  8.98 ns` | ` 10.06 ns` | ` 12.42 ns` | ` 23.31 ns` |
+| Ok.isOkAnd (true)   | `  5.99 ns/iter` | `  5.02 ns` | `  6.14 ns` | `  8.82 ns` | ` 24.78 ns` |
+| Err.isOkAnd         | `  6.80 ns/iter` | `  6.64 ns` | `  6.65 ns` | `  9.80 ns` | ` 34.19 ns` |
+| Ok.isErrAnd         | `  3.18 ns/iter` | `  2.40 ns` | `  2.41 ns` | `  8.33 ns` | ` 28.58 ns` |
+| Err.isErrAnd (true) | `  4.86 ns/iter` | `  4.79 ns` | `  4.79 ns` | `  7.03 ns` | ` 22.33 ns` |
 
 | • Result - conversions | avg              | min         | p75         | p99         | max         |
 | ---------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.ok()                | ` 11.79 ns/iter` | `  8.69 ns` | ` 11.32 ns` | ` 55.33 ns` | ` 82.05 ns` |
-| Err.ok()               | `  8.67 ns/iter` | `  7.31 ns` | `  8.40 ns` | ` 12.91 ns` | ` 74.42 ns` |
-| Ok.err()               | `  8.23 ns/iter` | `  6.98 ns` | `  7.89 ns` | ` 12.11 ns` | ` 74.35 ns` |
-| Err.err()              | ` 12.16 ns/iter` | ` 10.02 ns` | ` 11.71 ns` | ` 56.10 ns` | ` 96.65 ns` |
+| Ok.ok()                | ` 11.77 ns/iter` | ` 10.04 ns` | ` 10.92 ns` | ` 58.88 ns` | ` 89.77 ns` |
+| Err.ok()               | ` 10.82 ns/iter` | `  9.72 ns` | ` 10.33 ns` | ` 33.26 ns` | ` 79.99 ns` |
+| Ok.err()               | ` 10.21 ns/iter` | `  9.12 ns` | `  9.66 ns` | ` 22.72 ns` | ` 84.28 ns` |
+| Err.err()              | ` 13.18 ns/iter` | ` 11.53 ns` | ` 12.32 ns` | ` 63.20 ns` | `127.14 ns` |
 
 | • Result - map family | avg              | min         | p75         | p99         | max         |
 | --------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.map (alloc)        | `  9.87 ns/iter` | `  6.45 ns` | `  9.81 ns` | ` 14.98 ns` | ` 84.14 ns` |
-| Err.map (reuse)       | `  5.00 ns/iter` | `  4.69 ns` | `  4.97 ns` | `  6.99 ns` | ` 22.29 ns` |
-| Ok.mapOr              | `  2.50 ns/iter` | `  1.75 ns` | `  3.11 ns` | `  6.55 ns` | ` 14.90 ns` |
-| Err.mapOr             | `  3.10 ns/iter` | `  3.03 ns` | `  3.08 ns` | `  4.36 ns` | ` 14.47 ns` |
-| Ok.mapOrElse          | `  5.68 ns/iter` | `  4.93 ns` | `  5.39 ns` | ` 15.36 ns` | ` 73.98 ns` |
-| Err.mapOrElse         | `  7.33 ns/iter` | `  6.41 ns` | `  7.28 ns` | ` 10.58 ns` | ` 83.78 ns` |
-| Ok.mapErr (reuse)     | `  4.96 ns/iter` | `  4.55 ns` | `  4.97 ns` | `  6.37 ns` | ` 15.85 ns` |
-| Err.mapErr (alloc)    | ` 11.02 ns/iter` | `  7.06 ns` | `  9.87 ns` | ` 55.10 ns` | `128.66 ns` |
+| Ok.map (alloc)        | ` 12.94 ns/iter` | ` 11.68 ns` | ` 12.29 ns` | ` 60.30 ns` | ` 89.41 ns` |
+| Err.map (reuse)       | `  9.63 ns/iter` | `  9.49 ns` | `  9.50 ns` | ` 12.12 ns` | ` 27.42 ns` |
+| Ok.mapOr              | `  6.22 ns/iter` | `  6.10 ns` | `  6.10 ns` | `  8.45 ns` | ` 16.81 ns` |
+| Err.mapOr             | `  8.21 ns/iter` | `  8.10 ns` | `  8.11 ns` | ` 10.40 ns` | ` 21.25 ns` |
+| Ok.mapOrElse          | ` 12.46 ns/iter` | ` 11.74 ns` | ` 12.07 ns` | ` 16.97 ns` | ` 83.10 ns` |
+| Err.mapOrElse         | ` 12.68 ns/iter` | ` 12.02 ns` | ` 12.24 ns` | ` 19.17 ns` | ` 82.90 ns` |
+| Ok.mapErr (reuse)     | `  8.69 ns/iter` | `  8.57 ns` | `  8.57 ns` | ` 10.94 ns` | ` 19.91 ns` |
+| Err.mapErr (alloc)    | ` 13.99 ns/iter` | ` 12.65 ns` | ` 13.31 ns` | ` 63.71 ns` | ` 86.21 ns` |
 
 | • Result - inspect family | avg              | min         | p75         | p99         | max         |
 | ------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.inspect                | `  4.85 ns/iter` | `  2.31 ns` | `  5.34 ns` | `  7.49 ns` | `102.83 ns` |
-| Err.inspect               | `  5.17 ns/iter` | `  3.86 ns` | `  5.02 ns` | `  7.75 ns` | ` 76.30 ns` |
-| Ok.inspectErr             | `  3.33 ns/iter` | `  3.06 ns` | `  3.26 ns` | `  5.49 ns` | ` 45.68 ns` |
-| Err.inspectErr            | `  5.25 ns/iter` | `  3.79 ns` | `  5.03 ns` | ` 13.06 ns` | ` 66.53 ns` |
+| Ok.inspect                | `  7.62 ns/iter` | `  7.03 ns` | `  7.27 ns` | ` 13.10 ns` | ` 75.30 ns` |
+| Err.inspect               | `  8.57 ns/iter` | `  7.96 ns` | `  8.19 ns` | ` 14.84 ns` | ` 77.54 ns` |
+| Ok.inspectErr             | `  5.88 ns/iter` | `  5.79 ns` | `  5.79 ns` | `  8.05 ns` | ` 21.61 ns` |
+| Err.inspectErr            | `  7.66 ns/iter` | `  7.04 ns` | `  7.31 ns` | ` 12.66 ns` | ` 80.59 ns` |
 
 | • Result - unwrap family | avg              | min         | p75         | p99         | max         |
 | ------------------------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.unwrap                | `  3.14 ns/iter` | `  3.03 ns` | `  3.11 ns` | `  5.18 ns` | ` 38.26 ns` |
-| Err.unwrapErr            | `  3.37 ns/iter` | `  3.27 ns` | `  3.33 ns` | `  4.77 ns` | ` 14.48 ns` |
-| Ok.expect                | `  2.98 ns/iter` | `  2.84 ns` | `  2.97 ns` | `  4.44 ns` | ` 10.34 ns` |
-| Err.expectErr            | `  4.41 ns/iter` | `  4.24 ns` | `  4.41 ns` | `  5.95 ns` | ` 12.80 ns` |
-| Ok.unwrapOr              | `  2.93 ns/iter` | `  2.83 ns` | `  2.91 ns` | `  4.29 ns` | `  8.64 ns` |
-| Err.unwrapOr             | `  3.26 ns/iter` | `  2.88 ns` | `  3.28 ns` | `  4.76 ns` | ` 11.38 ns` |
-| Ok.unwrapOrElse          | `  2.95 ns/iter` | `  2.87 ns` | `  2.92 ns` | `  4.27 ns` | ` 23.32 ns` |
-| Err.unwrapOrElse         | `  5.54 ns/iter` | `  4.31 ns` | `  5.44 ns` | ` 13.51 ns` | ` 76.56 ns` |
+| Ok.unwrap                | `  5.60 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  8.28 ns` | ` 22.10 ns` |
+| Err.unwrapErr            | `  5.58 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.78 ns` | ` 23.51 ns` |
+| Ok.expect                | `  5.57 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.72 ns` | ` 21.94 ns` |
+| Err.expectErr            | `  8.47 ns/iter` | `  8.26 ns` | `  8.41 ns` | ` 10.74 ns` | ` 17.65 ns` |
+| Ok.unwrapOr              | `  5.57 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.73 ns` | ` 15.58 ns` |
+| Err.unwrapOr             | `  6.05 ns/iter` | `  5.90 ns` | `  5.97 ns` | `  8.22 ns` | ` 19.61 ns` |
+| Ok.unwrapOrElse          | `  5.59 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.79 ns` | ` 32.63 ns` |
+| Err.unwrapOrElse         | `  8.92 ns/iter` | `  8.26 ns` | `  8.57 ns` | ` 13.30 ns` | ` 86.02 ns` |
 
 | • Result - combinators | avg              | min         | p75         | p99         | max         |
 | ---------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.and (reuse)         | `  4.06 ns/iter` | `  3.92 ns` | `  4.03 ns` | `  6.26 ns` | ` 14.93 ns` |
-| Err.and (reuse)        | `  4.03 ns/iter` | `  3.92 ns` | `  4.01 ns` | `  5.46 ns` | ` 11.38 ns` |
-| Ok.andThen (alloc)     | ` 13.18 ns/iter` | `  9.67 ns` | ` 12.54 ns` | ` 49.87 ns` | ` 94.90 ns` |
-| Err.andThen (alloc)    | `  4.50 ns/iter` | `  4.38 ns` | `  4.47 ns` | `  6.09 ns` | ` 13.50 ns` |
-| Ok.or (reuse)          | `  3.85 ns/iter` | `  3.62 ns` | `  3.83 ns` | `  5.43 ns` | ` 10.49 ns` |
-| Err.or (reuse)         | `  3.86 ns/iter` | `  3.65 ns` | `  3.83 ns` | `  5.26 ns` | ` 11.20 ns` |
-| Ok.orElse (alloc)      | `  3.59 ns/iter` | `  3.50 ns` | `  3.56 ns` | `  4.97 ns` | ` 23.71 ns` |
-| Err.orElse (alloc)     | `  5.15 ns/iter` | `  3.73 ns` | `  5.08 ns` | ` 13.06 ns` | ` 80.49 ns` |
+| Ok.and (reuse)         | `  7.12 ns/iter` | `  7.02 ns` | `  7.03 ns` | `  9.34 ns` | ` 27.76 ns` |
+| Err.and (reuse)        | `  7.14 ns/iter` | `  7.02 ns` | `  7.04 ns` | `  9.42 ns` | ` 14.90 ns` |
+| Ok.andThen (alloc)     | ` 19.14 ns/iter` | ` 17.21 ns` | ` 18.20 ns` | ` 75.58 ns` | ` 92.90 ns` |
+| Err.andThen (alloc)    | `  6.52 ns/iter` | `  6.41 ns` | `  6.42 ns` | `  8.70 ns` | ` 35.89 ns` |
+| Ok.or (reuse)          | `  7.46 ns/iter` | `  7.33 ns` | `  7.34 ns` | `  9.89 ns` | ` 27.45 ns` |
+| Err.or (reuse)         | `  7.36 ns/iter` | `  7.26 ns` | `  7.26 ns` | `  9.56 ns` | ` 25.85 ns` |
+| Ok.orElse (alloc)      | `  5.89 ns/iter` | `  5.79 ns` | `  5.80 ns` | `  8.13 ns` | ` 31.36 ns` |
+| Err.orElse (alloc)     | `  7.40 ns/iter` | `  6.75 ns` | `  7.06 ns` | ` 13.65 ns` | ` 86.86 ns` |
 
 | • Result - flatten / transpose / match | avg              | min         | p75         | p99         | max         |
 | -------------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Result.flatten                         | `  5.68 ns/iter` | `  5.50 ns` | `  5.64 ns` | `  7.06 ns` | ` 15.68 ns` |
-| Ok(Some).transpose                     | ` 39.74 ns/iter` | ` 28.14 ns` | ` 38.56 ns` | ` 97.10 ns` | `190.42 ns` |
-| Ok(None).transpose                     | ` 23.25 ns/iter` | ` 20.23 ns` | ` 22.67 ns` | ` 75.30 ns` | ` 94.72 ns` |
-| Err.transpose                          | ` 27.32 ns/iter` | ` 20.85 ns` | ` 26.82 ns` | ` 77.78 ns` | ` 95.33 ns` |
-| Ok.match                               | `  7.28 ns/iter` | `  6.07 ns` | `  7.18 ns` | ` 10.34 ns` | ` 82.35 ns` |
-| Err.match                              | `  7.97 ns/iter` | `  6.86 ns` | `  7.79 ns` | ` 10.73 ns` | ` 91.40 ns` |
+| Result.flatten                         | `  9.62 ns/iter` | `  9.49 ns` | `  9.50 ns` | ` 11.86 ns` | ` 24.41 ns` |
+| Ok(Some).transpose                     | ` 41.60 ns/iter` | ` 36.27 ns` | ` 38.82 ns` | `104.87 ns` | `135.35 ns` |
+| Ok(None).transpose                     | ` 26.75 ns/iter` | ` 23.82 ns` | ` 25.05 ns` | ` 87.04 ns` | ` 98.85 ns` |
+| Err.transpose                          | ` 29.12 ns/iter` | ` 25.35 ns` | ` 26.90 ns` | ` 91.39 ns` | `103.19 ns` |
+| Ok.match                               | ` 12.09 ns/iter` | ` 11.37 ns` | ` 11.73 ns` | ` 15.77 ns` | ` 81.00 ns` |
+| Err.match                              | ` 14.11 ns/iter` | ` 13.43 ns` | ` 13.67 ns` | ` 20.43 ns` | ` 88.49 ns` |
 
 | • Result - iter | avg              | min         | p75         | p99         | max         |
 | --------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.iter         | ` 13.11 ns/iter` | `  8.04 ns` | ` 12.87 ns` | ` 19.50 ns` | `111.39 ns` |
-| Err.iter        | `  4.26 ns/iter` | `  4.19 ns` | `  4.23 ns` | `  5.55 ns` | ` 15.06 ns` |
+| Ok.iter         | ` 14.41 ns/iter` | ` 12.76 ns` | ` 13.74 ns` | ` 66.82 ns` | `102.48 ns` |
+| Err.iter        | `  6.64 ns/iter` | `  6.41 ns` | `  6.42 ns` | `  8.89 ns` | ` 23.08 ns` |
 
 | • Result - catchUnwind         | avg              | min         | p75         | p99         | max         |
 | ------------------------------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| catchUnwind (wrap + call, Ok)  | ` 15.56 ns/iter` | ` 12.59 ns` | ` 14.90 ns` | ` 66.95 ns` | `151.40 ns` |
-| catchUnwind (call only, Ok)    | ` 10.11 ns/iter` | `  6.98 ns` | `  9.91 ns` | ` 13.57 ns` | ` 84.99 ns` |
-| catchUnwind (wrap + call, Err) | `723.22 ns/iter` | `646.59 ns` | `717.78 ns` | `948.97 ns` | `  1.05 µs` |
-| catchUnwind (call only, catch) | `699.57 ns/iter` | `557.84 ns` | `714.72 ns` | `792.79 ns` | `837.39 ns` |
+| catchUnwind (wrap + call, Ok)  | ` 19.78 ns/iter` | ` 17.23 ns` | ` 18.37 ns` | ` 80.00 ns` | `139.13 ns` |
+| catchUnwind (call only, Ok)    | ` 13.64 ns/iter` | ` 12.36 ns` | ` 13.02 ns` | ` 56.37 ns` | ` 92.67 ns` |
+| catchUnwind (wrap + call, Err) | `  1.01 µs/iter` | `960.62 ns` | `990.17 ns` | `  1.42 µs` | `  1.43 µs` |
+| catchUnwind (call only, catch) | `989.46 ns/iter` | `889.18 ns` | `989.19 ns` | `  1.09 µs` | `  1.21 µs` |
 
 | • Option - queries    | avg              | min         | p75         | p99         | max         |
 | --------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.isSome()         | `  3.21 ns/iter` | `  2.98 ns` | `  3.29 ns` | `  4.57 ns` | ` 12.85 ns` |
-| None.isSome()         | `  3.30 ns/iter` | `  2.95 ns` | `  3.30 ns` | `  4.61 ns` | ` 10.33 ns` |
-| Some.isNone()         | `  3.22 ns/iter` | `  2.99 ns` | `  3.30 ns` | `  4.64 ns` | `  9.79 ns` |
-| None.isNone()         | `  3.33 ns/iter` | `  3.06 ns` | `  3.32 ns` | `  4.65 ns` | `  9.67 ns` |
-| Some.isSomeAnd (true) | `  3.08 ns/iter` | `  3.01 ns` | `  3.06 ns` | `  4.37 ns` | ` 14.29 ns` |
-| None.isSomeAnd        | `  4.03 ns/iter` | `  3.96 ns` | `  4.01 ns` | `  5.31 ns` | ` 15.61 ns` |
-| Some.isNoneOr (true)  | `  3.14 ns/iter` | `  3.07 ns` | `  3.12 ns` | `  4.43 ns` | ` 12.53 ns` |
-| None.isNoneOr         | `  3.57 ns/iter` | `  3.42 ns` | `  3.56 ns` | `  4.86 ns` | ` 15.41 ns` |
+| Some.isSome()         | `  5.90 ns/iter` | `  5.79 ns` | `  5.81 ns` | `  8.24 ns` | ` 15.14 ns` |
+| None.isSome()         | `  5.87 ns/iter` | `  5.79 ns` | `  5.80 ns` | `  8.06 ns` | ` 13.35 ns` |
+| Some.isNone()         | `  5.89 ns/iter` | `  5.79 ns` | `  5.81 ns` | `  8.13 ns` | ` 16.10 ns` |
+| None.isNone()         | `  5.87 ns/iter` | `  5.79 ns` | `  5.79 ns` | `  8.06 ns` | ` 17.47 ns` |
+| Some.isSomeAnd (true) | `  6.26 ns/iter` | `  6.10 ns` | `  6.11 ns` | ` 10.75 ns` | ` 26.40 ns` |
+| None.isSomeAnd        | `  6.83 ns/iter` | `  6.72 ns` | `  6.72 ns` | `  9.12 ns` | ` 29.71 ns` |
+| Some.isNoneOr (true)  | `  5.88 ns/iter` | `  5.79 ns` | `  5.80 ns` | `  8.03 ns` | ` 27.14 ns` |
+| None.isNoneOr         | `  7.12 ns/iter` | `  7.02 ns` | `  7.03 ns` | `  9.29 ns` | ` 30.75 ns` |
 
 | • Option - unwrap family | avg              | min         | p75         | p99         | max         |
 | ------------------------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.unwrap              | `  2.93 ns/iter` | `  2.82 ns` | `  2.92 ns` | `  4.27 ns` | ` 12.81 ns` |
-| Some.expect              | `  2.91 ns/iter` | `  2.82 ns` | `  2.90 ns` | `  4.23 ns` | ` 16.99 ns` |
-| Some.unwrapOr            | `  2.92 ns/iter` | `  2.84 ns` | `  2.91 ns` | `  4.24 ns` | `  8.22 ns` |
-| None.unwrapOr            | `  3.26 ns/iter` | `  3.06 ns` | `  3.24 ns` | `  4.56 ns` | `  9.49 ns` |
-| Some.unwrapOrElse        | `  5.58 ns/iter` | `  4.08 ns` | `  5.38 ns` | ` 13.81 ns` | ` 85.63 ns` |
-| None.unwrapOrElse        | `  5.95 ns/iter` | `  4.80 ns` | `  5.85 ns` | `  7.78 ns` | ` 87.44 ns` |
+| Some.unwrap              | `  5.58 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.83 ns` | ` 14.49 ns` |
+| Some.expect              | `  5.57 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.88 ns` | ` 15.82 ns` |
+| Some.unwrapOr            | `  5.92 ns/iter` | `  5.79 ns` | `  5.80 ns` | `  8.18 ns` | ` 16.27 ns` |
+| None.unwrapOr            | `  5.56 ns/iter` | `  5.48 ns` | `  5.49 ns` | `  7.76 ns` | ` 14.09 ns` |
+| Some.unwrapOrElse        | `  8.32 ns/iter` | `  7.65 ns` | `  7.94 ns` | ` 15.30 ns` | ` 88.30 ns` |
+| None.unwrapOrElse        | `  8.53 ns/iter` | `  7.95 ns` | `  8.20 ns` | ` 12.07 ns` | ` 85.64 ns` |
 
 | • Option - map family | avg              | min         | p75         | p99         | max         |
 | --------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.map (alloc)      | ` 11.46 ns/iter` | `  8.45 ns` | ` 11.31 ns` | ` 16.29 ns` | ` 86.35 ns` |
-| None.map (alloc)      | `  4.43 ns/iter` | `  4.18 ns` | `  4.24 ns` | `  6.37 ns` | ` 60.63 ns` |
-| Some.mapOr            | `  3.06 ns/iter` | `  2.95 ns` | `  3.04 ns` | `  4.41 ns` | ` 13.05 ns` |
-| None.mapOr            | `  3.53 ns/iter` | `  3.35 ns` | `  3.49 ns` | `  4.85 ns` | ` 38.01 ns` |
-| Some.mapOrElse        | `  7.30 ns/iter` | `  5.83 ns` | `  6.97 ns` | ` 17.19 ns` | ` 88.76 ns` |
-| None.mapOrElse        | `  7.54 ns/iter` | `  6.38 ns` | `  7.41 ns` | `  9.69 ns` | ` 88.43 ns` |
-| Some.inspect          | `  5.27 ns/iter` | `  3.92 ns` | `  5.15 ns` | `  7.13 ns` | ` 87.65 ns` |
-| None.inspect          | `  5.65 ns/iter` | `  4.37 ns` | `  5.52 ns` | `  7.57 ns` | ` 89.26 ns` |
+| Some.map (alloc)      | ` 12.37 ns/iter` | ` 10.88 ns` | ` 11.71 ns` | ` 65.07 ns` | ` 86.41 ns` |
+| None.map (alloc)      | `  6.52 ns/iter` | `  6.41 ns` | `  6.41 ns` | `  8.75 ns` | ` 35.13 ns` |
+| Some.mapOr            | `  5.93 ns/iter` | `  5.79 ns` | `  5.79 ns` | `  8.19 ns` | ` 24.34 ns` |
+| None.mapOr            | `  6.52 ns/iter` | `  6.41 ns` | `  6.41 ns` | `  8.73 ns` | ` 32.09 ns` |
+| Some.mapOrElse        | ` 11.42 ns/iter` | ` 10.73 ns` | ` 11.04 ns` | ` 19.52 ns` | ` 90.38 ns` |
+| None.mapOrElse        | ` 12.55 ns/iter` | ` 11.74 ns` | ` 12.23 ns` | ` 17.74 ns` | `112.83 ns` |
+| Some.inspect          | `  7.75 ns/iter` | `  7.05 ns` | `  7.48 ns` | ` 11.34 ns` | `107.28 ns` |
+| None.inspect          | `  8.59 ns/iter` | `  7.96 ns` | `  8.30 ns` | ` 11.66 ns` | `105.61 ns` |
 
 | • Option - okOr family | avg              | min         | p75         | p99         | max         |
 | ---------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.okOr              | `  8.74 ns/iter` | `  5.71 ns` | `  8.81 ns` | ` 11.79 ns` | ` 78.75 ns` |
-| None.okOr              | `  9.35 ns/iter` | `  6.60 ns` | `  9.17 ns` | ` 12.10 ns` | ` 82.29 ns` |
-| Some.okOrElse          | ` 12.45 ns/iter` | `  9.66 ns` | ` 12.16 ns` | ` 16.88 ns` | ` 90.70 ns` |
-| None.okOrElse          | ` 13.04 ns/iter` | ` 10.52 ns` | ` 12.75 ns` | ` 16.94 ns` | ` 91.47 ns` |
+| Some.okOr              | ` 11.62 ns/iter` | ` 10.21 ns` | ` 11.14 ns` | ` 23.69 ns` | ` 96.66 ns` |
+| None.okOr              | ` 12.27 ns/iter` | ` 11.03 ns` | ` 11.70 ns` | ` 35.21 ns` | ` 83.52 ns` |
+| Some.okOrElse          | ` 16.60 ns/iter` | ` 14.63 ns` | ` 15.55 ns` | ` 72.12 ns` | `137.46 ns` |
+| None.okOrElse          | ` 17.90 ns/iter` | ` 16.23 ns` | ` 17.07 ns` | ` 74.03 ns` | ` 94.75 ns` |
 
 | • Option - combinators     | avg              | min         | p75         | p99         | max         |
 | -------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.and (reuse/optb)      | `  4.03 ns/iter` | `  3.93 ns` | `  4.02 ns` | `  5.33 ns` | ` 15.28 ns` |
-| None.and (alloc)           | `  4.07 ns/iter` | `  3.97 ns` | `  4.06 ns` | `  5.38 ns` | ` 11.93 ns` |
-| Some.andThen (alloc)       | ` 16.16 ns/iter` | ` 11.72 ns` | ` 15.40 ns` | ` 77.92 ns` | `104.32 ns` |
-| None.andThen (alloc)       | `  3.81 ns/iter` | `  3.72 ns` | `  3.78 ns` | `  5.11 ns` | ` 20.76 ns` |
-| Some.filter (true, reuse)  | `  5.44 ns/iter` | `  3.72 ns` | `  5.22 ns` | ` 13.64 ns` | ` 87.17 ns` |
-| Some.filter (false, alloc) | ` 10.81 ns/iter` | `  7.27 ns` | ` 10.53 ns` | ` 14.25 ns` | ` 90.29 ns` |
-| None.filter (alloc)        | `  3.57 ns/iter` | `  3.35 ns` | `  3.57 ns` | `  4.89 ns` | ` 17.75 ns` |
-| Some.or (reuse)            | `  4.07 ns/iter` | `  3.96 ns` | `  4.05 ns` | `  5.39 ns` | ` 12.86 ns` |
-| None.or (reuse/optb)       | `  4.02 ns/iter` | `  3.89 ns` | `  4.01 ns` | `  5.33 ns` | ` 11.87 ns` |
-| Some.orElse (reuse)        | `  3.63 ns/iter` | `  3.54 ns` | `  3.60 ns` | `  4.94 ns` | ` 26.03 ns` |
-| None.orElse (alloc)        | `  6.38 ns/iter` | `  4.89 ns` | `  6.12 ns` | ` 15.10 ns` | ` 88.50 ns` |
-| Some xor None (reuse)      | `  4.73 ns/iter` | `  4.61 ns` | `  4.70 ns` | `  6.04 ns` | ` 19.74 ns` |
-| None xor Some (reuse/optb) | `  4.73 ns/iter` | `  4.63 ns` | `  4.70 ns` | `  6.06 ns` | ` 17.72 ns` |
-| Some xor Some (alloc)      | ` 10.39 ns/iter` | `  8.86 ns` | `  9.91 ns` | ` 29.85 ns` | ` 92.59 ns` |
+| Some.and (reuse/optb)      | `  7.13 ns/iter` | `  7.02 ns` | `  7.03 ns` | `  9.32 ns` | ` 31.93 ns` |
+| None.and (alloc)           | `  7.13 ns/iter` | `  7.02 ns` | `  7.03 ns` | `  9.37 ns` | ` 17.27 ns` |
+| Some.andThen (alloc)       | ` 20.36 ns/iter` | ` 18.22 ns` | ` 19.51 ns` | ` 78.72 ns` | `106.85 ns` |
+| None.andThen (alloc)       | `  6.82 ns/iter` | `  6.72 ns` | `  6.72 ns` | `  8.98 ns` | ` 35.39 ns` |
+| Some.filter (true, reuse)  | `  7.71 ns/iter` | `  7.06 ns` | `  7.37 ns` | ` 12.41 ns` | ` 92.01 ns` |
+| Some.filter (false, alloc) | ` 11.78 ns/iter` | `  9.81 ns` | ` 10.83 ns` | ` 63.91 ns` | `117.55 ns` |
+| None.filter (alloc)        | `  6.81 ns/iter` | `  6.72 ns` | `  6.72 ns` | `  9.01 ns` | ` 37.40 ns` |
+| Some.or (reuse)            | `  7.14 ns/iter` | `  7.02 ns` | `  7.03 ns` | `  9.41 ns` | ` 29.42 ns` |
+| None.or (reuse/optb)       | `  7.12 ns/iter` | `  7.02 ns` | `  7.03 ns` | `  9.32 ns` | ` 23.92 ns` |
+| Some.orElse (reuse)        | `  6.51 ns/iter` | `  6.41 ns` | `  6.41 ns` | `  8.73 ns` | ` 32.25 ns` |
+| None.orElse (alloc)        | ` 10.30 ns/iter` | `  9.55 ns` | `  9.92 ns` | ` 16.47 ns` | ` 84.97 ns` |
+| Some xor None (reuse)      | `  9.35 ns/iter` | `  9.18 ns` | `  9.19 ns` | ` 11.92 ns` | ` 36.09 ns` |
+| None xor Some (reuse/optb) | `  9.95 ns/iter` | `  9.80 ns` | `  9.81 ns` | ` 12.20 ns` | ` 31.76 ns` |
+| Some xor Some (alloc)      | ` 13.78 ns/iter` | ` 12.63 ns` | ` 13.31 ns` | ` 21.85 ns` | `101.63 ns` |
 
 | • Option - mutation             | avg              | min         | p75         | p99         | max         |
 | ------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.insert                     | ` 15.26 ns/iter` | `  8.78 ns` | ` 14.95 ns` | ` 27.27 ns` | ` 87.95 ns` |
-| None.insert                     | ` 11.43 ns/iter` | `  9.69 ns` | ` 11.25 ns` | ` 15.31 ns` | ` 89.86 ns` |
-| Some.getOrInsert (existing)     | ` 11.84 ns/iter` | `  7.33 ns` | ` 11.61 ns` | ` 15.74 ns` | ` 93.77 ns` |
-| None.getOrInsert (insert)       | ` 12.08 ns/iter` | ` 10.30 ns` | ` 11.87 ns` | ` 16.27 ns` | ` 81.75 ns` |
-| Some.getOrInsertWith (existing) | ` 15.20 ns/iter` | ` 13.05 ns` | ` 14.93 ns` | ` 25.31 ns` | ` 94.87 ns` |
-| None.getOrInsertWith (insert)   | ` 15.84 ns/iter` | ` 13.75 ns` | ` 15.48 ns` | ` 30.39 ns` | ` 98.14 ns` |
-| Some.take                       | ` 23.26 ns/iter` | ` 20.41 ns` | ` 22.88 ns` | ` 79.09 ns` | ` 95.34 ns` |
-| None.take                       | ` 15.83 ns/iter` | ` 13.32 ns` | ` 15.49 ns` | ` 27.93 ns` | ` 99.54 ns` |
-| Some.takeIf (true)              | ` 26.14 ns/iter` | ` 20.88 ns` | ` 25.62 ns` | ` 84.76 ns` | `126.16 ns` |
-| Some.takeIf (false)             | ` 21.97 ns/iter` | ` 18.97 ns` | ` 21.52 ns` | ` 78.16 ns` | ` 90.18 ns` |
-| Some.replace                    | ` 27.81 ns/iter` | ` 23.20 ns` | ` 27.47 ns` | ` 86.33 ns` | `107.88 ns` |
-| None.replace                    | ` 20.20 ns/iter` | ` 17.29 ns` | ` 19.79 ns` | ` 77.42 ns` | ` 94.54 ns` |
+| Some.insert                     | `  4.87 ns/iter` | `  4.79 ns` | `  4.79 ns` | `  7.03 ns` | ` 71.70 ns` |
+| None.insert                     | `  5.40 ns/iter` | `  5.32 ns` | `  5.33 ns` | `  7.54 ns` | ` 40.64 ns` |
+| Some.getOrInsert (existing)     | `  5.34 ns/iter` | `  5.17 ns` | `  5.18 ns` | `  7.39 ns` | ` 66.45 ns` |
+| None.getOrInsert (insert)       | ` 13.74 ns/iter` | ` 12.10 ns` | ` 13.10 ns` | ` 65.35 ns` | ` 93.28 ns` |
+| Some.getOrInsertWith (existing) | ` 19.06 ns/iter` | ` 16.97 ns` | ` 18.17 ns` | ` 81.33 ns` | `102.84 ns` |
+| None.getOrInsertWith (insert)   | ` 20.22 ns/iter` | ` 18.05 ns` | ` 19.36 ns` | ` 82.03 ns` | `113.48 ns` |
+| Some.take                       | ` 22.97 ns/iter` | ` 19.99 ns` | ` 21.73 ns` | ` 87.00 ns` | `107.91 ns` |
+| None.take                       | ` 18.00 ns/iter` | ` 15.84 ns` | ` 17.31 ns` | ` 76.80 ns` | ` 91.30 ns` |
+| Some.takeIf (true)              | ` 26.19 ns/iter` | ` 23.11 ns` | ` 24.67 ns` | ` 90.37 ns` | `102.24 ns` |
+| Some.takeIf (false)             | ` 23.52 ns/iter` | ` 20.50 ns` | ` 22.25 ns` | ` 88.38 ns` | `119.40 ns` |
+| Some.replace                    | ` 25.98 ns/iter` | ` 22.80 ns` | ` 24.40 ns` | ` 88.57 ns` | `107.29 ns` |
+| None.replace                    | ` 21.76 ns/iter` | ` 19.31 ns` | ` 20.74 ns` | ` 83.90 ns` | ` 97.80 ns` |
 
 | • Option - flatten / transpose / unzip / match | avg              | min         | p75         | p99         | max         |
 | ---------------------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Option.flatten                                 | `  4.68 ns/iter` | `  4.53 ns` | `  4.66 ns` | `  6.00 ns` | ` 17.50 ns` |
-| Some(Ok).transpose                             | ` 40.15 ns/iter` | ` 31.29 ns` | ` 38.70 ns` | `113.70 ns` | `208.33 ns` |
-| Some(Err).transpose                            | ` 29.91 ns/iter` | ` 23.82 ns` | ` 29.41 ns` | ` 89.62 ns` | `109.08 ns` |
-| None.transpose                                 | ` 22.29 ns/iter` | ` 19.04 ns` | ` 22.01 ns` | ` 81.25 ns` | ` 99.39 ns` |
-| Some.unzip                                     | ` 37.78 ns/iter` | ` 28.14 ns` | ` 37.23 ns` | ` 99.97 ns` | `128.38 ns` |
-| None.unzip                                     | ` 26.03 ns/iter` | ` 21.79 ns` | ` 25.61 ns` | ` 87.09 ns` | `109.36 ns` |
-| Some.match                                     | `  9.67 ns/iter` | `  8.44 ns` | `  9.43 ns` | ` 12.33 ns` | ` 94.83 ns` |
-| None.match                                     | `  9.86 ns/iter` | `  8.31 ns` | `  9.60 ns` | ` 12.36 ns` | ` 98.18 ns` |
+| Option.flatten                                 | `  8.40 ns/iter` | `  8.26 ns` | `  8.27 ns` | ` 11.09 ns` | ` 22.36 ns` |
+| Some(Ok).transpose                             | ` 41.90 ns/iter` | ` 36.39 ns` | ` 39.57 ns` | `114.28 ns` | `148.63 ns` |
+| Some(Err).transpose                            | ` 34.16 ns/iter` | ` 30.00 ns` | ` 32.45 ns` | `103.49 ns` | `140.18 ns` |
+| None.transpose                                 | ` 24.15 ns/iter` | ` 20.90 ns` | ` 22.74 ns` | ` 87.83 ns` | `102.43 ns` |
+| Some.unzip                                     | ` 36.43 ns/iter` | ` 31.36 ns` | ` 34.18 ns` | `102.53 ns` | `117.33 ns` |
+| None.unzip                                     | ` 26.35 ns/iter` | ` 22.65 ns` | ` 25.03 ns` | ` 89.48 ns` | `101.27 ns` |
+| Some.match                                     | ` 14.48 ns/iter` | ` 13.34 ns` | ` 13.95 ns` | ` 26.89 ns` | ` 89.12 ns` |
+| None.match                                     | ` 16.18 ns/iter` | ` 14.61 ns` | ` 15.30 ns` | ` 42.16 ns` | `151.87 ns` |
 
 | • Option - iter | avg              | min         | p75         | p99         | max         |
 | --------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.iter       | ` 12.92 ns/iter` | `  7.61 ns` | ` 13.03 ns` | ` 17.44 ns` | ` 89.11 ns` |
-| None.iter       | `  4.30 ns/iter` | `  4.20 ns` | `  4.26 ns` | `  5.62 ns` | ` 31.04 ns` |
+| Some.iter       | ` 14.67 ns/iter` | ` 12.84 ns` | ` 14.13 ns` | ` 54.62 ns` | ` 93.55 ns` |
+| None.iter       | `  6.62 ns/iter` | `  6.41 ns` | `  6.41 ns` | `  8.75 ns` | ` 37.15 ns` |
 
 | • Async Result - terminal unwrap | avg              | min         | p75         | p99         | max         |
 | -------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| AsyncResult.unwrap (Ok path)     | `162.42 ns/iter` | `150.73 ns` | `156.63 ns` | `288.50 ns` | `381.96 ns` |
-| AsyncResult.unwrap (Err path)    | `156.08 ns/iter` | `149.11 ns` | `155.20 ns` | `236.26 ns` | `247.57 ns` |
+| AsyncResult.unwrap (Ok path)     | `153.80 ns/iter` | `146.93 ns` | `151.24 ns` | `226.23 ns` | `279.96 ns` |
+| AsyncResult.unwrap (Err path)    | `152.59 ns/iter` | `144.54 ns` | `149.56 ns` | `286.12 ns` | `302.90 ns` |
 
 | • Async Result - sync-typed methods | avg              | min         | p75         | p99         | max         |
 | ----------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Result.mapOrElseAsync (Ok path)     | `116.71 ns/iter` | `111.25 ns` | `116.06 ns` | `184.51 ns` | `199.15 ns` |
-| Result.mapOrElseAsync (Err path)    | `116.91 ns/iter` | `111.77 ns` | `115.94 ns` | `191.77 ns` | `210.46 ns` |
-| Result.unwrapOrElseAsync (Ok path)  | `121.55 ns/iter` | `116.21 ns` | `120.81 ns` | `196.87 ns` | `216.42 ns` |
-| Result.unwrapOrElseAsync (Err path) | `116.48 ns/iter` | `110.67 ns` | `115.00 ns` | `192.38 ns` | `204.75 ns` |
+| Result.mapOrElseAsync (Ok path)     | `119.55 ns/iter` | `113.36 ns` | `117.52 ns` | `199.82 ns` | `253.61 ns` |
+| Result.mapOrElseAsync (Err path)    | `123.60 ns/iter` | `117.31 ns` | `121.76 ns` | `194.08 ns` | `259.97 ns` |
+| Result.unwrapOrElseAsync (Ok path)  | `126.94 ns/iter` | `121.85 ns` | `126.29 ns` | `196.71 ns` | `210.10 ns` |
+| Result.unwrapOrElseAsync (Err path) | `119.08 ns/iter` | `114.23 ns` | `118.20 ns` | `188.07 ns` | `240.02 ns` |
 
 | • Async Result - transform methods      | avg              | min         | p75         | p99         | max         |
 | --------------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Ok.mapAsync (alloc AsyncResult)         | `399.49 ns/iter` | `379.59 ns` | `394.71 ns` | `521.64 ns` | `655.41 ns` |
-| Err.mapAsync (alloc AsyncResult)        | `243.74 ns/iter` | `231.99 ns` | `240.48 ns` | `335.22 ns` | `417.22 ns` |
-| Ok.mapErrAsync (alloc AsyncResult)      | `235.83 ns/iter` | `224.60 ns` | `233.02 ns` | `327.51 ns` | `345.97 ns` |
-| Err.mapErrAsync (alloc AsyncResult)     | `392.74 ns/iter` | `377.99 ns` | `388.47 ns` | `482.84 ns` | `562.35 ns` |
-| Ok.inspectAsync (alloc AsyncResult)     | `405.12 ns/iter` | `392.21 ns` | `402.17 ns` | `495.08 ns` | `509.37 ns` |
-| Err.inspectAsync (alloc AsyncResult)    | `236.04 ns/iter` | `224.68 ns` | `233.35 ns` | `321.77 ns` | `370.92 ns` |
-| Ok.inspectErrAsync (alloc AsyncResult)  | `231.57 ns/iter` | `222.15 ns` | `229.24 ns` | `316.87 ns` | `343.77 ns` |
-| Err.inspectErrAsync (alloc AsyncResult) | `400.08 ns/iter` | `384.47 ns` | `396.55 ns` | `492.33 ns` | `527.50 ns` |
-| Ok.andThenAsync (alloc AsyncResult)     | `348.66 ns/iter` | `334.62 ns` | `345.18 ns` | `444.55 ns` | `461.95 ns` |
-| Err.andThenAsync (alloc AsyncResult)    | `243.07 ns/iter` | `231.72 ns` | `240.67 ns` | `327.53 ns` | `368.08 ns` |
-| Ok.orElseAsync (alloc AsyncResult)      | `241.04 ns/iter` | `228.95 ns` | `238.49 ns` | `329.46 ns` | `350.62 ns` |
-| Err.orElseAsync (alloc AsyncResult)     | `342.82 ns/iter` | `329.70 ns` | `339.40 ns` | `431.93 ns` | `484.48 ns` |
+| Ok.mapAsync (alloc AsyncResult)         | `473.45 ns/iter` | `459.46 ns` | `466.46 ns` | `550.60 ns` | `814.22 ns` |
+| Err.mapAsync (alloc AsyncResult)        | `277.91 ns/iter` | `268.56 ns` | `275.17 ns` | `354.70 ns` | `449.37 ns` |
+| Ok.mapErrAsync (alloc AsyncResult)      | `285.02 ns/iter` | `275.22 ns` | `282.05 ns` | `361.91 ns` | `482.90 ns` |
+| Err.mapErrAsync (alloc AsyncResult)     | `467.85 ns/iter` | `453.42 ns` | `463.91 ns` | `549.40 ns` | `559.30 ns` |
+| Ok.inspectAsync (alloc AsyncResult)     | `487.16 ns/iter` | `469.59 ns` | `482.70 ns` | `575.66 ns` | `602.11 ns` |
+| Err.inspectAsync (alloc AsyncResult)    | `262.81 ns/iter` | `255.99 ns` | `258.94 ns` | `337.53 ns` | `374.96 ns` |
+| Ok.inspectErrAsync (alloc AsyncResult)  | `269.96 ns/iter` | `262.49 ns` | `266.35 ns` | `340.65 ns` | `380.01 ns` |
+| Err.inspectErrAsync (alloc AsyncResult) | `478.28 ns/iter` | `464.33 ns` | `474.31 ns` | `549.60 ns` | `564.21 ns` |
+| Ok.andThenAsync (alloc AsyncResult)     | `421.51 ns/iter` | `410.67 ns` | `416.71 ns` | `497.04 ns` | `545.24 ns` |
+| Err.andThenAsync (alloc AsyncResult)    | `274.82 ns/iter` | `266.27 ns` | `270.72 ns` | `350.89 ns` | `452.97 ns` |
+| Ok.orElseAsync (alloc AsyncResult)      | `274.12 ns/iter` | `265.54 ns` | `270.65 ns` | `352.82 ns` | `480.44 ns` |
+| Err.orElseAsync (alloc AsyncResult)     | `422.07 ns/iter` | `409.53 ns` | `418.66 ns` | `505.10 ns` | `522.76 ns` |
 
 | • Async Result - then() wrapping | avg              | min         | p75         | p99         | max         |
 | -------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| AsyncResult.then (await)         | `216.99 ns/iter` | `205.72 ns` | `215.53 ns` | `302.29 ns` | `330.93 ns` |
+| AsyncResult.then (await)         | `259.92 ns/iter` | `248.88 ns` | `256.42 ns` | `377.65 ns` | `397.64 ns` |
 
 | • Async Result - catchUnwindAsync      | avg              | min         | p75         | p99         | max         |
 | -------------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| catchUnwindAsync (wrap + call, Ok)     | `447.97 ns/iter` | `420.92 ns` | `446.23 ns` | `542.92 ns` | `549.00 ns` |
-| catchUnwindAsync (call only, Ok)       | `435.07 ns/iter` | `417.60 ns` | `432.03 ns` | `524.65 ns` | `528.36 ns` |
-| catchUnwindAsync (wrap + call, reject) | `830.27 ns/iter` | `785.23 ns` | `808.49 ns` | `  1.29 µs` | `  1.34 µs` |
-| catchUnwindAsync (call only, reject)   | `793.00 ns/iter` | `742.53 ns` | `790.18 ns` | `894.43 ns` | `909.03 ns` |
+| catchUnwindAsync (wrap + call, Ok)     | `535.53 ns/iter` | `519.94 ns` | `530.77 ns` | `629.50 ns` | `635.54 ns` |
+| catchUnwindAsync (call only, Ok)       | `533.84 ns/iter` | `519.04 ns` | `529.19 ns` | `626.74 ns` | `665.91 ns` |
+| catchUnwindAsync (wrap + call, reject) | `  1.05 µs/iter` | `963.38 ns` | `  1.04 µs` | `  1.42 µs` | `  1.60 µs` |
+| catchUnwindAsync (call only, reject)   | `  1.04 µs/iter` | `973.78 ns` | `  1.04 µs` | `  1.14 µs` | `  1.38 µs` |
 
 | • Async Option - terminal unwrap      | avg              | min         | p75         | p99         | max         |
 | ------------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| AsyncOption.unwrap (Some path)        | `160.15 ns/iter` | `154.36 ns` | `159.05 ns` | `240.82 ns` | `267.09 ns` |
-| AsyncOption.unwrap (None path -> Err) | `  1.08 µs/iter` | `913.59 ns` | `  1.06 µs` | `  1.53 µs` | `  1.55 µs` |
+| AsyncOption.unwrap (Some path)        | `157.75 ns/iter` | `151.59 ns` | `156.66 ns` | `227.84 ns` | `249.67 ns` |
+| AsyncOption.unwrap (None path -> Err) | `  1.21 µs/iter` | `  1.09 µs` | `  1.15 µs` | `  1.74 µs` | `  1.79 µs` |
 
 | • Async Option - sync-typed methods  | avg              | min         | p75         | p99         | max         |
 | ------------------------------------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Option.mapOrElseAsync (Some path)    | `127.66 ns/iter` | `119.55 ns` | `126.37 ns` | `212.19 ns` | `230.41 ns` |
-| Option.mapOrElseAsync (None path)    | `125.18 ns/iter` | `116.74 ns` | `124.33 ns` | `203.48 ns` | `213.04 ns` |
-| Option.unwrapOrElseAsync (Some path) | `129.95 ns/iter` | `122.13 ns` | `128.83 ns` | `212.08 ns` | `224.82 ns` |
-| Option.unwrapOrElseAsync (None path) | `121.82 ns/iter` | `114.65 ns` | `120.74 ns` | `202.24 ns` | `218.62 ns` |
+| Option.mapOrElseAsync (Some path)    | `135.40 ns/iter` | `128.10 ns` | `133.27 ns` | `208.84 ns` | `247.89 ns` |
+| Option.mapOrElseAsync (None path)    | `132.91 ns/iter` | `127.10 ns` | `131.29 ns` | `206.42 ns` | `229.55 ns` |
+| Option.unwrapOrElseAsync (Some path) | `136.76 ns/iter` | `130.13 ns` | `134.97 ns` | `208.97 ns` | `238.57 ns` |
+| Option.unwrapOrElseAsync (None path) | `131.05 ns/iter` | `124.84 ns` | `129.70 ns` | `202.78 ns` | `213.90 ns` |
 
 | • Async Option - transform methods        | avg              | min         | p75         | p99         | max         |
 | ----------------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| Some.mapAsync (alloc AsyncOption)         | `402.09 ns/iter` | `383.39 ns` | `398.29 ns` | `491.47 ns` | `623.98 ns` |
-| None.mapAsync (alloc AsyncOption)         | `244.12 ns/iter` | `232.23 ns` | `240.76 ns` | `334.23 ns` | `386.98 ns` |
-| Some.inspectAsync (alloc AsyncOption)     | `404.83 ns/iter` | `387.51 ns` | `401.12 ns` | `496.80 ns` | `505.30 ns` |
-| None.inspectAsync (alloc AsyncOption)     | `234.59 ns/iter` | `221.65 ns` | `232.25 ns` | `320.90 ns` | `383.28 ns` |
-| Some.andThenAsync (alloc AsyncOption)     | `353.83 ns/iter` | `336.97 ns` | `350.36 ns` | `447.37 ns` | `486.86 ns` |
-| None.andThenAsync (alloc AsyncOption)     | `247.51 ns/iter` | `235.39 ns` | `244.69 ns` | `342.53 ns` | `361.10 ns` |
-| Some.filterAsync true (alloc AsyncOption) | `398.06 ns/iter` | `384.19 ns` | `394.45 ns` | `493.83 ns` | `505.21 ns` |
-| None.filterAsync (alloc AsyncOption)      | `240.67 ns/iter` | `225.92 ns` | `237.96 ns` | `334.56 ns` | `348.33 ns` |
-| Some.orElseAsync (alloc AsyncOption)      | `232.53 ns/iter` | `221.97 ns` | `230.29 ns` | `329.61 ns` | `334.42 ns` |
-| None.orElseAsync (alloc AsyncOption)      | `342.26 ns/iter` | `329.86 ns` | `339.09 ns` | `433.01 ns` | `452.67 ns` |
-| Some.okOrElseAsync (alloc AsyncResult)    | `238.57 ns/iter` | `227.84 ns` | `237.02 ns` | `330.08 ns` | `355.77 ns` |
-| None.okOrElseAsync (alloc AsyncResult)    | `388.80 ns/iter` | `370.31 ns` | `386.35 ns` | `484.21 ns` | `509.65 ns` |
-| Some.getOrInsertWithAsync (existing)      | `129.41 ns/iter` | `121.00 ns` | `128.03 ns` | `211.96 ns` | `238.30 ns` |
-| None.getOrInsertWithAsync (insert)        | `378.67 ns/iter` | `360.08 ns` | `374.99 ns` | `468.13 ns` | `564.66 ns` |
+| Some.mapAsync (alloc AsyncOption)         | `464.29 ns/iter` | `450.14 ns` | `457.81 ns` | `543.83 ns` | `600.88 ns` |
+| None.mapAsync (alloc AsyncOption)         | `275.54 ns/iter` | `265.50 ns` | `272.98 ns` | `354.89 ns` | `369.51 ns` |
+| Some.inspectAsync (alloc AsyncOption)     | `473.12 ns/iter` | `457.60 ns` | `470.03 ns` | `552.56 ns` | `679.75 ns` |
+| None.inspectAsync (alloc AsyncOption)     | `269.34 ns/iter` | `260.61 ns` | `267.11 ns` | `354.18 ns` | `359.64 ns` |
+| Some.andThenAsync (alloc AsyncOption)     | `436.49 ns/iter` | `420.83 ns` | `431.22 ns` | `528.90 ns` | `541.54 ns` |
+| None.andThenAsync (alloc AsyncOption)     | `273.21 ns/iter` | `264.20 ns` | `269.77 ns` | `355.79 ns` | `377.71 ns` |
+| Some.filterAsync true (alloc AsyncOption) | `458.59 ns/iter` | `446.25 ns` | `454.98 ns` | `538.73 ns` | `555.98 ns` |
+| None.filterAsync (alloc AsyncOption)      | `270.08 ns/iter` | `261.41 ns` | `266.70 ns` | `349.75 ns` | `475.20 ns` |
+| Some.orElseAsync (alloc AsyncOption)      | `269.14 ns/iter` | `261.73 ns` | `266.50 ns` | `345.99 ns` | `393.23 ns` |
+| None.orElseAsync (alloc AsyncOption)      | `417.49 ns/iter` | `402.92 ns` | `411.20 ns` | `507.94 ns` | `657.22 ns` |
+| Some.okOrElseAsync (alloc AsyncResult)    | `271.46 ns/iter` | `263.94 ns` | `267.90 ns` | `344.69 ns` | `357.46 ns` |
+| None.okOrElseAsync (alloc AsyncResult)    | `452.32 ns/iter` | `440.51 ns` | `448.40 ns` | `527.08 ns` | `542.06 ns` |
+| Some.getOrInsertWithAsync (existing)      | `137.21 ns/iter` | `130.87 ns` | `135.28 ns` | `211.71 ns` | `267.72 ns` |
+| None.getOrInsertWithAsync (insert)        | `449.48 ns/iter` | `434.38 ns` | `443.67 ns` | `526.62 ns` | `566.44 ns` |
 
 | • Async Option - then() wrapping | avg              | min         | p75         | p99         | max         |
 | -------------------------------- | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| AsyncOption.then (await)         | `222.72 ns/iter` | `212.67 ns` | `220.84 ns` | `311.18 ns` | `332.54 ns` |
+| AsyncOption.then (await)         | `249.38 ns/iter` | `243.95 ns` | `247.14 ns` | `323.72 ns` | `331.88 ns` |
