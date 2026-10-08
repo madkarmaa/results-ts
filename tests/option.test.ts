@@ -359,6 +359,60 @@ describe('Option', () => {
         expect(() => Some(42).transpose()).toThrow(TransposeError);
     });
 
+    test('zip', () => {
+        expect(Some(42).zip(Some('hello')).unwrap()).toEqual([42, 'hello']);
+        expect(Some(42).zip(None<string>()).isNone()).toBe(true);
+        expect(None<number>().zip(Some('hello')).isNone()).toBe(true);
+        expect(None<number>().zip(None<string>()).isNone()).toBe(true);
+        expect(Some(null).zip(Some(undefined)).unwrap()).toEqual([
+            null,
+            undefined
+        ]);
+    });
+
+    test('zip preserves both options and their value references', () => {
+        const value = { id: 42 };
+        const left = Some(value);
+        const right = Some('hello');
+        const zipped = left.zip(right);
+
+        expect(zipped.unwrap()[0]).toBe(value);
+        expect(left.unwrap()).toBe(value);
+        expect(right.unwrap()).toBe('hello');
+
+        const [a, b] = zipped.unzip();
+        expect(a.unwrap()).toBe(value);
+        expect(b.unwrap()).toBe('hello');
+
+        zipped.take();
+        expect(left.unwrap()).toBe(value);
+        expect(right.unwrap()).toBe('hello');
+    });
+
+    test('zip accepts a duck-typed Option and short-circuits None', () => {
+        const other = { _isSome: true, unwrap: () => 'hello' };
+        // @ts-expect-error - only the members used by zip are supplied
+        expect(Some(42).zip(other).unwrap()).toEqual([42, 'hello']);
+
+        const unreadable = {
+            _isSome: true,
+            unwrap: () => {
+                throw new Error('must not unwrap');
+            }
+        };
+        // @ts-expect-error - only the members used by zip are supplied
+        expect(None<number>().zip(unreadable).isNone()).toBe(true);
+    });
+
+    test('zip rejects invalid arguments', () => {
+        // @ts-expect-error - zip requires an Option
+        expect(() => Some(42).zip({})).toThrow(InvalidArgumentError);
+        // @ts-expect-error - zip requires a boolean discriminator
+        expect(() => None<number>().zip({ _isSome: 'yes' })).toThrow(
+            InvalidArgumentError
+        );
+    });
+
     test('unzip', () => {
         const [a, b] = Some([42, 'hello'] as [number, string]).unzip();
         expect(a.unwrap()).toBe(42);
