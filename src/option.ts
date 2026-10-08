@@ -590,7 +590,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     and<U>(
         optb: Option<U> | PromiseLike<Option<U>>
     ): Option<U> | AsyncOption<U> {
-        if (isPromiseLike(optb))
+        if (!(optb instanceof OptionImpl) && isPromiseLike(optb))
             return this.#combineAsync(optb, (current, other) =>
                 current.and(other)
             );
@@ -667,7 +667,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     or<T2>(
         optb: Option<T2> | PromiseLike<Option<T2>>
     ): Option<T | T2> | AsyncOption<T | T2> {
-        if (isPromiseLike(optb))
+        if (!(optb instanceof OptionImpl) && isPromiseLike(optb))
             return this.#combineAsync(optb, (current, other) =>
                 current.or(other)
             );
@@ -707,7 +707,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     xor<T2>(
         optb: Option<T2> | PromiseLike<Option<T2>>
     ): Option<T | T2> | AsyncOption<T | T2> {
-        if (isPromiseLike(optb))
+        if (!(optb instanceof OptionImpl) && isPromiseLike(optb))
             return this.#combineAsync(optb, (current, other) =>
                 current.xor(other)
             );
@@ -886,7 +886,7 @@ class OptionImpl<T> implements OptionMethods<T> {
     zip<U>(
         other: Option<U> | PromiseLike<Option<U>>
     ): Option<[T, U]> | AsyncOption<[T, U]> {
-        if (isPromiseLike(other))
+        if (!(other instanceof OptionImpl) && isPromiseLike(other))
             return this.#combineAsync(other, (current, other) =>
                 current.zip(other)
             );
@@ -915,10 +915,10 @@ class OptionImpl<T> implements OptionMethods<T> {
     ): AsyncOption<R> {
         const state = this.#state;
         const current = isRight(state) ? Some(state.right) : None<T>();
+        const resolved =
+            other instanceof AsyncOptionImpl ? other : Promise.resolve(other);
         return new AsyncOptionImpl(
-            Promise.resolve(other).then((resolved) =>
-                combine(current, resolved)
-            )
+            resolved.then((other) => combine(current, other))
         );
     }
 

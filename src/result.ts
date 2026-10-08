@@ -594,7 +594,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     and<U, E2>(
         res: Result<U, E2> | PromiseLike<Result<U, E2>>
     ): Result<U, E | E2> | AsyncResult<U, E | E2> {
-        if (isPromiseLike(res))
+        if (!(res instanceof ResultImpl) && isPromiseLike(res))
             return this.#combineAsync(res, (current, other) =>
                 current.and(other)
             );
@@ -643,7 +643,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     or<T2, F>(
         res: Result<T2, F> | PromiseLike<Result<T2, F>>
     ): Result<T | T2, F> | AsyncResult<T | T2, F> {
-        if (isPromiseLike(res))
+        if (!(res instanceof ResultImpl) && isPromiseLike(res))
             return this.#combineAsync(res, (current, other) =>
                 current.or(other)
             );
@@ -738,8 +738,10 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         other: PromiseLike<Result<U, F>>,
         combine: (current: Result<T, E>, other: Result<U, F>) => Result<R, G>
     ): AsyncResult<R, G> {
+        const resolved =
+            other instanceof AsyncResultImpl ? other : Promise.resolve(other);
         return new AsyncResultImpl(
-            Promise.resolve(other).then((resolved) => combine(this, resolved))
+            resolved.then((other) => combine(this, other))
         );
     }
 

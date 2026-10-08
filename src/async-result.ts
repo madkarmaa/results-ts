@@ -338,14 +338,9 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     and<U, E2>(
         res: Result<U, E2> | PromiseLike<Result<U, E2>>
     ): AsyncResult<U, E | E2> {
-        return new AsyncResultImpl(
-            isPromiseLike(res)
-                ? Promise.all([
-                      this.promise,
-                      res instanceof AsyncResultImpl ? res.promise : res
-                  ]).then(([value, resolved]) => value.and(resolved))
-                : this.then((value) => value.and(res))
-        );
+        if (isPromiseLike(res))
+            return this.#combineAsync(res, (left, right) => left.and(right));
+        return new AsyncResultImpl(this.then((r) => r.and(res)));
     }
 
     andThen<U, F>(f: (val: T) => Result<U, F>): AsyncResult<U, E | F> {
@@ -361,13 +356,20 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     or<T2, F>(
         res: Result<T2, F> | PromiseLike<Result<T2, F>>
     ): AsyncResult<T | T2, F> {
+        if (isPromiseLike(res))
+            return this.#combineAsync(res, (left, right) => left.or(right));
+        return new AsyncResultImpl(this.then((r) => r.or(res)));
+    }
+
+    #combineAsync<U, F, R, G>(
+        other: PromiseLike<Result<U, F>>,
+        combine: (left: Result<T, E>, right: Result<U, F>) => Result<R, G>
+    ): AsyncResult<R, G> {
         return new AsyncResultImpl(
-            isPromiseLike(res)
-                ? Promise.all([
-                      this.promise,
-                      res instanceof AsyncResultImpl ? res.promise : res
-                  ]).then(([value, resolved]) => value.or(resolved))
-                : this.then((value) => value.or(res))
+            Promise.all([
+                this.promise,
+                other instanceof AsyncResultImpl ? other.promise : other
+            ]).then(([left, right]) => combine(left, right))
         );
     }
 
