@@ -1,3 +1,23 @@
+## [4.3.1](https://github.com/madkarmaa/results-ts/compare/v4.3.0...v4.3.1) (2026-10-09)
+
+### Documentation
+
+- add installable results-ts skill ([c5bca33](https://github.com/madkarmaa/results-ts/commit/c5bca330a08fd1dbb8f523ed21e80474caee998a))
+- prefer llms.txt in results-ts skill ([5b44546](https://github.com/madkarmaa/results-ts/commit/5b4454646a9d0b190346229383071587ec1aff0e))
+- regenerate API reference ([8980271](https://github.com/madkarmaa/results-ts/commit/8980271f9f0195323cfe64fe770008385e4c37f6))
+- require tests and benchmarks for new features ([3a45a14](https://github.com/madkarmaa/results-ts/commit/3a45a14824cafcf90245f4d990a20200ddf3a8c1))
+- restrict exception adapters to unavoidable external failures ([82bcd1b](https://github.com/madkarmaa/results-ts/commit/82bcd1b3d24238fd0b35175ca7b5e7b534ec52c0))
+- simplify documentation and comments ([493f3f8](https://github.com/madkarmaa/results-ts/commit/493f3f8eafc3c624562921c2d6fcb76392af4130))
+- simplify results-ts skill prose ([081d952](https://github.com/madkarmaa/results-ts/commit/081d9527b37c7999ff98eb6eea9e7eb49a4c61bb))
+
+### Performance Improvements
+
+- allocate option insertion bookkeeping lazily ([7a47964](https://github.com/madkarmaa/results-ts/commit/7a479646ac4574aac0406bc0750eef972bdcc5b5))
+- reduce async kickoff allocations ([6304f43](https://github.com/madkarmaa/results-ts/commit/6304f43ac36a6620fb98f9047ce2cc15a82d007e))
+- share immutable result state in fresh wrappers ([61622af](https://github.com/madkarmaa/results-ts/commit/61622afd15e078cb5fc60d2e7070effc78c4821a))
+- simplify async insertion cleanup ([c2b7584](https://github.com/madkarmaa/results-ts/commit/c2b75843714c9c4ece1aa39fa325bcf60824af1c))
+- store option payloads without intermediate objects ([a98eee9](https://github.com/madkarmaa/results-ts/commit/a98eee9c8448fd2b0cffdc2e7124d79ed1ec4133))
+
 ## [4.3.1-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.3.0...v4.3.1-canary.1) (2026-10-09)
 
 ### Performance Improvements
