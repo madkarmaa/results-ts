@@ -27,7 +27,6 @@ import { Ok, Err } from 'results-ts';
 
 const loadUser = async (id: number) => {
     if (id === 13) return Err({ code: 'NOT_FOUND', id } as const);
-
     return Ok({ id, name: 'Ada' });
 };
 
@@ -38,6 +37,8 @@ const name = await Ok(1)
 ```
 
 Methods such as [`AsyncResult.unwrapOr()`](../api/interfaces/AsyncResult.md#unwrapor) return a `Promise` of the contained value or fallback. The example awaits that promise to get a string. Use [`AsyncResult.match()`](../api/interfaces/AsyncResult.md#match) to handle each variant with a function.
+
+Callbacks in ordinary chains do not convert thrown errors or rejected promises to `Err`. Those failures propagate. Return `Err` for recoverable failures, or see [Exception adapters](./error-handling.md#exception-adapters) for an unavoidable throwing boundary.
 
 ## Panics become rejections
 

@@ -1,6 +1,6 @@
 # Error handling
 
-Use `Result` for expected failures. Panic errors and argument validation errors indicate bugs in the calling code.
+Use [`Result`](../api/type-aliases/Result.md) for expected failures. Panic errors and argument validation errors indicate bugs in the calling code.
 
 ## Panics
 
@@ -39,61 +39,34 @@ Methods that accept callbacks or operands validate their types at runtime. Inval
 
 The library does not export `PanicError`, `InvalidArgumentError`, or its other internal error classes. Use [`Result`](../api/type-aliases/Result.md) for expected failures and [`Option`](../api/type-aliases/Option.md) for absent values.
 
-## catchUnwind
+## Exception adapters
 
-Use [`catchUnwind`](../api/functions/catchUnwind.md) or [`catchUnwindAsync`](../api/functions/catchUnwindAsync.md) to convert exceptions from existing code into [`Result`](../api/type-aliases/Result.md) values. New functions with expected failures should return `Result` directly.
+Avoid [`catchUnwind`](../api/functions/catchUnwind.md) and
+[`catchUnwindAsync`](../api/functions/catchUnwindAsync.md). Use either only as a
+last resort when an external dependency or platform API inevitably throws or
+rejects, you cannot change that behavior, and no nonthrowing or
+[`Result`](../api/type-aliases/Result.md)-returning API is available. Some Node
+APIs require this exception.
 
-[`catchUnwind`](../api/functions/catchUnwind.md) wraps a synchronous function and turns a throw into an [`Err`](../api/functions/Err.md). Its optional [`onThrow`](../api/functions/catchUnwind.md#onthrow) handler can normalize JavaScript's `unknown` thrown value into a typed error.
+Do not use these adapters for code you control, routine failures, general
+`try`/`catch`, or just to create a [`Result`](../api/type-aliases/Result.md) or
+[`AsyncResult`](../api/interfaces/AsyncResult.md). Return [`Err`](../api/functions/Err.md)
+for recoverable failures in your own code, including invalid input and HTTP
+status failures. Keep any unavoidable adapter at the external call boundary,
+and use its `onThrow` handler to map the unknown thrown value to a specific
+error type.
+
+For reference, this is how to adapt a legacy boundary that must keep a throwing
+`JSON.parse` call:
 
 ```typescript
 import { catchUnwind } from 'results-ts';
 
-const parseJson = (text: string): unknown => JSON.parse(text);
-
-const safeParse = catchUnwind(parseJson, (thrown) =>
-    thrown instanceof Error ? thrown.message : 'parse error'
+const parseLegacyJson = catchUnwind(
+    (text: string): unknown => JSON.parse(text),
+    (thrown) => (thrown instanceof Error ? thrown.message : 'Invalid JSON')
 );
-
-safeParse('{"a":1}'); // Ok({ a: 1 })
-safeParse('{bad'); // Err('Unexpected token ...')
 ```
-
-Without an [`onThrow`](../api/functions/catchUnwind.md#onthrow) handler, the caught error type remains `unknown`, because JavaScript allows throwing any value:
-
-```typescript
-import { catchUnwind } from 'results-ts';
-
-const unsafe = catchUnwind(() => {
-    throw 'literal string';
-});
-
-const result = unsafe();
-//    ^? Result<never, unknown>
-```
-
-[`catchUnwindAsync`](../api/functions/catchUnwindAsync.md) captures both synchronous throws and rejected promises and returns an [`AsyncResult`](../api/interfaces/AsyncResult.md):
-
-```typescript
-import { catchUnwindAsync } from 'results-ts';
-
-const readJson = async (response: Response): Promise<unknown> =>
-    response.json();
-
-const safeFetch = catchUnwindAsync(
-    async (url: string) => {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return readJson(response);
-    },
-    (thrown) => (thrown instanceof Error ? thrown.message : 'request failed')
-);
-
-const result = await safeFetch('https://api.example.com');
-//    ^? Result<unknown, string>
-```
-
-> [!NOTE]
-> The [`onThrow`](../api/functions/catchUnwind.md#onthrow) handler receives the thrown value and the original call arguments. Its signature is [`(thrown, ...args) => E`](../api/functions/catchUnwind.md#onthrow).
 
 ## How this differs from Rust
 

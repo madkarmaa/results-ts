@@ -18,6 +18,12 @@ import { isOptionOperand, isAsyncOptionOperand } from './utils';
  */
 export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
+     * Resolves to the contained option's string representation.
+     * Call with `await option.toString()`; implicit string conversion does not await it.
+     */
+    toString(): Promise<string>;
+
+    /**
      * Returns a `Promise` that resolves to `true` if the option is a `Some` value.
      */
     isSome(): Promise<boolean>;
@@ -122,6 +128,12 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E>;
 
     /**
+     * Returns an async iterator that yields the `Some` value once, or nothing for `None`.
+     * Promise-like payloads are awaited. Source and payload rejections propagate.
+     */
+    iter(): AsyncIterableIterator<Awaited<T>, undefined, unknown>;
+
+    /**
      * Returns `None` if the option is `None`, otherwise returns `optb`.
      */
     and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U>;
@@ -209,6 +221,10 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
 
 export class AsyncOptionImpl<T> implements AsyncOption<T> {
     constructor(private readonly promise: PromiseLike<Option<T>>) {}
+
+    toString(): Promise<string> {
+        return this.then((opt) => opt.toString());
+    }
 
     then<TResult1 = Option<T>, TResult2 = never>(
         onfulfilled?:
@@ -300,6 +316,11 @@ export class AsyncOptionImpl<T> implements AsyncOption<T> {
 
     okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((opt) => opt.okOrElseAsync(errF)));
+    }
+
+    async *iter(): AsyncIterableIterator<Awaited<T>, undefined, unknown> {
+        const opt = await this.promise;
+        if (opt.isSome()) yield opt.unwrap();
     }
 
     and<U>(optb: Option<U> | PromiseLike<Option<U>>): AsyncOption<U> {

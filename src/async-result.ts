@@ -15,6 +15,12 @@ import { ASYNC_START, isResultOperand, isAsyncResultOperand } from './utils';
  */
 export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     /**
+     * Resolves to the contained result's string representation.
+     * Call with `await result.toString()`; implicit string conversion does not await it.
+     */
+    toString(): Promise<string>;
+
+    /**
      * Returns a `Promise` that resolves to `true` if the result is `Ok`.
      */
     isOk(): Promise<boolean>;
@@ -111,6 +117,12 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
      * Async version of `inspectErr`. Calls an async function with a reference to the contained value if `Err`, then returns the original result.
      */
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E>;
+
+    /**
+     * Returns an async iterator that yields the `Ok` value once, or nothing for `Err`.
+     * Promise-like payloads are awaited. Source and payload rejections propagate.
+     */
+    iter(): AsyncIterableIterator<Awaited<T>, undefined, unknown>;
 
     /**
      * Returns the contained `Ok` value.
@@ -224,6 +236,10 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     constructor(private readonly promise: PromiseLike<Result<T, E>>) {}
 
+    toString(): Promise<string> {
+        return this.then((res) => res.toString());
+    }
+
     then<TResult1 = Result<T, E>, TResult2 = never>(
         onfulfilled?:
             | ((value: Result<T, E>) => TResult1 | PromiseLike<TResult1>)
@@ -306,6 +322,11 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
 
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.inspectErrAsync(f)));
+    }
+
+    async *iter(): AsyncIterableIterator<Awaited<T>, undefined, unknown> {
+        const res = await this.promise;
+        if (res.isOk()) yield res.unwrap();
     }
 
     expect(msg: string): Promise<T> {

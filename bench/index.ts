@@ -10,6 +10,7 @@ import './result.async';
 import './option.async';
 import './combinators';
 import './async-wrappers';
+import './async-iteration';
 import './edge-cases';
 import './state-clones';
 import './workloads';

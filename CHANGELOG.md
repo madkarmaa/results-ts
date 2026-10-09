@@ -1,3 +1,15 @@
+# [4.4.0-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.3.1...v4.4.0-canary.1) (2026-10-09)
+
+### Documentation
+
+- clarify async callback failures ([ead1ba3](https://github.com/madkarmaa/results-ts/commit/ead1ba336c79cd0bec44fbe64c2fcca4a951574c))
+- simplify docs ([934c873](https://github.com/madkarmaa/results-ts/commit/934c8733c55a76b48c93f1a436db07f8ab57c344))
+
+### Features
+
+- add async iteration ([bae6b0c](https://github.com/madkarmaa/results-ts/commit/bae6b0c33e121f4837695253330653c4e6991b84))
+- add async string formatting ([d1b8237](https://github.com/madkarmaa/results-ts/commit/d1b8237317801f4cd176f4c6451c5f823db6add5))
+
 ## [4.3.1](https://github.com/madkarmaa/results-ts/compare/v4.3.0...v4.3.1) (2026-10-09)
 
 ### Documentation
