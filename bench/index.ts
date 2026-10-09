@@ -9,6 +9,10 @@ import './option';
 import './result.async';
 import './option.async';
 import './combinators';
+import './async-wrappers';
+import './edge-cases';
+import './state-clones';
+import './workloads';
 
 // ---------------------------------------------------------------------------
 // Runner modes
