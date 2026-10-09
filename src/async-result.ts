@@ -15,6 +15,12 @@ import { ASYNC_START, isResultOperand, isAsyncResultOperand } from './utils';
  */
 export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     /**
+     * Resolves to the contained result's string representation.
+     * Call with `await result.toString()`; implicit string conversion does not await it.
+     */
+    toString(): Promise<string>;
+
+    /**
      * Returns a `Promise` that resolves to `true` if the result is `Ok`.
      */
     isOk(): Promise<boolean>;
@@ -223,6 +229,10 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
 export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
     constructor(private readonly promise: PromiseLike<Result<T, E>>) {}
+
+    toString(): Promise<string> {
+        return this.then((res) => res.toString());
+    }
 
     then<TResult1 = Result<T, E>, TResult2 = never>(
         onfulfilled?:

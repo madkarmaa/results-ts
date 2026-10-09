@@ -18,6 +18,7 @@ for (const [variant, input] of [
         2
     ]);
     const operations = {
+        toString: () => option.toString(),
         then: () => option.then((value) => value),
         isSome: () => option.isSome(),
         isSomeAnd: () => option.isSomeAnd(gt0),
@@ -86,6 +87,7 @@ for (const [variant, input] of [
     const nested = input.mapAsync(async (value) => Ok(value));
     const transposed = input.mapAsync(async (value) => Some(value));
     const operations = {
+        toString: () => result.toString(),
         then: () => result.then((value) => value),
         isOk: () => result.isOk(),
         isOkAnd: () => result.isOkAnd(gt0),

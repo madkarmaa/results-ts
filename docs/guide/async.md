@@ -39,6 +39,20 @@ const name = await Ok(1)
 
 Methods such as [`AsyncResult.unwrapOr()`](../api/interfaces/AsyncResult.md#unwrapor) return a `Promise` of the contained value or fallback. The example awaits that promise to get a string. Use [`AsyncResult.match()`](../api/interfaces/AsyncResult.md#match) to handle each variant with a function.
 
+## Formatting
+
+```typescript
+import { Some } from 'results-ts';
+
+const option = Some(21).mapAsync(async (n) => n * 2);
+
+console.log(await option.toString()); // Some(42)
+```
+
+`toString()` returns a `Promise<string>` using the resolved container's formatting.
+Call it explicitly and await it. Implicit conversion through `String(wrapper)` or
+template literals does not await it and does not produce the container's text.
+
 ## Panics become rejections
 
 [`Result.unwrap()`](../api/interfaces/ResultMethods.md#unwrap) and [`Result.expect()`](../api/interfaces/ResultMethods.md#expect) throw on `Err`. [`Result.unwrapErr()`](../api/interfaces/ResultMethods.md#unwraperr) and [`Result.expectErr()`](../api/interfaces/ResultMethods.md#expecterr) throw on `Ok`.

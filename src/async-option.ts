@@ -18,6 +18,12 @@ import { isOptionOperand, isAsyncOptionOperand } from './utils';
  */
 export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
+     * Resolves to the contained option's string representation.
+     * Call with `await option.toString()`; implicit string conversion does not await it.
+     */
+    toString(): Promise<string>;
+
+    /**
      * Returns a `Promise` that resolves to `true` if the option is a `Some` value.
      */
     isSome(): Promise<boolean>;
@@ -209,6 +215,10 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
 
 export class AsyncOptionImpl<T> implements AsyncOption<T> {
     constructor(private readonly promise: PromiseLike<Option<T>>) {}
+
+    toString(): Promise<string> {
+        return this.then((opt) => opt.toString());
+    }
 
     then<TResult1 = Option<T>, TResult2 = never>(
         onfulfilled?:
