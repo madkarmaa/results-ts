@@ -8,7 +8,7 @@
 
 > **Result**\<`T`, `E`\> = [`OkResult`](OkResult.md)\<`T`, `E`\> \| [`ErrResult`](ErrResult.md)\<`T`, `E`\>
 
-Defined in: [result.ts:49](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L49)
+Defined in: [result.ts:49](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L49)
 
 `Result<T, E>` is either `Ok(value)` with a value of type `T`, or
 `Err(error)` with an error of type `E`. Return it for recoverable failures.

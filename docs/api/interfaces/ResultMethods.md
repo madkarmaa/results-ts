@@ -6,7 +6,7 @@
 
 # Interface: ResultMethods\<T, E\>
 
-Defined in: [result.ts:51](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L51)
+Defined in: [result.ts:51](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L51)
 
 ## Type Parameters
 
@@ -26,7 +26,7 @@ Defined in: [result.ts:51](https://github.com/madkarmaa/results-ts/blob/493f3f8e
 
 > **and**\<`U`, `E2`\>(`res`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `E2`\>
 
-Defined in: [result.ts:194](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L194)
+Defined in: [result.ts:194](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L194)
 
 Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -56,7 +56,7 @@ JavaScript evaluates the operand before the call. Use `andThen` to compute it on
 
 > **and**\<`U`, `E2`\>(`res`): [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `E2`\>
 
-Defined in: [result.ts:195](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L195)
+Defined in: [result.ts:195](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L195)
 
 ##### Type Parameters
 
@@ -82,7 +82,7 @@ Defined in: [result.ts:195](https://github.com/madkarmaa/results-ts/blob/493f3f8
 
 > **and**\<`U`, `E2`\>(`res`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `E2`\> \| [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `E2`\>
 
-Defined in: [result.ts:196](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L196)
+Defined in: [result.ts:196](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L196)
 
 ##### Type Parameters
 
@@ -110,7 +110,7 @@ Defined in: [result.ts:196](https://github.com/madkarmaa/results-ts/blob/493f3f8
 
 > **andThen**\<`U`, `F`\>(`f`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `F`\>
 
-Defined in: [result.ts:203](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L203)
+Defined in: [result.ts:203](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L203)
 
 Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -140,7 +140,7 @@ Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
 > **andThenAsync**\<`U`, `F`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `F`\>
 
-Defined in: [result.ts:208](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L208)
+Defined in: [result.ts:208](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L208)
 
 Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -170,7 +170,7 @@ Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise 
 
 > **err**(): [`Option`](../type-aliases/Option.md)\<`E`\>
 
-Defined in: [result.ts:88](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L88)
+Defined in: [result.ts:88](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L88)
 
 Converts from `Result<T, E>` to `Option<E>`.
 
@@ -186,7 +186,7 @@ Returns `Some` for `Err` and `None` for `Ok`.
 
 > **expect**(`msg`): `T`
 
-Defined in: [result.ts:166](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L166)
+Defined in: [result.ts:166](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L166)
 
 Returns the contained `Ok` value.
 
@@ -210,7 +210,7 @@ Returns the contained `Ok` value.
 
 > **expectErr**(`msg`): `E`
 
-Defined in: [result.ts:180](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L180)
+Defined in: [result.ts:180](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L180)
 
 Returns the contained `Err` value.
 
@@ -234,7 +234,7 @@ Returns the contained `Err` value.
 
 > **flatten**\<`U`, `F`\>(`this`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `F`\>
 
-Defined in: [result.ts:257](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L257)
+Defined in: [result.ts:257](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L257)
 
 Unwraps one nested `Result`. The return type includes both error types.
 
@@ -268,7 +268,7 @@ Unwraps one nested `Result`. The return type includes both error types.
 
 > **inspect**(`f`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:135](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L135)
+Defined in: [result.ts:135](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L135)
 
 Calls a function with a reference to the contained value if `Ok`.
 
@@ -290,7 +290,7 @@ Returns the original result.
 
 > **inspectAsync**(`f`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [result.ts:140](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L140)
+Defined in: [result.ts:140](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L140)
 
 Async version of `inspect`. Calls an async function with a reference to the contained value if `Ok`, then returns the original result.
 
@@ -310,7 +310,7 @@ Async version of `inspect`. Calls an async function with a reference to the cont
 
 > **inspectErr**(`f`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:147](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L147)
+Defined in: [result.ts:147](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L147)
 
 Calls a function with a reference to the contained value if `Err`.
 
@@ -332,7 +332,7 @@ Returns the original result.
 
 > **inspectErrAsync**(`f`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [result.ts:152](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L152)
+Defined in: [result.ts:152](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L152)
 
 Async version of `inspectErr`. Calls an async function with a reference to the contained value if `Err`, then returns the original result.
 
@@ -352,7 +352,7 @@ Async version of `inspectErr`. Calls an async function with a reference to the c
 
 > **isErr**(): `this is ErrResult<never, E>`
 
-Defined in: [result.ts:68](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L68)
+Defined in: [result.ts:68](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L68)
 
 Returns `true` if the result is `Err`.
 
@@ -368,7 +368,7 @@ Returns `true` if the result is `Err`.
 
 > **isErrAnd**\<`F`\>(`f`): `this is ErrResult<T, F>`
 
-Defined in: [result.ts:73](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L73)
+Defined in: [result.ts:73](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L73)
 
 Returns `true` if the result is `Err` and its value matches the predicate.
 
@@ -392,7 +392,7 @@ Returns `true` if the result is `Err` and its value matches the predicate.
 
 > **isErrAnd**(`f`): `this is ErrResult<T, E>`
 
-Defined in: [result.ts:74](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L74)
+Defined in: [result.ts:74](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L74)
 
 ##### Parameters
 
@@ -410,7 +410,7 @@ Defined in: [result.ts:74](https://github.com/madkarmaa/results-ts/blob/493f3f8e
 
 > **isOk**(): `this is OkResult<T, never>`
 
-Defined in: [result.ts:57](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L57)
+Defined in: [result.ts:57](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L57)
 
 Returns `true` if the result is `Ok`.
 
@@ -426,7 +426,7 @@ Returns `true` if the result is `Ok`.
 
 > **isOkAnd**\<`U`\>(`f`): `this is OkResult<U, E>`
 
-Defined in: [result.ts:62](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L62)
+Defined in: [result.ts:62](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L62)
 
 Returns `true` if the result is `Ok` and its value matches the predicate.
 
@@ -450,7 +450,7 @@ Returns `true` if the result is `Ok` and its value matches the predicate.
 
 > **isOkAnd**(`f`): `this is OkResult<T, E>`
 
-Defined in: [result.ts:63](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L63)
+Defined in: [result.ts:63](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L63)
 
 ##### Parameters
 
@@ -468,7 +468,7 @@ Defined in: [result.ts:63](https://github.com/madkarmaa/results-ts/blob/493f3f8e
 
 > **iter**(): `Iterable`\<`T`\>
 
-Defined in: [result.ts:159](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L159)
+Defined in: [result.ts:159](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L159)
 
 Returns an iterator over the contained value, or an empty iterator if absent.
 
@@ -484,7 +484,7 @@ The iterator yields one value if the result is `Ok`, otherwise none.
 
 > **map**\<`U`\>(`f`): [`Result`](../type-aliases/Result.md)\<`U`, `E`\>
 
-Defined in: [result.ts:93](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L93)
+Defined in: [result.ts:93](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L93)
 
 Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
 
@@ -510,7 +510,7 @@ Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `O
 
 > **mapAsync**\<`U`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`U`, `E`\>
 
-Defined in: [result.ts:98](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L98)
+Defined in: [result.ts:98](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L98)
 
 Async version of `map`. Maps a `Result<T, E>` to `AsyncResult<U, E>` by applying an async function to a contained `Ok` value, leaving an `Err` value untouched.
 
@@ -536,7 +536,7 @@ Async version of `map`. Maps a `Result<T, E>` to `AsyncResult<U, E>` by applying
 
 > **mapErr**\<`F`\>(`f`): [`Result`](../type-aliases/Result.md)\<`T`, `F`\>
 
-Defined in: [result.ts:123](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L123)
+Defined in: [result.ts:123](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L123)
 
 Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
 
@@ -562,7 +562,7 @@ Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `E
 
 > **mapErrAsync**\<`F`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`T`, `F`\>
 
-Defined in: [result.ts:128](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L128)
+Defined in: [result.ts:128](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L128)
 
 Async version of `mapErr`. Maps a `Result<T, E>` to `AsyncResult<T, F>` by applying an async function to a contained `Err` value, leaving an `Ok` value untouched.
 
@@ -588,7 +588,7 @@ Async version of `mapErr`. Maps a `Result<T, E>` to `AsyncResult<T, F>` by apply
 
 > **mapOr**\<`U`\>(`fallback`, `f`): `U`
 
-Defined in: [result.ts:105](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L105)
+Defined in: [result.ts:105](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L105)
 
 Returns the fallback on `Err`, or calls `f` with the `Ok` value.
 
@@ -620,7 +620,7 @@ JavaScript evaluates the fallback before the call. Use `mapOrElse` to compute it
 
 > **mapOrElse**\<`U`\>(`fallbackFn`, `f`): `U`
 
-Defined in: [result.ts:110](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L110)
+Defined in: [result.ts:110](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L110)
 
 Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
 
@@ -650,7 +650,7 @@ Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a con
 
 > **mapOrElseAsync**\<`U`\>(`fallbackFn`, `f`): `Promise`\<`U`\>
 
-Defined in: [result.ts:115](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L115)
+Defined in: [result.ts:115](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L115)
 
 Async version of `mapOrElse`. Maps a `Result<T, E>` to `Promise<U>` by applying async fallback function `fallbackFn` to a contained `Err` value, or async function `f` to a contained `Ok` value.
 
@@ -680,7 +680,7 @@ Async version of `mapOrElse`. Maps a `Result<T, E>` to `Promise<U>` by applying 
 
 > **match**\<`U`\>(`handlers`): `U`
 
-Defined in: [result.ts:272](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L272)
+Defined in: [result.ts:272](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L272)
 
 Matches the `Result` with two functions, one for each variant.
 
@@ -712,7 +712,7 @@ Matches the `Result` with two functions, one for each variant.
 
 > **ok**(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [result.ts:81](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L81)
+Defined in: [result.ts:81](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L81)
 
 Converts from `Result<T, E>` to `Option<T>`.
 
@@ -730,7 +730,7 @@ Returns `Some` for `Ok` and `None` for `Err`.
 
 > **or**\<`T2`, `F`\>(`res`): [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:217](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L217)
+Defined in: [result.ts:217](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L217)
 
 Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -760,7 +760,7 @@ JavaScript evaluates the operand before the call. Use `orElse` to compute it onl
 
 > **or**\<`T2`, `F`\>(`res`): [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:218](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L218)
+Defined in: [result.ts:218](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L218)
 
 ##### Type Parameters
 
@@ -786,7 +786,7 @@ Defined in: [result.ts:218](https://github.com/madkarmaa/results-ts/blob/493f3f8
 
 > **or**\<`T2`, `F`\>(`res`): [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\> \| [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:219](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L219)
+Defined in: [result.ts:219](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L219)
 
 ##### Type Parameters
 
@@ -814,7 +814,7 @@ Defined in: [result.ts:219](https://github.com/madkarmaa/results-ts/blob/493f3f8
 
 > **orElse**\<`T2`, `F`\>(`f`): [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:226](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L226)
+Defined in: [result.ts:226](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L226)
 
 Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -844,7 +844,7 @@ Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
 > **orElseAsync**\<`T2`, `F`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:231](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L231)
+Defined in: [result.ts:231](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L231)
 
 Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -874,7 +874,7 @@ Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise 
 
 > **toString**(): `string`
 
-Defined in: [result.ts:52](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L52)
+Defined in: [result.ts:52](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L52)
 
 #### Returns
 
@@ -886,7 +886,7 @@ Defined in: [result.ts:52](https://github.com/madkarmaa/results-ts/blob/493f3f8e
 
 > **transpose**\<`T`, `E`\>(`this`): [`Option`](../type-aliases/Option.md)\<[`Result`](../type-aliases/Result.md)\<`T`, `E`\>\>
 
-Defined in: [result.ts:267](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L267)
+Defined in: [result.ts:267](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L267)
 
 Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
@@ -923,7 +923,7 @@ and `Err(error)` to `Some(Err(error))`.
 
 > **unwrap**(): `T`
 
-Defined in: [result.ts:173](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L173)
+Defined in: [result.ts:173](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L173)
 
 Returns the contained `Ok` value.
 
@@ -941,7 +941,7 @@ Returns the contained `Ok` value.
 
 > **unwrapErr**(): `E`
 
-Defined in: [result.ts:187](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L187)
+Defined in: [result.ts:187](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L187)
 
 Returns the contained `Err` value.
 
@@ -959,7 +959,7 @@ Returns the contained `Err` value.
 
 > **unwrapOr**\<`T2`\>(`fallback`): `T` \| `T2`
 
-Defined in: [result.ts:240](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L240)
+Defined in: [result.ts:240](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L240)
 
 Returns the contained `Ok` value or a provided default.
 
@@ -987,7 +987,7 @@ JavaScript evaluates the fallback before the call. Use `unwrapOrElse` to compute
 
 > **unwrapOrElse**\<`T2`\>(`f`): `T` \| `T2`
 
-Defined in: [result.ts:245](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L245)
+Defined in: [result.ts:245](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L245)
 
 Returns the contained `Ok` value, or calls `f` with the error.
 
@@ -1013,7 +1013,7 @@ Returns the contained `Ok` value, or calls `f` with the error.
 
 > **unwrapOrElseAsync**\<`T2`\>(`f`): `Promise`\<`T` \| `T2`\>
 
-Defined in: [result.ts:250](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L250)
+Defined in: [result.ts:250](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L250)
 
 Returns the `Ok` value, or awaits `f` with the error.
 

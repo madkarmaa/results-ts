@@ -10,7 +10,7 @@
 
 > **catchUnwindAsync**\<`T`, `Args`\>(`fn`, `onThrow?`): (...`args`) => [`AsyncResult`](../interfaces/AsyncResult.md)\<`T`, `unknown`\>
 
-Defined in: [async-result.ts:416](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/async-result.ts#L416)
+Defined in: [async-result.ts:416](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/async-result.ts#L416)
 
 Wraps `fn` so a resolved value becomes `Ok(value)` and a throw or rejection becomes `Err(cause)`.
 Use this to adapt functions that throw or reject. Functions with expected failures should return `AsyncResult`.
@@ -53,7 +53,7 @@ A function that captures throws and rejections from `fn` in an `AsyncResult`.
 
 > **catchUnwindAsync**\<`T`, `Args`, `E`\>(`fn`, `onThrow`): (...`args`) => [`AsyncResult`](../interfaces/AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [async-result.ts:420](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/async-result.ts#L420)
+Defined in: [async-result.ts:420](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/async-result.ts#L420)
 
 Wraps `fn` so a resolved value becomes `Ok(value)` and a throw or rejection becomes `Err(cause)`.
 Use this to adapt functions that throw or reject. Functions with expected failures should return `AsyncResult`.

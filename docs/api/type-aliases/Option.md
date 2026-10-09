@@ -8,7 +8,7 @@
 
 > **Option**\<`T`\> = [`SomeOption`](SomeOption.md)\<`T`\> \| [`NoneOption`](NoneOption.md)\<`T`\>
 
-Defined in: [option.ts:41](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/option.ts#L41)
+Defined in: [option.ts:41](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L41)
 
 `Option<T>` is either `Some(value)` with a value of type `T`, or `None`.
 Use `match` to handle both variants.
