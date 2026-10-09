@@ -38,6 +38,8 @@ const name = await Ok(1)
 
 Methods such as [`AsyncResult.unwrapOr()`](../api/interfaces/AsyncResult.md#unwrapor) return a `Promise` of the contained value or fallback. The example awaits that promise to get a string. Use [`AsyncResult.match()`](../api/interfaces/AsyncResult.md#match) to handle each variant with a function.
 
+Callbacks in ordinary chains do not convert thrown errors or rejected promises to `Err`. Those failures propagate. Return `Err` for recoverable failures, or see [Exception adapters](./error-handling.md#exception-adapters) for an unavoidable throwing boundary.
+
 ## Panics become rejections
 
 [`Result.unwrap()`](../api/interfaces/ResultMethods.md#unwrap) and [`Result.expect()`](../api/interfaces/ResultMethods.md#expect) throw on `Err`. [`Result.unwrapErr()`](../api/interfaces/ResultMethods.md#unwraperr) and [`Result.expectErr()`](../api/interfaces/ResultMethods.md#expecterr) throw on `Ok`.
