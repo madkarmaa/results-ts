@@ -10,21 +10,14 @@
 
 > **catchUnwind**\<`T`, `Args`\>(`fn`, `onThrow?`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `unknown`\>
 
-Defined in: [result.ts:808](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L808)
+Defined in: [result.ts:731](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L731)
 
-Invokes a function, capturing the cause of a thrown error if one occurs.
+Wraps `fn` so a return value becomes `Ok(value)` and a thrown value becomes `Err(thrown)`.
+Use this to adapt functions that throw. Functions with expected failures should return `Result`.
 
-This function will return `Ok` with the function's result if it does not throw, and will return
-`Err(cause)` if the function throws. The cause returned is the value with which the function
-originally threw.
-
-It is not recommended to use this function for a general try/catch mechanism. The `Result` type
-is more appropriate to use for functions that can fail on a regular basis.
-
-When no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
-(typed as `unknown`, since JavaScript allows throwing anything).
-When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
-in an `Err`, allowing the error type to be narrowed and normalized.
+Without `onThrow`, the error type is `unknown`. With `onThrow`, its return value
+becomes the error. The handler receives the thrown value and the original arguments.
+Exceptions from `onThrow` propagate to the caller.
 
 ### Type Parameters
 
@@ -52,7 +45,7 @@ Optional handler invoked when `fn` throws; its return value becomes the `Err` pa
 
 ### Returns
 
-A function returning `Result<T, E>` that never throws.
+A function that captures exceptions from `fn` in a `Result`.
 
 (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `unknown`\>
 
@@ -60,21 +53,14 @@ A function returning `Result<T, E>` that never throws.
 
 > **catchUnwind**\<`T`, `Args`, `E`\>(`fn`, `onThrow`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:812](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L812)
+Defined in: [result.ts:735](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L735)
 
-Invokes a function, capturing the cause of a thrown error if one occurs.
+Wraps `fn` so a return value becomes `Ok(value)` and a thrown value becomes `Err(thrown)`.
+Use this to adapt functions that throw. Functions with expected failures should return `Result`.
 
-This function will return `Ok` with the function's result if it does not throw, and will return
-`Err(cause)` if the function throws. The cause returned is the value with which the function
-originally threw.
-
-It is not recommended to use this function for a general try/catch mechanism. The `Result` type
-is more appropriate to use for functions that can fail on a regular basis.
-
-When no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
-(typed as `unknown`, since JavaScript allows throwing anything).
-When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
-in an `Err`, allowing the error type to be narrowed and normalized.
+Without `onThrow`, the error type is `unknown`. With `onThrow`, its return value
+becomes the error. The handler receives the thrown value and the original arguments.
+Exceptions from `onThrow` propagate to the caller.
 
 ### Type Parameters
 
@@ -106,6 +92,6 @@ Optional handler invoked when `fn` throws; its return value becomes the `Err` pa
 
 ### Returns
 
-A function returning `Result<T, E>` that never throws.
+A function that captures exceptions from `fn` in a `Result`.
 
 (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `E`\>

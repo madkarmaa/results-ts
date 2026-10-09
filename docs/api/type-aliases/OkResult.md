@@ -8,7 +8,7 @@
 
 > **OkResult**\<`T`, `E`\> = [`ResultMethods`](../interfaces/ResultMethods.md)\<`T`, `E`\> & `object`
 
-Defined in: [result.ts:25](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L25)
+Defined in: [result.ts:26](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L26)
 
 Represents a successful `Result` containing a value of type `T`.
 

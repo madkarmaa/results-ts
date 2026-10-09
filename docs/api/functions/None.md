@@ -8,7 +8,7 @@
 
 > **None**\<`T`\>(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:961](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/option.ts#L961)
+Defined in: [option.ts:895](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/option.ts#L895)
 
 No value.
 

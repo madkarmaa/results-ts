@@ -8,15 +8,16 @@
 
 > **Option**\<`T`\> = [`SomeOption`](SomeOption.md)\<`T`\> \| [`NoneOption`](NoneOption.md)\<`T`\>
 
-Defined in: [option.ts:44](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/option.ts#L44)
+Defined in: [option.ts:41](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/option.ts#L41)
 
-Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
+`Option<T>` is either `Some(value)` with a value of type `T`, or `None`.
+Use `match` to handle both variants.
 
-`Option`s are commonly paired with pattern matching to query the presence of a value and take action, always accounting for the `None` case.
+Invalid callbacks and operands throw errors. Callback exceptions propagate.
 
 `and`, `or`, `xor`, and `zip` return an `AsyncOption` for promise-like operands.
 They capture the receiver's state at invocation and resolve the operand even
-when its value is unused; operand rejections propagate.
+when its value is unused. Operand rejections propagate.
 
 ## Type Parameters
 
@@ -24,4 +25,4 @@ when its value is unused; operand rejections propagate.
 
 `T`
 
-Contains the type of the value that may be present in the `Option`.
+The contained value type.
