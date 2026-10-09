@@ -119,6 +119,12 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E>;
 
     /**
+     * Returns an async iterator that yields the `Ok` value once, or nothing for `Err`.
+     * Promise-like payloads are awaited. Source and payload rejections propagate.
+     */
+    iter(): AsyncIterableIterator<Awaited<T>, undefined, unknown>;
+
+    /**
      * Returns the contained `Ok` value.
      *
      * @throws Rejects with `PanicError` if the value is an `Err`, with a panic message including the passed message, and the content of the `Err`.
@@ -316,6 +322,11 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
 
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E> {
         return new AsyncResultImpl(this.then((res) => res.inspectErrAsync(f)));
+    }
+
+    async *iter(): AsyncIterableIterator<Awaited<T>, undefined, unknown> {
+        const res = await this.promise;
+        if (res.isOk()) yield res.unwrap();
     }
 
     expect(msg: string): Promise<T> {

@@ -19,6 +19,9 @@ for (const [variant, input] of [
     ]);
     const operations = {
         toString: () => option.toString(),
+        iter: async () => {
+            for await (const value of option.iter()) do_not_optimize(value);
+        },
         then: () => option.then((value) => value),
         isSome: () => option.isSome(),
         isSomeAnd: () => option.isSomeAnd(gt0),
@@ -88,6 +91,9 @@ for (const [variant, input] of [
     const transposed = input.mapAsync(async (value) => Some(value));
     const operations = {
         toString: () => result.toString(),
+        iter: async () => {
+            for await (const value of result.iter()) do_not_optimize(value);
+        },
         then: () => result.then((value) => value),
         isOk: () => result.isOk(),
         isOkAnd: () => result.isOkAnd(gt0),
