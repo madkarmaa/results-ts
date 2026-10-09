@@ -27,7 +27,6 @@ import { Ok, Err } from 'results-ts';
 
 const loadUser = async (id: number) => {
     if (id === 13) return Err({ code: 'NOT_FOUND', id } as const);
-
     return Ok({ id, name: 'Ada' });
 };
 
@@ -38,36 +37,6 @@ const name = await Ok(1)
 ```
 
 Methods such as [`AsyncResult.unwrapOr()`](../api/interfaces/AsyncResult.md#unwrapor) return a `Promise` of the contained value or fallback. The example awaits that promise to get a string. Use [`AsyncResult.match()`](../api/interfaces/AsyncResult.md#match) to handle each variant with a function.
-
-## Iteration
-
-Both async types have an `iter()` method for use with `for await...of`. It yields
-the value once for `Some` or `Ok`, and yields nothing for `None` or `Err`.
-Promise-like payloads are awaited, and source or payload rejections propagate.
-
-```typescript
-import { Some } from 'results-ts';
-
-const option = Some(21).mapAsync(async (n) => n * 2);
-
-for await (const value of option.iter()) {
-    console.log(value); // 42
-}
-```
-
-## Formatting
-
-```typescript
-import { Some } from 'results-ts';
-
-const option = Some(21).mapAsync(async (n) => n * 2);
-
-console.log(await option.toString()); // Some(42)
-```
-
-`toString()` returns a `Promise<string>` using the resolved container's formatting.
-Call it explicitly and await it. Implicit conversion through `String(wrapper)` or
-template literals does not await it and does not produce the container's text.
 
 ## Panics become rejections
 

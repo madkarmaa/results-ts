@@ -37,7 +37,7 @@ Use [`Result`](../api/type-aliases/Result.md) when a failed operation needs an e
 
 ## Result
 
-[`Result<T, E>`](../api/type-aliases/Result.md) is either [`Ok(value)`](../api/functions/Ok.md) with a value of type `T`, or [`Err(error)`](../api/functions/Err.md) with an error of type `E`. Return a `Result` when callers can recover from a failure.
+[`Result<T, E>`](../api/type-aliases/Result.md) is either [`Ok(value)`](../api/functions/Ok.md) with a value of type `T`, or [`Err(error)`](../api/functions/Err.md) with an error of type `E`. Return a [`Result`](../api/type-aliases/Result.md) when callers can recover from a failure.
 
 ```typescript
 import { Ok, Err } from 'results-ts';
