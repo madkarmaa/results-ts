@@ -132,8 +132,7 @@ group('Workloads - synchronous pipelines', () => {
 });
 
 group('Workloads - structural operands', () => {
-    // These intentionally minimal external operands exercise the supported
-    // discriminator-based contract, as in the structural-validation tests.
+    // These operands test validation by discriminator, as in the structural tests.
     const result = { _isOk: true } as unknown as Result<RecordValue, Failure>;
     const option = { _isSome: true } as unknown as Option<RecordValue>;
 

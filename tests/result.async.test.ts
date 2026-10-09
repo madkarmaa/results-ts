@@ -612,7 +612,7 @@ describe('Result async methods', () => {
             ).toThrow(InvalidArgumentError);
         });
 
-        test('wraps fetch-like promise realistically', async () => {
+        test('captures a failed fetch request', async () => {
             const fakeFetch = catchUnwindAsync(
                 async (url: string) => {
                     if (url === 'bad') throw new Error('network');

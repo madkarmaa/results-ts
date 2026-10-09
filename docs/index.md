@@ -4,13 +4,13 @@ layout: home
 hero:
     name: results-ts
     text: Rust's Result and Option types, for TypeScript.
-    tagline: Make every outcome explicit and type-safe.
+    tagline: Chain operations on values, errors, and optional values.
     actions:
         - theme: brand
-          text: Get Started
+          text: Get started
           link: /guide/getting-started
         - theme: alt
-          text: API Reference
+          text: API reference
           link: /api/
         - theme: alt
           text: Benchmarks

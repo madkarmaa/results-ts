@@ -3,9 +3,6 @@ import { Ok, Err, catchUnwind, type Result } from '../src/result';
 import { Some, None, type Option } from '../src/option';
 import { ok, err, inc, gt0, safeInc, thrower, safeThower } from './fixtures';
 
-// ---------------------------------------------------------------------------
-// Result - queries
-// ---------------------------------------------------------------------------
 group('Result - queries', () => {
     bench('Ok.isOk()', () => {
         do_not_optimize(ok.isOk());
@@ -33,9 +30,6 @@ group('Result - queries', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Result - conversions
-// ---------------------------------------------------------------------------
 group('Result - conversions', () => {
     bench('Ok.ok()', () => {
         do_not_optimize(ok.ok());
@@ -51,9 +45,6 @@ group('Result - conversions', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Result - map family (allocation-heavy transforms)
-// ---------------------------------------------------------------------------
 group('Result - map family', () => {
     bench('Ok.map (alloc)', () => {
         do_not_optimize(ok.map(inc));
@@ -81,9 +72,6 @@ group('Result - map family', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Result - inspect family
-// ---------------------------------------------------------------------------
 group('Result - inspect family', () => {
     bench('Ok.inspect', () => {
         do_not_optimize(ok.inspect(() => {}));
@@ -99,9 +87,6 @@ group('Result - inspect family', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Result - unwrap family
-// ---------------------------------------------------------------------------
 group('Result - unwrap family', () => {
     bench('Ok.unwrap', () => {
         do_not_optimize(ok.unwrap());
@@ -129,9 +114,6 @@ group('Result - unwrap family', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Result - combinators (allocation-heavy transforms)
-// ---------------------------------------------------------------------------
 group('Result - combinators', () => {
     const ok2: Result<number, number> = Ok(2);
     const err2: Result<number, number> = Err(2);
@@ -162,9 +144,6 @@ group('Result - combinators', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Result - flatten / transpose / match (heavy transforms)
-// ---------------------------------------------------------------------------
 group('Result - flatten / transpose / match', () => {
     const nestedOk: Result<Result<number, number>, number> = Ok(Ok(1));
 
@@ -191,9 +170,6 @@ group('Result - flatten / transpose / match', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Result - iter
-// ---------------------------------------------------------------------------
 group('Result - iter', () => {
     bench('Ok.iter', () => {
         for (const v of ok.iter()) do_not_optimize(v);
@@ -203,9 +179,6 @@ group('Result - iter', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Result - catchUnwind
-// ---------------------------------------------------------------------------
 group('Result - catchUnwind', () => {
     bench('catchUnwind (wrap + call, Ok)', () => {
         const fn = catchUnwind(inc);

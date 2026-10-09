@@ -2,9 +2,6 @@ import { bench, do_not_optimize, group } from 'mitata';
 import { Some, None, type Option } from '../src/option';
 import { some, none } from './fixtures';
 
-// ---------------------------------------------------------------------------
-// Async Option - terminal unwrap (AsyncOption)
-// ---------------------------------------------------------------------------
 group('Async Option - terminal unwrap', () => {
     const someAsync = some.mapAsync((x) => Promise.resolve(x + 1));
     const noneAsync = none.mapAsync((x) => Promise.resolve(x + 1));
@@ -21,9 +18,6 @@ group('Async Option - terminal unwrap', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Option - sync-typed *Async methods (the extra-Promise wrappers)
-// ---------------------------------------------------------------------------
 group('Async Option - sync-typed methods', () => {
     bench('Option.mapOrElseAsync (Some path)', async () => {
         do_not_optimize(
@@ -49,10 +43,6 @@ group('Async Option - sync-typed methods', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Option - transform methods (each constructs a new AsyncOptionImpl /
-// AsyncResultImpl)
-// ---------------------------------------------------------------------------
 group('Async Option - transform methods', () => {
     bench('Some.mapAsync (alloc AsyncOption)', async () => {
         do_not_optimize(await some.mapAsync((x) => Promise.resolve(x + 1)));
@@ -104,9 +94,6 @@ group('Async Option - transform methods', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Option - then() wrapping (await cost)
-// ---------------------------------------------------------------------------
 group('Async Option - then() wrapping', () => {
     const someAsync = Some(1).mapAsync((x) => Promise.resolve(x + 1));
 

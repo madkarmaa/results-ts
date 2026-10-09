@@ -45,7 +45,7 @@ export default defineConfig({
         sidebar: {
             '/api/': [
                 {
-                    text: 'API Reference',
+                    text: 'API reference',
                     items: getApiSidebar()
                 }
             ],
@@ -66,7 +66,7 @@ export default defineConfig({
 
         footer: {
             message:
-                'Made with ❤️ by <a href="https://github.com/madkarmaa" target="_blank">MadKarma</a> and <a href="https://github.com/madkarmaa/results-ts/graphs/contributors" target="_blank">contributors</a> &#58;&#41;'
+                'Maintained by <a href="https://github.com/madkarmaa" target="_blank">MadKarma</a> and <a href="https://github.com/madkarmaa/results-ts/graphs/contributors" target="_blank">contributors</a>'
         }
     }
 });

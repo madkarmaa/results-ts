@@ -10,9 +10,6 @@ import {
     safeAsyncReject
 } from './fixtures';
 
-// ---------------------------------------------------------------------------
-// Async Result - terminal unwrap (AsyncResult)
-// ---------------------------------------------------------------------------
 group('Async Result - terminal unwrap', () => {
     const okAsync = ok.mapAsync((x) => Promise.resolve(x + 1));
     const errAsync = err.mapAsync((x) => Promise.resolve(x + 1));
@@ -32,9 +29,6 @@ group('Async Result - terminal unwrap', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Result - sync-typed *Async methods (the extra-Promise wrappers)
-// ---------------------------------------------------------------------------
 group('Async Result - sync-typed methods', () => {
     const okT: Result<number, number> = Ok(1);
     const errT: Result<number, number> = Err(1);
@@ -63,9 +57,6 @@ group('Async Result - sync-typed methods', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Result - transform methods (each constructs a new AsyncResultImpl)
-// ---------------------------------------------------------------------------
 group('Async Result - transform methods', () => {
     bench('Ok.mapAsync (alloc AsyncResult)', async () => {
         do_not_optimize(await ok.mapAsync((x) => Promise.resolve(x + 1)));
@@ -109,9 +100,6 @@ group('Async Result - transform methods', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Result - then() wrapping (await cost)
-// ---------------------------------------------------------------------------
 group('Async Result - then() wrapping', () => {
     const okAsync = ok.mapAsync((x) => Promise.resolve(x + 1));
 
@@ -120,9 +108,6 @@ group('Async Result - then() wrapping', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Async Result - catchUnwindAsync
-// ---------------------------------------------------------------------------
 group('Async Result - catchUnwindAsync', () => {
     bench('catchUnwindAsync (wrap + call, Ok)', async () => {
         const fn = catchUnwindAsync(asyncInc);

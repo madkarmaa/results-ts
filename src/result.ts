@@ -35,18 +35,16 @@ export type ErrResult<T, E> = ResultMethods<T, E> & {
 };
 
 /**
- * `Result<T, E>` is the type used for returning and propagating errors.
+ * `Result<T, E>` is either `Ok(value)` with a value of type `T`, or
+ * `Err(error)` with an error of type `E`. Return it for recoverable failures.
  *
- * It is a type with the parameters, `Ok(T)`, representing success and containing a value,
- * and `Err(E)`, representing error and containing an error value.
- *
- * Functions return `Result` whenever errors are expected and recoverable.
+ * Invalid callbacks and operands throw errors. Callback exceptions propagate.
  *
  * `and` and `or` return an `AsyncResult` for promise-like operands. They resolve
- * the operand even when its value is unused; operand rejections propagate.
+ * the operand even when its value is unused. Operand rejections propagate.
  *
- * @template T - Contains the success value.
- * @template E - Contains the error value.
+ * @template T - The success value type.
+ * @template E - The error value type.
  */
 export type Result<T, E> = OkResult<T, E> | ErrResult<T, E>;
 
@@ -59,9 +57,7 @@ interface ResultMethods<T, E> {
     isOk(): this is OkResult<T, never>;
 
     /**
-     * Returns `true` if the result is `Ok` and the value inside of it matches a predicate.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns `true` if the result is `Ok` and its value matches the predicate.
      */
     isOkAnd<U extends T>(f: (val: T) => val is U): this is OkResult<U, E>;
     isOkAnd(f: (val: T) => boolean): this is OkResult<T, E>;
@@ -72,9 +68,7 @@ interface ResultMethods<T, E> {
     isErr(): this is ErrResult<never, E>;
 
     /**
-     * Returns `true` if the result is `Err` and the value inside of it matches a predicate.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns `true` if the result is `Err` and its value matches the predicate.
      */
     isErrAnd<F extends E>(f: (err: E) => err is F): this is ErrResult<T, F>;
     isErrAnd(f: (err: E) => boolean): this is ErrResult<T, E>;
@@ -95,42 +89,28 @@ interface ResultMethods<T, E> {
 
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
-     *
-     * This function can be used to compose the results of two functions.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     map<U>(f: (val: T) => U): Result<U, E>;
 
     /**
      * Async version of `map`. Maps a `Result<T, E>` to `AsyncResult<U, E>` by applying an async function to a contained `Ok` value, leaving an `Err` value untouched.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncResult<U, E>;
 
     /**
-     * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
+     * Returns the fallback on `Err`, or calls `f` with the `Ok` value.
      *
-     * Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `mapOrElse`, which is lazily evaluated.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * JavaScript evaluates the fallback before the call. Use `mapOrElse` to compute it only on `Err`.
      */
     mapOr<U>(fallback: U, f: (val: T) => U): U;
 
     /**
      * Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
-     *
-     * This function can be used to unpack a successful result while handling an error.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): U;
 
     /**
      * Async version of `mapOrElse`. Maps a `Result<T, E>` to `Promise<U>` by applying async fallback function `fallbackFn` to a contained `Err` value, or async function `f` to a contained `Ok` value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapOrElseAsync<U>(
         fallbackFn: (err: E) => PromiseLike<U>,
@@ -139,17 +119,11 @@ interface ResultMethods<T, E> {
 
     /**
      * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
-     *
-     * This function can be used to pass through a successful result while handling an error.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapErr<F>(f: (err: E) => F): Result<T, F>;
 
     /**
      * Async version of `mapErr`. Maps a `Result<T, E>` to `AsyncResult<T, F>` by applying an async function to a contained `Err` value, leaving an `Ok` value untouched.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapErrAsync<F>(f: (err: E) => PromiseLike<F>): AsyncResult<T, F>;
 
@@ -157,15 +131,11 @@ interface ResultMethods<T, E> {
      * Calls a function with a reference to the contained value if `Ok`.
      *
      * Returns the original result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspect(f: (val: T) => void): Result<T, E>;
 
     /**
      * Async version of `inspect`. Calls an async function with a reference to the contained value if `Ok`, then returns the original result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncResult<T, E>;
 
@@ -173,61 +143,53 @@ interface ResultMethods<T, E> {
      * Calls a function with a reference to the contained value if `Err`.
      *
      * Returns the original result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspectErr(f: (err: E) => void): Result<T, E>;
 
     /**
      * Async version of `inspectErr`. Calls an async function with a reference to the contained value if `Err`, then returns the original result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     inspectErrAsync(f: (err: E) => PromiseLike<void>): AsyncResult<T, E>;
 
     /**
-     * Returns an iterator over the possibly contained value.
+     * Returns an iterator over the contained value, or an empty iterator if absent.
      *
      * The iterator yields one value if the result is `Ok`, otherwise none.
      */
     iter(): Iterable<T>;
 
     /**
-     * Returns the contained `Ok` value, consuming the `self` value.
+     * Returns the contained `Ok` value.
      *
-     * @throws Panics if the value is an `Err`, with a panic message including the passed message, and the content of the `Err`.
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `PanicError` with `msg` and the error value on `Err`.
      */
     expect(msg: string): T;
 
     /**
-     * Returns the contained `Ok` value, consuming the `self` value.
+     * Returns the contained `Ok` value.
      *
-     * @throws Panics if the value is an `Err`, with a panic message provided by the `Err`'s value.
+     * @throws `PanicError` with the error value on `Err`.
      */
     unwrap(): T;
 
     /**
-     * Returns the contained `Err` value, consuming the `self` value.
+     * Returns the contained `Err` value.
      *
-     * @throws Panics if the value is an `Ok`, with a panic message including the passed message, and the content of the `Ok`.
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `PanicError` with `msg` and the success value on `Ok`.
      */
     expectErr(msg: string): E;
 
     /**
-     * Returns the contained `Err` value, consuming the `self` value.
+     * Returns the contained `Err` value.
      *
-     * @throws Panics if the value is an `Ok`, with a custom panic message provided by the `Ok`'s value.
+     * @throws `PanicError` with the success value on `Ok`.
      */
     unwrapErr(): E;
 
     /**
      * Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
      *
-     * Arguments passed to `and` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `andThen`, which is lazily evaluated.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * JavaScript evaluates the operand before the call. Use `andThen` to compute it only on `Ok`.
      */
     and<U, E2>(res: Result<U, E2>): Result<U, E | E2>;
     and<U, E2>(res: PromiseLike<Result<U, E2>>): AsyncResult<U, E | E2>;
@@ -237,17 +199,11 @@ interface ResultMethods<T, E> {
 
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
-     *
-     * This function can be used for control flow based on `Result` values.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     andThen<U, F>(f: (val: T) => Result<U, F>): Result<U, E | F>;
 
     /**
      * Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     andThenAsync<U, F>(
         f: (val: T) => PromiseLike<Result<U, F>>
@@ -256,9 +212,7 @@ interface ResultMethods<T, E> {
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
-     * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * JavaScript evaluates the operand before the call. Use `orElse` to compute it only on `Err`.
      */
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F>;
     or<T2, F>(res: PromiseLike<Result<T2, F>>): AsyncResult<T | T2, F>;
@@ -268,17 +222,11 @@ interface ResultMethods<T, E> {
 
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
-     *
-     * This function can be used for control flow based on result values.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     orElse<T2, F>(f: (err: E) => Result<T2, F>): Result<T | T2, F>;
 
     /**
      * Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     orElseAsync<T2, F>(
         f: (err: E) => PromiseLike<Result<T2, F>>
@@ -287,47 +235,39 @@ interface ResultMethods<T, E> {
     /**
      * Returns the contained `Ok` value or a provided default.
      *
-     * Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * JavaScript evaluates the fallback before the call. Use `unwrapOrElse` to compute it only on `Err`.
      */
     unwrapOr<T2>(fallback: T2): T | T2;
 
     /**
-     * Returns the contained `Ok` value or computes it from a closure.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns the contained `Ok` value, or calls `f` with the error.
      */
     unwrapOrElse<T2>(f: (err: E) => T2): T | T2;
 
     /**
-     * Async version of `unwrapOrElse`. Returns the contained `Ok` value or computes it from an async closure.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns the `Ok` value, or awaits `f` with the error.
      */
     unwrapOrElseAsync<T2>(f: (err: E) => PromiseLike<T2>): Promise<T | T2>;
 
     /**
-     * Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
+     * Unwraps one nested `Result`. The return type includes both error types.
      *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `FlattenError` if an `Ok` value is not a `Result`.
      */
     flatten<U, F>(this: Result<Result<U, F>, E>): Result<U, E | F>;
 
     /**
      * Transposes a `Result` of an `Option` into an `Option` of a `Result`.
      *
-     * `Ok(None)` will be mapped to `None`. `Ok(Some(_))` and `Err(_)` will be mapped to
-     * `Some(Ok(_))` and `Some(Err(_))`.
+     * Converts `Ok(None)` to `None`, `Ok(Some(value))` to `Some(Ok(value))`,
+     * and `Err(error)` to `Some(Err(error))`.
      *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `TransposeError` if an `Ok` value is not an `Option`.
      */
     transpose<T, E>(this: Result<Option<T>, E>): Option<Result<T, E>>;
 
     /**
      * Matches the `Result` with two functions, one for each variant.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     match<U>(handlers: { Ok: (val: T) => U; Err: (err: E) => U }): U;
 }
@@ -403,9 +343,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
 
-        // Err path: the wrapped value is unchanged, so reuse `this` to avoid an
-        // extra allocation. The Ok type is narrowed to `U` via a cast - safe
-        // because the value is never read on an `Err`.
+        // Reuse Err. It contains no success value of the old type.
         if (isLeft(state)) return this as unknown as ResultImpl<U, E>;
 
         const mappedValue = f(state.right);
@@ -474,9 +412,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         if (isLeft(state)) return new ResultImpl(Left(f(state.left)));
 
-        // Ok path: the wrapped value is unchanged, so reuse `this`. The Err
-        // type is narrowed to `F` via a cast - safe because the value is never
-        // read on an `Ok`.
+        // Reuse Ok. It contains no error value of the old type.
         return this as unknown as ResultImpl<T, F>;
     }
 
@@ -614,9 +550,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isRight(state)) return f(state.right);
 
-        // Err path: the wrapped error is unchanged, so reuse `this` to avoid an
-        // extra allocation. The Ok type is narrowed to `U` via a cast - safe
-        // because the value is never read on an `Err`.
+        // Reuse Err. It contains no success value of the old type.
         return this as unknown as ResultImpl<U, E | F>;
     }
 
@@ -663,9 +597,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isLeft(state)) return f(state.left);
 
-        // Ok path: the wrapped value is unchanged, so reuse `this` to avoid an
-        // extra allocation. The Err type is narrowed to `F` via a cast - safe
-        // because the value is never read on an `Ok`.
+        // Reuse Ok. It contains no error value of the old type.
         return this as unknown as ResultImpl<T | T2, F>;
     }
 
@@ -785,23 +717,16 @@ export function Err<E>(error: E): Result<never, E> {
 }
 
 /**
- * Invokes a function, capturing the cause of a thrown error if one occurs.
+ * Wraps `fn` so a return value becomes `Ok(value)` and a thrown value becomes `Err(thrown)`.
+ * Use this to adapt functions that throw. Functions with expected failures should return `Result`.
  *
- * This function will return `Ok` with the function's result if it does not throw, and will return
- * `Err(cause)` if the function throws. The cause returned is the value with which the function
- * originally threw.
- *
- * It is not recommended to use this function for a general try/catch mechanism. The `Result` type
- * is more appropriate to use for functions that can fail on a regular basis.
- *
- * When no `onThrow` handler is provided, the thrown value is wrapped as-is in an `Err`
- * (typed as `unknown`, since JavaScript allows throwing anything).
- * When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
- * in an `Err`, allowing the error type to be narrowed and normalized.
+ * Without `onThrow`, the error type is `unknown`. With `onThrow`, its return value
+ * becomes the error. The handler receives the thrown value and the original arguments.
+ * Exceptions from `onThrow` propagate to the caller.
  *
  * @param fn - The throwing function to wrap.
  * @param onThrow - Optional handler invoked when `fn` throws; its return value becomes the `Err` payload.
- * @returns A function returning `Result<T, E>` that never throws.
+ * @returns A function that captures exceptions from `fn` in a `Result`.
  */
 export function catchUnwind<T, Args extends unknown[]>(
     fn: (...args: Args) => T,

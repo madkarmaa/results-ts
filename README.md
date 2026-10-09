@@ -5,7 +5,7 @@
 
 ---
 
-This library brings Rust's [`Result`](./docs/api/type-aliases/Result.md) and [`Option`](./docs/api/type-aliases/Option.md) enums and their chainable methods to TypeScript with full type safety. See the [results-ts API reference](https://results-ts.madkarma.top/api/) for complete method documentation. The API follows Rust's [Result](https://doc.rust-lang.org/std/result/enum.Result.html) and [Option](https://doc.rust-lang.org/std/option/enum.Option.html) types closely.
+`results-ts` provides Rust-style [`Result`](./docs/api/type-aliases/Result.md) and [`Option`](./docs/api/type-aliases/Option.md) types with chainable methods. `Result<T, E>` represents a value or an error. `Option<T>` represents a value that may be absent.
 
 <p align="center">
     <a href="https://npmx.dev/package/results-ts/v/latest"><img src="https://img.shields.io/npm/v/results-ts?labelColor=blue&color=grey" alt="npm version" /></a>
@@ -17,9 +17,9 @@ This library brings Rust's [`Result`](./docs/api/type-aliases/Result.md) and [`O
 ## Installation
 
 ```bash
-npm install results-ts
-# or
 bun add results-ts
+# or
+npm install results-ts
 # or
 pnpm add results-ts
 # or
@@ -30,7 +30,7 @@ yarn add results-ts
 
 ## Usage
 
-A quick taste of the [`Result`](./docs/api/type-aliases/Result.md) type:
+Return `Ok` or `Err`, then transform or handle the result:
 
 ```typescript
 import { Ok, Err } from 'results-ts';
@@ -65,24 +65,22 @@ console.log(message);
 
 ## Documentation
 
-Full documentation and complete API reference: **[results-ts.madkarma.top](https://results-ts.madkarma.top)**.
+See the [guides and API reference](https://results-ts.madkarma.top).
 
 ## Contributing
 
-Interested in contributing? See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, development guidelines, and pull request expectations.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup and pull request requirements.
 
 ## Attribution
 
-- **[Web Dev Simplified](https://www.youtube.com/@WebDevSimplified)** - concept from [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc).
-- **[vultix/ts-results](https://github.com/vultix/ts-results)**
-- **[supermacro/neverthrow](https://github.com/supermacro/neverthrow)**
+- [Web Dev Simplified](https://www.youtube.com/@WebDevSimplified), concept from [this video](https://www.youtube.com/watch?v=ovnyeq-Xxrc).
+- [vultix/ts-results](https://github.com/vultix/ts-results)
+- [supermacro/neverthrow](https://github.com/supermacro/neverthrow)
 
 ## Contributors
-
-Thanks to all the contributors who helped make this project better!
 
 [![Contributors](https://contrib.rocks/image?repo=madkarmaa/results-ts&max=400&columns=20)](https://github.com/madkarmaa/results-ts/graphs/contributors)
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE).
+[MIT License](./LICENSE).

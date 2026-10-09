@@ -453,7 +453,7 @@ describe('Result', () => {
             );
         });
 
-        test('wraps JSON.parse realistically', () => {
+        test('captures JSON.parse failures', () => {
             const safeParse = catchUnwind(JSON.parse, (thrown) =>
                 thrown instanceof Error ? thrown.message : 'parse error'
             );

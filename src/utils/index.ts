@@ -3,8 +3,7 @@ import type { Result } from '../result';
 
 export * from './either';
 
-// Each .then still queues its own reaction; only the fulfilled kickoff promise
-// is shared, avoiding an allocation without changing callback scheduling.
+// Share the resolved promise. Each .then call still queues its own reaction.
 export const ASYNC_START: Promise<void> = Promise.resolve();
 
 export function isOptionOperand<T>(
@@ -74,11 +73,8 @@ export function isAsyncResultOperand<T, E>(
     );
 }
 
-// Shared, stateless iterator used for the empty `iter()` path (`Err`/`None`).
-// Returning this constant instead of entering a generator avoids allocating a
-// generator object on every call when there is nothing to yield. Typed as
-// `IterableIterator<never>` so it is assignable to `IterableIterator<T>` for any
-// `T` without a cast at the call site.
+// Err and None share this stateless iterator to avoid per-call allocations.
+// IterableIterator<never> is assignable to IterableIterator<T> without a cast.
 export const EMPTY_ITERATOR: IterableIterator<never> = {
     next(): IteratorResult<never, undefined> {
         return { value: undefined, done: true };
@@ -89,9 +85,7 @@ export const EMPTY_ITERATOR: IterableIterator<never> = {
     }
 };
 
-// Dedicated iterator for the single-value `iter()` path (`Ok`/`Some`).
-// Built as a class so there is no anonymous generator function
-// and no generator-protocol overhead: just a flagged one-shot `next()`.
+// Ok and Some use a one-item iterator instead of allocating a generator.
 export class OneItemIterator<T> implements IterableIterator<T> {
     #done = false;
 
