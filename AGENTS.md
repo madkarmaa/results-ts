@@ -126,6 +126,7 @@ Forbidden:
 - Make the smallest correct change.
 - Keep changes consistent with repository style.
 - Do not refactor unrelated code.
+- Every new feature must have coverage in both tests and benchmarks before it is considered done.
 
 ### Output Expectations
 
