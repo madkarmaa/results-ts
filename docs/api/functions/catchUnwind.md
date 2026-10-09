@@ -10,7 +10,7 @@
 
 > **catchUnwind**\<`T`, `Args`\>(`fn`, `onThrow?`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `unknown`\>
 
-Defined in: [result.ts:731](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L731)
+Defined in: [result.ts:731](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/result.ts#L731)
 
 Wraps `fn` so a return value becomes `Ok(value)` and a thrown value becomes `Err(thrown)`.
 Use this to adapt functions that throw. Functions with expected failures should return `Result`.
@@ -53,7 +53,7 @@ A function that captures exceptions from `fn` in a `Result`.
 
 > **catchUnwind**\<`T`, `Args`, `E`\>(`fn`, `onThrow`): (...`args`) => [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:735](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/result.ts#L735)
+Defined in: [result.ts:735](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/result.ts#L735)
 
 Wraps `fn` so a return value becomes `Ok(value)` and a thrown value becomes `Err(thrown)`.
 Use this to adapt functions that throw. Functions with expected failures should return `Result`.

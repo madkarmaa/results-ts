@@ -6,7 +6,7 @@
 
 # Interface: OptionMethods\<T\>
 
-Defined in: [option.ts:43](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L43)
+Defined in: [option.ts:43](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L43)
 
 ## Type Parameters
 
@@ -22,7 +22,7 @@ Defined in: [option.ts:43](https://github.com/madkarmaa/results-ts/blob/59837911
 
 > **and**\<`U`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:157](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L157)
+Defined in: [option.ts:157](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L157)
 
 Returns `None` if the option is `None`, otherwise returns `optb`.
 
@@ -46,7 +46,7 @@ Returns `None` if the option is `None`, otherwise returns `optb`.
 
 > **and**\<`U`\>(`optb`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:158](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L158)
+Defined in: [option.ts:158](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L158)
 
 ##### Type Parameters
 
@@ -68,7 +68,7 @@ Defined in: [option.ts:158](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **and**\<`U`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`U`\> \| [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:159](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L159)
+Defined in: [option.ts:159](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L159)
 
 ##### Type Parameters
 
@@ -92,7 +92,7 @@ Defined in: [option.ts:159](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **andThen**\<`U`\>(`f`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:166](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L166)
+Defined in: [option.ts:166](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L166)
 
 Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
 
@@ -118,7 +118,7 @@ Returns `None` if the option is `None`, otherwise calls `f` with the wrapped val
 
 > **andThenAsync**\<`U`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:171](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L171)
+Defined in: [option.ts:171](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L171)
 
 Async version of `andThen`. Returns `None` if the option is `None`, otherwise calls async `f` with the wrapped value and returns the result.
 
@@ -144,7 +144,7 @@ Async version of `andThen`. Returns `None` if the option is `None`, otherwise ca
 
 > **expect**(`msg`): `T`
 
-Defined in: [option.ts:72](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L72)
+Defined in: [option.ts:72](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L72)
 
 Returns the contained `Some` value.
 
@@ -168,7 +168,7 @@ Returns the contained `Some` value.
 
 > **filter**(`predicate`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:178](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L178)
+Defined in: [option.ts:178](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L178)
 
 Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
 - `Some(t)` if `predicate` returns `true` (where `t` is the wrapped value), and
@@ -190,7 +190,7 @@ Returns `None` if the option is `None`, otherwise calls `predicate` with the wra
 
 > **filterAsync**(`predicate`): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [option.ts:185](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L185)
+Defined in: [option.ts:185](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L185)
 
 Async version of `filter`. Returns `None` if the option is `None`, otherwise calls async `predicate` with the wrapped value and returns:
 - `Some(t)` if `predicate` resolves to `true` (where `t` is the wrapped value), and
@@ -212,7 +212,7 @@ Async version of `filter`. Returns `None` if the option is `None`, otherwise cal
 
 > **flatten**\<`U`\>(`this`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:255](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L255)
+Defined in: [option.ts:255](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L255)
 
 Converts from `Option<Option<T>>` to `Option<T>`.
 
@@ -242,7 +242,7 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 
 > **getOrInsert**(`value`): `T`
 
-Defined in: [option.ts:223](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L223)
+Defined in: [option.ts:223](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L223)
 
 Inserts `value` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -262,7 +262,7 @@ Inserts `value` into the option if it is `None`, then returns a reference to the
 
 > **getOrInsertWith**(`f`): `T`
 
-Defined in: [option.ts:228](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L228)
+Defined in: [option.ts:228](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L228)
 
 Inserts a value computed from `f` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -282,7 +282,7 @@ Inserts a value computed from `f` into the option if it is `None`, then returns 
 
 > **getOrInsertWithAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [option.ts:233](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L233)
+Defined in: [option.ts:233](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L233)
 
 Async version of `getOrInsertWith`. Inserts a value computed from async `f` into the option if it is `None`, then returns a reference to the contained value.
 
@@ -302,7 +302,7 @@ Async version of `getOrInsertWith`. Inserts a value computed from async `f` into
 
 > **insert**(`value`): `T`
 
-Defined in: [option.ts:218](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L218)
+Defined in: [option.ts:218](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L218)
 
 Inserts `value` into the option, then returns a reference to it.
 
@@ -322,7 +322,7 @@ Inserts `value` into the option, then returns a reference to it.
 
 > **inspect**(`f`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:109](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L109)
+Defined in: [option.ts:109](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L109)
 
 Calls `f` with the `Some` value and returns the original option.
 
@@ -342,7 +342,7 @@ Calls `f` with the `Some` value and returns the original option.
 
 > **inspectAsync**(`f`): [`AsyncOption`](AsyncOption.md)\<`T`\>
 
-Defined in: [option.ts:114](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L114)
+Defined in: [option.ts:114](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L114)
 
 Awaits `f` with the `Some` value and returns the original option.
 
@@ -362,7 +362,7 @@ Awaits `f` with the `Some` value and returns the original option.
 
 > **isNone**(): `this is NoneOption<T>`
 
-Defined in: [option.ts:60](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L60)
+Defined in: [option.ts:60](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L60)
 
 Returns `true` if the option is a `None` value.
 
@@ -376,7 +376,7 @@ Returns `true` if the option is a `None` value.
 
 > **isNoneOr**(`f`): `boolean`
 
-Defined in: [option.ts:65](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L65)
+Defined in: [option.ts:65](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L65)
 
 Returns `true` if the option is a `None` or its value matches the predicate.
 
@@ -396,7 +396,7 @@ Returns `true` if the option is a `None` or its value matches the predicate.
 
 > **isSome**(): `this is SomeOption<T>`
 
-Defined in: [option.ts:49](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L49)
+Defined in: [option.ts:49](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L49)
 
 Returns `true` if the option is a `Some` value.
 
@@ -412,7 +412,7 @@ Returns `true` if the option is a `Some` value.
 
 > **isSomeAnd**\<`U`\>(`f`): `this is SomeOption<U>`
 
-Defined in: [option.ts:54](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L54)
+Defined in: [option.ts:54](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L54)
 
 Returns `true` if the option is a `Some` and its value matches the predicate.
 
@@ -436,7 +436,7 @@ Returns `true` if the option is a `Some` and its value matches the predicate.
 
 > **isSomeAnd**(`f`): `this is SomeOption<T>`
 
-Defined in: [option.ts:55](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L55)
+Defined in: [option.ts:55](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L55)
 
 ##### Parameters
 
@@ -454,7 +454,7 @@ Defined in: [option.ts:55](https://github.com/madkarmaa/results-ts/blob/59837911
 
 > **iter**(): `IterableIterator`\<`T`\>
 
-Defined in: [option.ts:152](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L152)
+Defined in: [option.ts:152](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L152)
 
 Returns an iterator over the contained value, or an empty iterator if absent.
 
@@ -468,7 +468,7 @@ Returns an iterator over the contained value, or an empty iterator if absent.
 
 > **map**\<`U`\>(`f`): [`Option`](../type-aliases/Option.md)\<`U`\>
 
-Defined in: [option.ts:99](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L99)
+Defined in: [option.ts:99](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L99)
 
 Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
@@ -494,7 +494,7 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 > **mapAsync**\<`U`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`U`\>
 
-Defined in: [option.ts:104](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L104)
+Defined in: [option.ts:104](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L104)
 
 Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an async function to a contained value.
 
@@ -520,7 +520,7 @@ Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an a
 
 > **mapOr**\<`U`\>(`defaultVal`, `f`): `U`
 
-Defined in: [option.ts:119](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L119)
+Defined in: [option.ts:119](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L119)
 
 Returns the fallback on `None`, or calls `f` with the `Some` value.
 
@@ -550,7 +550,7 @@ Returns the fallback on `None`, or calls `f` with the `Some` value.
 
 > **mapOrElse**\<`U`\>(`defaultF`, `f`): `U`
 
-Defined in: [option.ts:124](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L124)
+Defined in: [option.ts:124](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L124)
 
 Calls `defaultF` on `None`, or calls `f` with the `Some` value.
 
@@ -580,7 +580,7 @@ Calls `defaultF` on `None`, or calls `f` with the `Some` value.
 
 > **mapOrElseAsync**\<`U`\>(`defaultF`, `f`): `Promise`\<`U`\>
 
-Defined in: [option.ts:129](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L129)
+Defined in: [option.ts:129](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L129)
 
 Awaits `defaultF` on `None`, or awaits `f` with the `Some` value.
 
@@ -610,7 +610,7 @@ Awaits `defaultF` on `None`, or awaits `f` with the `Some` value.
 
 > **match**\<`U`\>(`handlers`): `U`
 
-Defined in: [option.ts:288](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L288)
+Defined in: [option.ts:288](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L288)
 
 Matches the `Option` with two functions, one for each variant.
 
@@ -642,7 +642,7 @@ Matches the `Option` with two functions, one for each variant.
 
 > **okOr**\<`E`\>(`err`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [option.ts:137](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L137)
+Defined in: [option.ts:137](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L137)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 
@@ -668,7 +668,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 > **okOrElse**\<`E`\>(`errF`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [option.ts:142](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L142)
+Defined in: [option.ts:142](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L142)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
 
@@ -694,7 +694,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 > **okOrElseAsync**\<`E`\>(`errF`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [option.ts:147](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L147)
+Defined in: [option.ts:147](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L147)
 
 Async version of `okOrElse`. Converts the `Option<T>` to an `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
 
@@ -722,7 +722,7 @@ Async version of `okOrElse`. Converts the `Option<T>` to an `AsyncResult<T, E>`,
 
 > **or**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:190](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L190)
+Defined in: [option.ts:190](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L190)
 
 Returns the option if it contains a value, otherwise returns `optb`.
 
@@ -746,7 +746,7 @@ Returns the option if it contains a value, otherwise returns `optb`.
 
 > **or**\<`T2`\>(`optb`): [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:191](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L191)
+Defined in: [option.ts:191](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L191)
 
 ##### Type Parameters
 
@@ -768,7 +768,7 @@ Defined in: [option.ts:191](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **or**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\> \| [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:192](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L192)
+Defined in: [option.ts:192](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L192)
 
 ##### Type Parameters
 
@@ -792,7 +792,7 @@ Defined in: [option.ts:192](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **orElse**\<`T2`\>(`f`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:199](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L199)
+Defined in: [option.ts:199](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L199)
 
 Returns the option if it contains a value, otherwise calls `f` and returns the result.
 
@@ -818,7 +818,7 @@ Returns the option if it contains a value, otherwise calls `f` and returns the r
 
 > **orElseAsync**\<`T2`\>(`f`): [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:204](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L204)
+Defined in: [option.ts:204](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L204)
 
 Async version of `orElse`. Returns the option if it contains a value, otherwise calls async `f` and returns the result.
 
@@ -844,7 +844,7 @@ Async version of `orElse`. Returns the option if it contains a value, otherwise 
 
 > **replace**(`value`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:248](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L248)
+Defined in: [option.ts:248](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L248)
 
 Sets the option to `Some(value)` and returns its previous state as an `Option`.
 
@@ -864,7 +864,7 @@ Sets the option to `Some(value)` and returns its previous state as an `Option`.
 
 > **take**(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:238](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L238)
+Defined in: [option.ts:238](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L238)
 
 Takes the value out of the option, leaving a `None` in its place.
 
@@ -878,7 +878,7 @@ Takes the value out of the option, leaving a `None` in its place.
 
 > **takeIf**(`predicate`): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [option.ts:243](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L243)
+Defined in: [option.ts:243](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L243)
 
 Takes the value out of the option, but only if the predicate evaluates to `true` on the value.
 
@@ -898,7 +898,7 @@ Takes the value out of the option, but only if the predicate evaluates to `true`
 
 > **toString**(): `string`
 
-Defined in: [option.ts:44](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L44)
+Defined in: [option.ts:44](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L44)
 
 #### Returns
 
@@ -910,7 +910,7 @@ Defined in: [option.ts:44](https://github.com/madkarmaa/results-ts/blob/59837911
 
 > **transpose**\<`T`, `E`\>(`this`): [`Result`](../type-aliases/Result.md)\<[`Option`](../type-aliases/Option.md)\<`T`\>, `E`\>
 
-Defined in: [option.ts:265](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L265)
+Defined in: [option.ts:265](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L265)
 
 Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
@@ -947,7 +947,7 @@ Converts `Some(Ok(value))` to `Ok(Some(value))`, `Some(Err(error))` to
 
 > **unwrap**(): `T`
 
-Defined in: [option.ts:79](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L79)
+Defined in: [option.ts:79](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L79)
 
 Returns the contained `Some` value.
 
@@ -965,7 +965,7 @@ Returns the contained `Some` value.
 
 > **unwrapOr**(`defaultVal`): `T`
 
-Defined in: [option.ts:84](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L84)
+Defined in: [option.ts:84](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L84)
 
 Returns the contained `Some` value or a provided default.
 
@@ -985,7 +985,7 @@ Returns the contained `Some` value or a provided default.
 
 > **unwrapOrElse**(`f`): `T`
 
-Defined in: [option.ts:89](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L89)
+Defined in: [option.ts:89](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L89)
 
 Returns the contained `Some` value, or calls `f` on `None`.
 
@@ -1005,7 +1005,7 @@ Returns the contained `Some` value, or calls `f` on `None`.
 
 > **unwrapOrElseAsync**(`f`): `Promise`\<`T`\>
 
-Defined in: [option.ts:94](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L94)
+Defined in: [option.ts:94](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L94)
 
 Returns the `Some` value, or awaits `f` on `None`.
 
@@ -1025,7 +1025,7 @@ Returns the `Some` value, or awaits `f` on `None`.
 
 > **unzip**\<`T`, `U`\>(`this`): \[[`Option`](../type-aliases/Option.md)\<`T`\>, [`Option`](../type-aliases/Option.md)\<`U`\>\]
 
-Defined in: [option.ts:283](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L283)
+Defined in: [option.ts:283](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L283)
 
 Unzips an `Option` containing a tuple of two values.
 
@@ -1059,7 +1059,7 @@ Returns `[Some(a), Some(b)]` for `Some([a, b])`, or `[None, None]` for `None`.
 
 > **xor**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:209](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L209)
+Defined in: [option.ts:209](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L209)
 
 Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
 
@@ -1083,7 +1083,7 @@ Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `No
 
 > **xor**\<`T2`\>(`optb`): [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:210](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L210)
+Defined in: [option.ts:210](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L210)
 
 ##### Type Parameters
 
@@ -1105,7 +1105,7 @@ Defined in: [option.ts:210](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **xor**\<`T2`\>(`optb`): [`Option`](../type-aliases/Option.md)\<`T` \| `T2`\> \| [`AsyncOption`](AsyncOption.md)\<`T` \| `T2`\>
 
-Defined in: [option.ts:211](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L211)
+Defined in: [option.ts:211](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L211)
 
 ##### Type Parameters
 
@@ -1131,7 +1131,7 @@ Defined in: [option.ts:211](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **zip**\<`U`\>(`other`): [`Option`](../type-aliases/Option.md)\<\[`T`, `U`\]\>
 
-Defined in: [option.ts:272](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L272)
+Defined in: [option.ts:272](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L272)
 
 Combines two options into an option containing a tuple of their values.
 
@@ -1157,7 +1157,7 @@ Returns `Some([a, b])` if both options are `Some`, otherwise returns `None`.
 
 > **zip**\<`U`\>(`other`): [`AsyncOption`](AsyncOption.md)\<\[`T`, `U`\]\>
 
-Defined in: [option.ts:273](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L273)
+Defined in: [option.ts:273](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L273)
 
 ##### Type Parameters
 
@@ -1179,7 +1179,7 @@ Defined in: [option.ts:273](https://github.com/madkarmaa/results-ts/blob/5983791
 
 > **zip**\<`U`\>(`other`): [`Option`](../type-aliases/Option.md)\<\[`T`, `U`\]\> \| [`AsyncOption`](AsyncOption.md)\<\[`T`, `U`\]\>
 
-Defined in: [option.ts:274](https://github.com/madkarmaa/results-ts/blob/59837911cd809c86b2752dfc2815fe7973609f5d/src/option.ts#L274)
+Defined in: [option.ts:274](https://github.com/madkarmaa/results-ts/blob/c58f1a23b90448049621e08e35753ac39e638895/src/option.ts#L274)
 
 ##### Type Parameters
 
