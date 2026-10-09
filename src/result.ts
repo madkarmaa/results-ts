@@ -333,6 +333,7 @@ interface ResultMethods<T, E> {
 }
 
 class ResultImpl<T, E> implements ResultMethods<T, E> {
+    // Private states are immutable, so fresh wrappers can safely share them.
     readonly #state: Either<E, T>;
 
     static name = 'Result';

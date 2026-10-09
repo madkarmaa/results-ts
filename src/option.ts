@@ -373,6 +373,8 @@ type AsyncInsertionState<T> = {
 
 class OptionImpl<T> implements OptionMethods<T> {
     #state: T | NoneValue;
+    // Retain this record once allocated so in-flight insertions observe every
+    // later invalidation, even after the pending promise has been cleared.
     #insertion?: AsyncInsertionState<T>;
 
     static name = 'Option';
@@ -776,14 +778,14 @@ class OptionImpl<T> implements OptionMethods<T> {
 
         if (insertion.promise) return insertion.promise;
 
-        const startVersion = insertion.mutationVersion;
+        const startMutationVersion = insertion.mutationVersion;
 
         const pendingToken = insertion.pendingToken + 1;
         insertion.pendingToken = pendingToken;
 
         const insertPromise = ASYNC_START.then(() => f()).then((value) => {
             if (
-                insertion.mutationVersion === startVersion &&
+                insertion.mutationVersion === startMutationVersion &&
                 insertion.pendingToken === pendingToken
             ) {
                 insertion.mutationVersion += 1;
