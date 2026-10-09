@@ -143,4 +143,30 @@ describe('private state and payload preservation', () => {
         for (const operation of operations)
             expect(operation).toThrow(InvalidArgumentError);
     });
+
+    test('fresh Result wrappers retain shared mutable error payloads', () => {
+        const error = { count: 0 };
+        const nested: Result<Result<number, never>, typeof error> = Err(error);
+        const optional: Result<Option<number>, typeof error> = Err(error);
+        const flattened = [nested.flatten(), nested.flatten()] as const;
+        const transposed = [
+            optional.transpose(),
+            optional.transpose()
+        ] as const;
+
+        expect(flattened[0]).not.toBe(flattened[1]);
+        expect(transposed[0]).not.toBe(transposed[1]);
+        expect(transposed[0].unwrap()).not.toBe(transposed[1].unwrap());
+        error.count = 1;
+        for (const result of flattened) {
+            expect(result).not.toBe(nested);
+            expect(result.unwrapErr()).toBe(error);
+            expect(result.unwrapErr().count).toBe(1);
+        }
+        for (const option of transposed) {
+            expect(option.unwrap()).not.toBe(optional);
+            expect(option.unwrap().unwrapErr()).toBe(error);
+            expect(option.unwrap().unwrapErr().count).toBe(1);
+        }
+    });
 });
