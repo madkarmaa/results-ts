@@ -67,6 +67,12 @@ console.log(message);
 
 See the [guides and API reference](https://results-ts.madkarma.top).
 
+Install the [agent skill](./skills/results-ts/SKILL.md) for guidance on using the library:
+
+```bash
+bunx skills add madkarmaa/results-ts --skill results-ts
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup and pull request requirements.
