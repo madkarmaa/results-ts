@@ -3,9 +3,6 @@ import { Some, None, type Option } from '../src/option';
 import { Ok, Err, type Result } from '../src/result';
 import { some, none, inc, gt0 } from './fixtures';
 
-// ---------------------------------------------------------------------------
-// Option - queries
-// ---------------------------------------------------------------------------
 group('Option - queries', () => {
     bench('Some.isSome()', () => {
         do_not_optimize(some.isSome());
@@ -33,9 +30,6 @@ group('Option - queries', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Option - unwrap family
-// ---------------------------------------------------------------------------
 group('Option - unwrap family', () => {
     bench('Some.unwrap', () => {
         do_not_optimize(some.unwrap());
@@ -57,9 +51,6 @@ group('Option - unwrap family', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Option - map family (allocation-heavy transforms)
-// ---------------------------------------------------------------------------
 group('Option - map family', () => {
     bench('Some.map (alloc)', () => {
         do_not_optimize(some.map(inc));
@@ -87,9 +78,6 @@ group('Option - map family', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Option - okOr / okOrElse (Result construction)
-// ---------------------------------------------------------------------------
 group('Option - okOr family', () => {
     bench('Some.okOr', () => {
         do_not_optimize(some.okOr(1));
@@ -105,9 +93,6 @@ group('Option - okOr family', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Option - combinators (allocation-heavy transforms)
-// ---------------------------------------------------------------------------
 group('Option - combinators', () => {
     const some2: Option<number> = Some(2);
     bench('Some.and (reuse/optb)', () => {
@@ -154,9 +139,6 @@ group('Option - combinators', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Option - mutation (insert / getOrInsert / take / replace)
-// ---------------------------------------------------------------------------
 group('Option - mutation', () => {
     bench('Some.insert', () => {
         const o = Some(0);
@@ -208,9 +190,6 @@ group('Option - mutation', () => {
     }).gc('once');
 });
 
-// ---------------------------------------------------------------------------
-// Option - flatten / transpose / unzip / match (heavy transforms)
-// ---------------------------------------------------------------------------
 group('Option - flatten / transpose / unzip / match', () => {
     const nestedSome: Option<Option<number>> = Some(Some(1));
 
@@ -240,9 +219,6 @@ group('Option - flatten / transpose / unzip / match', () => {
     });
 });
 
-// ---------------------------------------------------------------------------
-// Option - iter
-// ---------------------------------------------------------------------------
 group('Option - iter', () => {
     bench('Some.iter', () => {
         for (const v of some.iter()) do_not_optimize(v);

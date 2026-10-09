@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        // Environment setup & latest features
+        // Environment
         "lib": ["ESNext", "DOM"],
         "types": ["bun", "node", "vitepress/client"],
         "target": "ESNext",
@@ -12,14 +12,14 @@
         "verbatimModuleSyntax": true,
         "noEmit": true,
 
-        // Best practices
+        // Type checks
         "strict": true,
         "skipLibCheck": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedIndexedAccess": true,
         "noImplicitOverride": true,
 
-        // Some stricter flags (disabled by default)
+        // Additional checks
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noPropertyAccessFromIndexSignature": false

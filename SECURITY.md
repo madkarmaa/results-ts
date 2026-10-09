@@ -1,24 +1,22 @@
-# Security Policy
+# Security policy
 
-## Supported Versions
+## Supported versions
 
 Only the latest version of `results-ts` receives security fixes.
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-Please **do not** open a public GitHub issue for security vulnerabilities.
+Report vulnerabilities through [GitHub's private vulnerability reporting](https://github.com/madkarmaa/results-ts/security/advisories/new). Do not open a public issue.
 
-Instead, report them via [GitHub's private vulnerability reporting](https://github.com/madkarmaa/results-ts/security/advisories/new).
-
-Include as much detail as possible:
+Include:
 
 - A description of the vulnerability
 - Steps to reproduce
 - Potential impact
 - Any suggested fixes, if you have them
 
-You can expect an acknowledgement within **72 hours** and a resolution or status update within **7 days**.
+Expect an acknowledgement within 72 hours and a resolution or status update within 7 days.
 
 ## Scope
 
-This is a zero-dependency TypeScript utility library with no network access, file system usage, or runtime side effects. The attack surface is minimal to non-existent.
+`results-ts` has no runtime dependencies. The library does not access the network or file system. Its methods can invoke callbacks supplied by the caller.

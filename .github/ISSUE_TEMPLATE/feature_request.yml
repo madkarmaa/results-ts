@@ -29,7 +29,7 @@ body:
       id: proposed_api
       attributes:
           label: Proposed API usage
-          description: Provide a short code snippet that demonstrates the proposed API usage.
+          description: Show how you would use the API in a short code example.
           render: typescript
       validations:
           required: true
@@ -38,7 +38,7 @@ body:
       id: rationale
       attributes:
           label: Why?
-          description: Explain why this method or behavior is needed and how it would benefit users.
-          placeholder: Explain why this method or behavior is needed and how it would benefit users.
+          description: Explain which problem this method or behavior would solve.
+          placeholder: Explain which problem this method or behavior would solve.
       validations:
           required: true

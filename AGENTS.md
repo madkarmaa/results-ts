@@ -1,13 +1,13 @@
-# Model Instructions
+# Model instructions
 
-## Core Requirements
+## Core requirements
 
-### Development Standards
+### Development standards
 
 - Keep README content concise and focused on installing, running, and using the app. Do not add unnecessary information, internal commit/release workflow documentation, or other maintainer process details.
 - Before introducing or refactoring main package APIs, consult their current official web documentation and migration guides, and check installed declarations for deprecations. Use supported modern APIs; do not suppress deprecated usage warnings. Dependency versions must satisfy the installed toolchain's peer requirements.
 
-### TypeScript Type Safety Is Mandatory
+### TypeScript type safety is mandatory
 
 - Type safety is an absolute requirement.
 - Preserve and maximize static type guarantees at all times.
@@ -18,7 +18,7 @@
 
 ---
 
-### `any` Is Strictly Prohibited
+### `any` is strictly prohibited
 
 - Never introduce the `any` type unless there is no technically viable alternative.
 - Before using `any`, exhaust:
@@ -45,7 +45,7 @@ Avoid:
 
 ---
 
-### Default Package Manager: Bun
+### Default package manager
 
 - Assume Bun is the package manager unless project files indicate otherwise.
 - Prefer Bun commands in all generated instructions and examples.
@@ -66,7 +66,7 @@ Only switch package managers when:
 
 ---
 
-### Generate Only From Available Source Code
+### Generate only from available source code
 
 - All generated implementations must be derived from the existing source code and project structure.
 - Do not invent APIs, architecture, utilities, conventions, or behavior.
@@ -93,7 +93,7 @@ Forbidden:
 
 ---
 
-### Prefer Native Filesystem and CLI Operations Over Manual Content Handling
+### Use native filesystem and CLI operations
 
 - When performing file operations, always prefer built-in system tools and binaries over reading, rewriting, or reconstructing file contents in code or model output.
 - Use OS/environment tools when available:
@@ -111,7 +111,7 @@ Forbidden:
 
 ---
 
-## Implementation Preferences
+## Implementation preferences
 
 ### TypeScript
 
@@ -121,14 +121,14 @@ Forbidden:
 - Preserve exact return types.
 - Avoid unnecessary assertions (`as`).
 
-### Code Changes
+### Code changes
 
 - Make the smallest correct change.
 - Keep changes consistent with repository style.
 - Do not refactor unrelated code.
 - Every new feature must have coverage in both tests and benchmarks before it is considered done.
 
-### Output Expectations
+### Output expectations
 
 - Produce production-ready code.
 - Generated code should be immediately usable.

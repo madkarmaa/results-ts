@@ -10,11 +10,15 @@ type Example = {
 
 const root = resolve(import.meta.dirname, '..');
 const guideDir = resolve(root, 'docs', 'guide');
+const skillDir = resolve(root, 'skills', 'results-ts');
 const markdownFiles = [
     resolve(root, 'README.md'),
     ...readdirSync(guideDir)
         .filter((file) => file.endsWith('.md'))
-        .map((file) => resolve(guideDir, file))
+        .map((file) => resolve(guideDir, file)),
+    ...readdirSync(skillDir, { recursive: true, encoding: 'utf8' })
+        .filter((file) => file.endsWith('.md'))
+        .map((file) => resolve(skillDir, file))
 ];
 const typescriptFence = /```(?:typescript|ts)\r?\n([\s\S]*?)```/g;
 

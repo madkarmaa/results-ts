@@ -4,19 +4,17 @@ import { type AsyncResult, AsyncResultImpl } from './async-result';
 import { isOptionOperand, isAsyncOptionOperand } from './utils';
 
 /**
- * An async wrapper around `Option<T>` that is `PromiseLike` (so it's awaitable)
- * but also carries all chainable `Option` methods.
+ * An awaitable wrapper around `Option<T>` with chainable methods.
  *
  * `and`, `or`, `xor`, and `zip` accept sync or promise-like operands. Async
- * operands resolve concurrently with the receiver; either rejection propagates.
+ * operands resolve concurrently with the receiver. Either rejection propagates.
  *
- * **Intentionally omitted mutation methods:** `insert`, `getOrInsert`, `getOrInsertWith`,
- * `getOrInsertWithAsync`, `take`, `takeIf`, and `replace` are not available on `AsyncOption`.
- * These methods mutate the `Option` in-place, which is not meaningful on a pending async value -
- * the underlying `Option` doesn't exist yet. Use `await` to resolve first, then mutate.
+ * `AsyncOption` omits `insert`, `getOrInsert`, `getOrInsertWith`,
+ * `getOrInsertWithAsync`, `take`, `takeIf`, and `replace`.
+ * Await the wrapper to get an `Option`, then call its mutation methods.
  *
- * **Error behavior in async context:** Methods that throw synchronously on `Option`
- * (e.g. `unwrap` on `None`, `flatten` on non-nested) will produce a rejected `Promise`.
+ * Methods that throw on `Option` reject on `AsyncOption`.
+ * For example, `unwrap` rejects on `None`, and `flatten` rejects a non-nested value.
  */
 export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
@@ -25,7 +23,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     isSome(): Promise<boolean>;
 
     /**
-     * Returns a `Promise` that resolves to `true` if the option is a `Some` and the value inside matches a predicate.
+     * Returns a `Promise` that resolves to `true` if the option is a `Some` and its value matches the predicate.
      */
     isSomeAnd(f: (val: T) => boolean): Promise<boolean>;
 
@@ -35,7 +33,7 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     isNone(): Promise<boolean>;
 
     /**
-     * Returns a `Promise` that resolves to `true` if the option is a `None` or the value inside matches a predicate.
+     * Returns a `Promise` that resolves to `true` if the option is a `None` or its value matches the predicate.
      */
     isNoneOr(f: (val: T) => boolean): Promise<boolean>;
 
@@ -59,12 +57,12 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     unwrapOr(defaultVal: T): Promise<T>;
 
     /**
-     * Returns the contained `Some` value or computes it from a closure.
+     * Returns the contained `Some` value, or calls `f` on `None`.
      */
     unwrapOrElse(f: () => T): Promise<T>;
 
     /**
-     * Async version of `unwrapOrElse`. Returns the contained `Some` value or computes it from an async closure.
+     * Returns the `Some` value, or awaits `f` on `None`.
      */
     unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T>;
 
@@ -79,29 +77,29 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U>;
 
     /**
-     * Calls the provided closure with a reference to the contained value (if `Some`).
+     * Calls `f` with the `Some` value and returns the original option.
      *
      * Returns the original option.
      */
     inspect(f: (val: T) => void): AsyncOption<T>;
 
     /**
-     * Async version of `inspect`. Calls the provided async closure with a reference to the contained value (if `Some`), then returns the original option.
+     * Awaits `f` with the `Some` value and returns the original option.
      */
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T>;
 
     /**
-     * Returns the provided default result (if none), or applies a function to the contained value (if any).
+     * Returns the fallback on `None`, or calls `f` with the `Some` value.
      */
     mapOr<U>(defaultVal: U, f: (val: T) => U): Promise<U>;
 
     /**
-     * Computes a default function result (if none), or applies a different function to the contained value (if any).
+     * Calls `defaultF` on `None`, or calls `f` with the `Some` value.
      */
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): Promise<U>;
 
     /**
-     * Async version of `mapOrElse`. Computes a default async function result (if none), or applies a different async function to the contained value (if any).
+     * Awaits `defaultF` on `None`, or awaits `f` with the `Some` value.
      */
     mapOrElseAsync<U>(
         defaultF: () => PromiseLike<U>,
@@ -198,8 +196,8 @@ export interface AsyncOption<T> extends PromiseLike<Option<T>> {
     /**
      * Unzips an `AsyncOption` containing a tuple of two values.
      *
-     * If `self` resolves to `Some((a, b))` this method returns `(AsyncOption(a), AsyncOption(b))`.
-     * Otherwise, `(AsyncOption(None), AsyncOption(None))` is returned.
+     * Returns two async options. They resolve to `Some(a)` and `Some(b)` for
+     * `Some([a, b])`, or both resolve to `None` for `None`.
      */
     unzip<T, U>(this: AsyncOption<[T, U]>): [AsyncOption<T>, AsyncOption<U>];
 

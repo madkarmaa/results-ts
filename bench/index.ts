@@ -14,9 +14,6 @@ import './edge-cases';
 import './state-clones';
 import './workloads';
 
-// ---------------------------------------------------------------------------
-// Runner modes
-// ---------------------------------------------------------------------------
 const PUBLISH = process.env.BENCH_PUBLISH === '1';
 
 const main = async () => {

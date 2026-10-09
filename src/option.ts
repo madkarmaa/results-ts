@@ -27,15 +27,16 @@ export type SomeOption<T> = OptionMethods<T> & { readonly _isSome: true };
 export type NoneOption<T> = OptionMethods<T> & { readonly _isSome: false };
 
 /**
- * Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
+ * `Option<T>` is either `Some(value)` with a value of type `T`, or `None`.
+ * Use `match` to handle both variants.
  *
- * `Option`s are commonly paired with pattern matching to query the presence of a value and take action, always accounting for the `None` case.
+ * Invalid callbacks and operands throw errors. Callback exceptions propagate.
  *
  * `and`, `or`, `xor`, and `zip` return an `AsyncOption` for promise-like operands.
  * They capture the receiver's state at invocation and resolve the operand even
- * when its value is unused; operand rejections propagate.
+ * when its value is unused. Operand rejections propagate.
  *
- * @template T Contains the type of the value that may be present in the `Option`.
+ * @template T The contained value type.
  */
 export type Option<T> = SomeOption<T> | NoneOption<T>;
 
@@ -48,9 +49,7 @@ interface OptionMethods<T> {
     isSome(): this is SomeOption<T>;
 
     /**
-     * Returns `true` if the option is a `Some` and the value inside of it matches a predicate.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns `true` if the option is a `Some` and its value matches the predicate.
      */
     isSomeAnd<U extends T>(f: (val: T) => val is U): this is SomeOption<U>;
     isSomeAnd(f: (val: T) => boolean): this is SomeOption<T>;
@@ -61,94 +60,71 @@ interface OptionMethods<T> {
     isNone(): this is NoneOption<T>;
 
     /**
-     * Returns `true` if the option is a `None` or the value inside of it matches a predicate.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns `true` if the option is a `None` or its value matches the predicate.
      */
     isNoneOr(f: (val: T) => boolean): boolean;
 
     /**
      * Returns the contained `Some` value.
      *
-     * @throws Panics if the value is a `None` with a custom panic message provided by `msg`.
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `PanicError` with `msg` on `None`.
      */
     expect(msg: string): T;
 
     /**
      * Returns the contained `Some` value.
      *
-     * @throws Panics if the self value equals `None`.
+     * @throws `PanicError` on `None`.
      */
     unwrap(): T;
 
     /**
      * Returns the contained `Some` value or a provided default.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     unwrapOr(defaultVal: T): T;
 
     /**
-     * Returns the contained `Some` value or computes it from a closure.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns the contained `Some` value, or calls `f` on `None`.
      */
     unwrapOrElse(f: () => T): T;
 
     /**
-     * Async version of `unwrapOrElse`. Returns the contained `Some` value or computes it from an async closure.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns the `Some` value, or awaits `f` on `None`.
      */
     unwrapOrElseAsync(f: () => PromiseLike<T>): Promise<T>;
 
     /**
      * Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     map<U>(f: (val: T) => U): Option<U>;
 
     /**
      * Async version of `map`. Maps an `Option<T>` to `AsyncOption<U>` by applying an async function to a contained value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncOption<U>;
 
     /**
-     * Calls the provided closure with a reference to the contained value (if `Some`).
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Calls `f` with the `Some` value and returns the original option.
      */
     inspect(f: (val: T) => void): Option<T>;
 
     /**
-     * Async version of `inspect`. Calls the provided async closure with a reference to the contained value (if `Some`), then returns the original option.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Awaits `f` with the `Some` value and returns the original option.
      */
     inspectAsync(f: (val: T) => PromiseLike<void>): AsyncOption<T>;
 
     /**
-     * Returns the provided default result (if none), or applies a function to the contained value (if any).
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns the fallback on `None`, or calls `f` with the `Some` value.
      */
     mapOr<U>(defaultVal: U, f: (val: T) => U): U;
 
     /**
-     * Computes a default function result (if none), or applies a different function to the contained value (if any).
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Calls `defaultF` on `None`, or calls `f` with the `Some` value.
      */
     mapOrElse<U>(defaultF: () => U, f: (val: T) => U): U;
 
     /**
-     * Async version of `mapOrElse`. Computes a default async function result (if none), or applies a different async function to the contained value (if any).
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Awaits `defaultF` on `None`, or awaits `f` with the `Some` value.
      */
     mapOrElseAsync<U>(
         defaultF: () => PromiseLike<U>,
@@ -157,34 +133,26 @@ interface OptionMethods<T> {
 
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     okOr<E>(err: E): Result<T, E>;
 
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     okOrElse<E>(errF: () => E): Result<T, E>;
 
     /**
-     * Async version of `okOrElse`. Transforms the `Option<T>` into a `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Async version of `okOrElse`. Converts the `Option<T>` to an `AsyncResult<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(await errF())`.
      */
     okOrElseAsync<E>(errF: () => PromiseLike<E>): AsyncResult<T, E>;
 
     /**
-     * Returns an iterator over the possibly contained value.
+     * Returns an iterator over the contained value, or an empty iterator if absent.
      */
     iter(): IterableIterator<T>;
 
     /**
      * Returns `None` if the option is `None`, otherwise returns `optb`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     and<U>(optb: Option<U>): Option<U>;
     and<U>(optb: PromiseLike<Option<U>>): AsyncOption<U>;
@@ -194,15 +162,11 @@ interface OptionMethods<T> {
 
     /**
      * Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     andThen<U>(f: (val: T) => Option<U>): Option<U>;
 
     /**
      * Async version of `andThen`. Returns `None` if the option is `None`, otherwise calls async `f` with the wrapped value and returns the result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     andThenAsync<U>(f: (val: T) => PromiseLike<Option<U>>): AsyncOption<U>;
 
@@ -210,8 +174,6 @@ interface OptionMethods<T> {
      * Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
      * - `Some(t)` if `predicate` returns `true` (where `t` is the wrapped value), and
      * - `None` if `predicate` returns `false`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     filter(predicate: (val: T) => boolean): Option<T>;
 
@@ -219,15 +181,11 @@ interface OptionMethods<T> {
      * Async version of `filter`. Returns `None` if the option is `None`, otherwise calls async `predicate` with the wrapped value and returns:
      * - `Some(t)` if `predicate` resolves to `true` (where `t` is the wrapped value), and
      * - `None` if `predicate` resolves to `false`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     filterAsync(predicate: (val: T) => PromiseLike<boolean>): AsyncOption<T>;
 
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     or<T2>(optb: Option<T2>): Option<T | T2>;
     or<T2>(optb: PromiseLike<Option<T2>>): AsyncOption<T | T2>;
@@ -237,22 +195,16 @@ interface OptionMethods<T> {
 
     /**
      * Returns the option if it contains a value, otherwise calls `f` and returns the result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     orElse<T2>(f: () => Option<T2>): Option<T | T2>;
 
     /**
      * Async version of `orElse`. Returns the option if it contains a value, otherwise calls async `f` and returns the result.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     orElseAsync<T2>(f: () => PromiseLike<Option<T2>>): AsyncOption<T | T2>;
 
     /**
      * Returns `Some` if exactly one of `this`, `optb` is `Some`, otherwise returns `None`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     xor<T2>(optb: Option<T2>): Option<T | T2>;
     xor<T2>(optb: PromiseLike<Option<T2>>): AsyncOption<T | T2>;
@@ -262,29 +214,21 @@ interface OptionMethods<T> {
 
     /**
      * Inserts `value` into the option, then returns a reference to it.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     insert(value: T): T;
 
     /**
      * Inserts `value` into the option if it is `None`, then returns a reference to the contained value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     getOrInsert(value: T): T;
 
     /**
      * Inserts a value computed from `f` into the option if it is `None`, then returns a reference to the contained value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     getOrInsertWith(f: () => T): T;
 
     /**
      * Async version of `getOrInsertWith`. Inserts a value computed from async `f` into the option if it is `None`, then returns a reference to the contained value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     getOrInsertWithAsync(f: () => PromiseLike<T>): Promise<T>;
 
@@ -295,33 +239,28 @@ interface OptionMethods<T> {
 
     /**
      * Takes the value out of the option, but only if the predicate evaluates to `true` on the value.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     takeIf(predicate: (val: T) => boolean): Option<T>;
 
     /**
-     * Replaces the actual value in the option by the value given in parameter, returning the old value if present,
-     * leaving a `Some` in its place.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Sets the option to `Some(value)` and returns its previous state as an `Option`.
      */
     replace(value: T): Option<T>;
 
     /**
      * Converts from `Option<Option<T>>` to `Option<T>`.
      *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `FlattenError` if a `Some` value is not an `Option`.
      */
     flatten<U>(this: Option<Option<U>>): Option<U>;
 
     /**
      * Transposes an `Option` of a `Result` into a `Result` of an `Option`.
      *
-     * `Some(Ok(_))` is mapped to `Ok(Some(_))`, `Some(Err(_))` is mapped to `Err(_)`, and `None`
-     * will be mapped to `Ok(None)`.
+     * Converts `Some(Ok(value))` to `Ok(Some(value))`, `Some(Err(error))` to
+     * `Err(error)`, and `None` to `Ok(None)`.
      *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * @throws `TransposeError` if a `Some` value is not a `Result`.
      */
     transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E>;
 
@@ -329,8 +268,6 @@ interface OptionMethods<T> {
      * Combines two options into an option containing a tuple of their values.
      *
      * Returns `Some([a, b])` if both options are `Some`, otherwise returns `None`.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     zip<U>(other: Option<U>): Option<[T, U]>;
     zip<U>(other: PromiseLike<Option<U>>): AsyncOption<[T, U]>;
@@ -341,17 +278,12 @@ interface OptionMethods<T> {
     /**
      * Unzips an `Option` containing a tuple of two values.
      *
-     * If `self` is `Some((a, b))` this method returns `(Some(a), Some(b))`. Otherwise, `(None, None)`
-     * is returned.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+     * Returns `[Some(a), Some(b)]` for `Some([a, b])`, or `[None, None]` for `None`.
      */
     unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>];
 
     /**
      * Matches the `Option` with two functions, one for each variant.
-     *
-     * @throws If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
      */
     match<U>(handlers: { Some: (val: T) => U; None: () => U }): U;
 }
@@ -477,9 +409,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isSomeValue(state)) return Some(f(state));
 
-        // None path: the wrapped value is unchanged, so reuse `this` to avoid an
-        // extra allocation. The Some type is narrowed to `U` via a cast - safe
-        // because the value is never read on a `None`.
+        // Reuse None. It contains no value of the old type.
         return this as unknown as OptionImpl<U>;
     }
 
@@ -608,9 +538,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isSomeValue(state)) return optb;
 
-        // None path: `this` is already `None`, so reuse it to avoid an extra
-        // allocation. The Some type is narrowed to `U` via a cast - safe because
-        // the value is never read on a `None`.
+        // Reuse None. It contains no value of the old type.
         return this as unknown as OptionImpl<U>;
     }
 
@@ -621,9 +549,7 @@ class OptionImpl<T> implements OptionMethods<T> {
         const state = this.#state;
         if (isSomeValue(state)) return f(state);
 
-        // None path: `this` is already `None`, so reuse it to avoid an extra
-        // allocation. The Some type is narrowed to `U` via a cast - safe because
-        // the value is never read on a `None`.
+        // Reuse None. It contains no value of the old type.
         return this as unknown as OptionImpl<U>;
     }
 

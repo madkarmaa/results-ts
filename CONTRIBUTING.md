@@ -1,10 +1,8 @@
 # Contributing
 
-Thanks for your interest in improving `results-ts`.
-
 ## Prerequisites
 
-- [Bun](https://bun.com/docs/installation) - **required**
+- [Bun](https://bun.com/docs/installation)
 - Node.js [`>=22.18.0`](./.node-version)
 
 ## Setup
@@ -29,8 +27,8 @@ bun install
 
 - Keep changes type-safe.
 - Align API behavior with Rust `Result`/`Option` semantics where applicable.
-- Add or update tests for any behavioral change, PRs without tests won't be merged.
-- Formatting is handled automatically by git hooks on commit.
+- Add or update tests for behavior changes. Every new feature also needs benchmarks.
+- Git hooks format staged files on commit.
 
 ## Before opening a PR
 
@@ -40,7 +38,7 @@ bun run typecheck && bun run test
 
 - Keep PRs focused and small.
 - Use [conventional commit](https://www.conventionalcommits.org/) messages.
-- Include a short description: what changed, why, and any tradeoffs.
+- Describe what changed, why, and any tradeoffs.
 
 ## Reporting issues
 

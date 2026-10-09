@@ -6,7 +6,7 @@
 
 # Interface: ResultMethods\<T, E\>
 
-Defined in: [result.ts:52](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L52)
+Defined in: [result.ts:51](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L51)
 
 ## Type Parameters
 
@@ -26,11 +26,11 @@ Defined in: [result.ts:52](https://github.com/madkarmaa/results-ts/blob/393ae2e7
 
 > **and**\<`U`, `E2`\>(`res`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `E2`\>
 
-Defined in: [result.ts:231](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L231)
+Defined in: [result.ts:194](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L194)
 
 Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
-Arguments passed to `and` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `andThen`, which is lazily evaluated.
+JavaScript evaluates the operand before the call. Use `andThen` to compute it only on `Ok`.
 
 ##### Type Parameters
 
@@ -52,15 +52,11 @@ Arguments passed to `and` are eagerly evaluated; if you are passing the result o
 
 [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `E2`\>
 
-##### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 #### Call Signature
 
 > **and**\<`U`, `E2`\>(`res`): [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `E2`\>
 
-Defined in: [result.ts:232](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L232)
+Defined in: [result.ts:195](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L195)
 
 ##### Type Parameters
 
@@ -86,7 +82,7 @@ Defined in: [result.ts:232](https://github.com/madkarmaa/results-ts/blob/393ae2e
 
 > **and**\<`U`, `E2`\>(`res`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `E2`\> \| [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `E2`\>
 
-Defined in: [result.ts:233](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L233)
+Defined in: [result.ts:196](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L196)
 
 ##### Type Parameters
 
@@ -114,11 +110,9 @@ Defined in: [result.ts:233](https://github.com/madkarmaa/results-ts/blob/393ae2e
 
 > **andThen**\<`U`, `F`\>(`f`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `F`\>
 
-Defined in: [result.ts:244](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L244)
+Defined in: [result.ts:203](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L203)
 
 Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
-
-This function can be used for control flow based on `Result` values.
 
 #### Type Parameters
 
@@ -140,17 +134,13 @@ This function can be used for control flow based on `Result` values.
 
 [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `F`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### andThenAsync()
 
 > **andThenAsync**\<`U`, `F`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `F`\>
 
-Defined in: [result.ts:251](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L251)
+Defined in: [result.ts:208](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L208)
 
 Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
 
@@ -174,17 +164,13 @@ Async version of `andThen`. Calls an async `f` if the result is `Ok`, otherwise 
 
 [`AsyncResult`](AsyncResult.md)\<`U`, `E` \| `F`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### err()
 
 > **err**(): [`Option`](../type-aliases/Option.md)\<`E`\>
 
-Defined in: [result.ts:93](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L93)
+Defined in: [result.ts:88](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L88)
 
 Converts from `Result<T, E>` to `Option<E>`.
 
@@ -200,9 +186,9 @@ Returns `Some` for `Err` and `None` for `Ok`.
 
 > **expect**(`msg`): `T`
 
-Defined in: [result.ts:200](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L200)
+Defined in: [result.ts:166](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L166)
 
-Returns the contained `Ok` value, consuming the `self` value.
+Returns the contained `Ok` value.
 
 #### Parameters
 
@@ -216,11 +202,7 @@ Returns the contained `Ok` value, consuming the `self` value.
 
 #### Throws
 
-Panics if the value is an `Err`, with a panic message including the passed message, and the content of the `Err`.
-
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+`PanicError` with `msg` and the error value on `Err`.
 
 ***
 
@@ -228,9 +210,9 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **expectErr**(`msg`): `E`
 
-Defined in: [result.ts:215](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L215)
+Defined in: [result.ts:180](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L180)
 
-Returns the contained `Err` value, consuming the `self` value.
+Returns the contained `Err` value.
 
 #### Parameters
 
@@ -244,11 +226,7 @@ Returns the contained `Err` value, consuming the `self` value.
 
 #### Throws
 
-Panics if the value is an `Ok`, with a panic message including the passed message, and the content of the `Ok`.
-
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+`PanicError` with `msg` and the success value on `Ok`.
 
 ***
 
@@ -256,9 +234,9 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **flatten**\<`U`, `F`\>(`this`): [`Result`](../type-aliases/Result.md)\<`U`, `E` \| `F`\>
 
-Defined in: [result.ts:314](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L314)
+Defined in: [result.ts:257](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L257)
 
-Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
+Unwraps one nested `Result`. The return type includes both error types.
 
 #### Type Parameters
 
@@ -282,7 +260,7 @@ Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
 
 #### Throws
 
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+`FlattenError` if an `Ok` value is not a `Result`.
 
 ***
 
@@ -290,7 +268,7 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **inspect**(`f`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:162](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L162)
+Defined in: [result.ts:135](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L135)
 
 Calls a function with a reference to the contained value if `Ok`.
 
@@ -306,17 +284,13 @@ Returns the original result.
 
 [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### inspectAsync()
 
 > **inspectAsync**(`f`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [result.ts:169](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L169)
+Defined in: [result.ts:140](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L140)
 
 Async version of `inspect`. Calls an async function with a reference to the contained value if `Ok`, then returns the original result.
 
@@ -330,17 +304,13 @@ Async version of `inspect`. Calls an async function with a reference to the cont
 
 [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### inspectErr()
 
 > **inspectErr**(`f`): [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-Defined in: [result.ts:178](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L178)
+Defined in: [result.ts:147](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L147)
 
 Calls a function with a reference to the contained value if `Err`.
 
@@ -356,17 +326,13 @@ Returns the original result.
 
 [`Result`](../type-aliases/Result.md)\<`T`, `E`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### inspectErrAsync()
 
 > **inspectErrAsync**(`f`): [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-Defined in: [result.ts:185](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L185)
+Defined in: [result.ts:152](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L152)
 
 Async version of `inspectErr`. Calls an async function with a reference to the contained value if `Err`, then returns the original result.
 
@@ -380,17 +346,13 @@ Async version of `inspectErr`. Calls an async function with a reference to the c
 
 [`AsyncResult`](AsyncResult.md)\<`T`, `E`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### isErr()
 
 > **isErr**(): `this is ErrResult<never, E>`
 
-Defined in: [result.ts:71](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L71)
+Defined in: [result.ts:68](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L68)
 
 Returns `true` if the result is `Err`.
 
@@ -406,9 +368,9 @@ Returns `true` if the result is `Err`.
 
 > **isErrAnd**\<`F`\>(`f`): `this is ErrResult<T, F>`
 
-Defined in: [result.ts:78](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L78)
+Defined in: [result.ts:73](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L73)
 
-Returns `true` if the result is `Err` and the value inside of it matches a predicate.
+Returns `true` if the result is `Err` and its value matches the predicate.
 
 ##### Type Parameters
 
@@ -426,15 +388,11 @@ Returns `true` if the result is `Err` and the value inside of it matches a predi
 
 `this is ErrResult<T, F>`
 
-##### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 #### Call Signature
 
 > **isErrAnd**(`f`): `this is ErrResult<T, E>`
 
-Defined in: [result.ts:79](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L79)
+Defined in: [result.ts:74](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L74)
 
 ##### Parameters
 
@@ -452,7 +410,7 @@ Defined in: [result.ts:79](https://github.com/madkarmaa/results-ts/blob/393ae2e7
 
 > **isOk**(): `this is OkResult<T, never>`
 
-Defined in: [result.ts:58](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L58)
+Defined in: [result.ts:57](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L57)
 
 Returns `true` if the result is `Ok`.
 
@@ -468,9 +426,9 @@ Returns `true` if the result is `Ok`.
 
 > **isOkAnd**\<`U`\>(`f`): `this is OkResult<U, E>`
 
-Defined in: [result.ts:65](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L65)
+Defined in: [result.ts:62](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L62)
 
-Returns `true` if the result is `Ok` and the value inside of it matches a predicate.
+Returns `true` if the result is `Ok` and its value matches the predicate.
 
 ##### Type Parameters
 
@@ -488,15 +446,11 @@ Returns `true` if the result is `Ok` and the value inside of it matches a predic
 
 `this is OkResult<U, E>`
 
-##### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 #### Call Signature
 
 > **isOkAnd**(`f`): `this is OkResult<T, E>`
 
-Defined in: [result.ts:66](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L66)
+Defined in: [result.ts:63](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L63)
 
 ##### Parameters
 
@@ -514,9 +468,9 @@ Defined in: [result.ts:66](https://github.com/madkarmaa/results-ts/blob/393ae2e7
 
 > **iter**(): `Iterable`\<`T`\>
 
-Defined in: [result.ts:192](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L192)
+Defined in: [result.ts:159](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L159)
 
-Returns an iterator over the possibly contained value.
+Returns an iterator over the contained value, or an empty iterator if absent.
 
 The iterator yields one value if the result is `Ok`, otherwise none.
 
@@ -530,11 +484,9 @@ The iterator yields one value if the result is `Ok`, otherwise none.
 
 > **map**\<`U`\>(`f`): [`Result`](../type-aliases/Result.md)\<`U`, `E`\>
 
-Defined in: [result.ts:102](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L102)
+Defined in: [result.ts:93](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L93)
 
 Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
-
-This function can be used to compose the results of two functions.
 
 #### Type Parameters
 
@@ -552,17 +504,13 @@ This function can be used to compose the results of two functions.
 
 [`Result`](../type-aliases/Result.md)\<`U`, `E`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### mapAsync()
 
 > **mapAsync**\<`U`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`U`, `E`\>
 
-Defined in: [result.ts:109](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L109)
+Defined in: [result.ts:98](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L98)
 
 Async version of `map`. Maps a `Result<T, E>` to `AsyncResult<U, E>` by applying an async function to a contained `Ok` value, leaving an `Err` value untouched.
 
@@ -582,21 +530,15 @@ Async version of `map`. Maps a `Result<T, E>` to `AsyncResult<U, E>` by applying
 
 [`AsyncResult`](AsyncResult.md)\<`U`, `E`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### mapErr()
 
 > **mapErr**\<`F`\>(`f`): [`Result`](../type-aliases/Result.md)\<`T`, `F`\>
 
-Defined in: [result.ts:146](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L146)
+Defined in: [result.ts:123](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L123)
 
 Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
-
-This function can be used to pass through a successful result while handling an error.
 
 #### Type Parameters
 
@@ -614,17 +556,13 @@ This function can be used to pass through a successful result while handling an 
 
 [`Result`](../type-aliases/Result.md)\<`T`, `F`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### mapErrAsync()
 
 > **mapErrAsync**\<`F`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`T`, `F`\>
 
-Defined in: [result.ts:153](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L153)
+Defined in: [result.ts:128](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L128)
 
 Async version of `mapErr`. Maps a `Result<T, E>` to `AsyncResult<T, F>` by applying an async function to a contained `Err` value, leaving an `Ok` value untouched.
 
@@ -644,21 +582,17 @@ Async version of `mapErr`. Maps a `Result<T, E>` to `AsyncResult<T, F>` by apply
 
 [`AsyncResult`](AsyncResult.md)\<`T`, `F`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### mapOr()
 
 > **mapOr**\<`U`\>(`fallback`, `f`): `U`
 
-Defined in: [result.ts:118](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L118)
+Defined in: [result.ts:105](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L105)
 
-Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
+Returns the fallback on `Err`, or calls `f` with the `Ok` value.
 
-Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `mapOrElse`, which is lazily evaluated.
+JavaScript evaluates the fallback before the call. Use `mapOrElse` to compute it only on `Err`.
 
 #### Type Parameters
 
@@ -680,21 +614,15 @@ Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result
 
 `U`
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### mapOrElse()
 
 > **mapOrElse**\<`U`\>(`fallbackFn`, `f`): `U`
 
-Defined in: [result.ts:127](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L127)
+Defined in: [result.ts:110](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L110)
 
 Maps a `Result<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
-
-This function can be used to unpack a successful result while handling an error.
 
 #### Type Parameters
 
@@ -716,17 +644,13 @@ This function can be used to unpack a successful result while handling an error.
 
 `U`
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### mapOrElseAsync()
 
 > **mapOrElseAsync**\<`U`\>(`fallbackFn`, `f`): `Promise`\<`U`\>
 
-Defined in: [result.ts:134](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L134)
+Defined in: [result.ts:115](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L115)
 
 Async version of `mapOrElse`. Maps a `Result<T, E>` to `Promise<U>` by applying async fallback function `fallbackFn` to a contained `Err` value, or async function `f` to a contained `Ok` value.
 
@@ -750,17 +674,13 @@ Async version of `mapOrElse`. Maps a `Result<T, E>` to `Promise<U>` by applying 
 
 `Promise`\<`U`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### match()
 
 > **match**\<`U`\>(`handlers`): `U`
 
-Defined in: [result.ts:331](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L331)
+Defined in: [result.ts:272](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L272)
 
 Matches the `Result` with two functions, one for each variant.
 
@@ -786,17 +706,13 @@ Matches the `Result` with two functions, one for each variant.
 
 `U`
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### ok()
 
 > **ok**(): [`Option`](../type-aliases/Option.md)\<`T`\>
 
-Defined in: [result.ts:86](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L86)
+Defined in: [result.ts:81](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L81)
 
 Converts from `Result<T, E>` to `Option<T>`.
 
@@ -814,11 +730,11 @@ Returns `Some` for `Ok` and `None` for `Err`.
 
 > **or**\<`T2`, `F`\>(`res`): [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:262](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L262)
+Defined in: [result.ts:217](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L217)
 
 Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
-Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
+JavaScript evaluates the operand before the call. Use `orElse` to compute it only on `Err`.
 
 ##### Type Parameters
 
@@ -840,15 +756,11 @@ Arguments passed to `or` are eagerly evaluated; if you are passing the result of
 
 [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\>
 
-##### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 #### Call Signature
 
 > **or**\<`T2`, `F`\>(`res`): [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:263](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L263)
+Defined in: [result.ts:218](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L218)
 
 ##### Type Parameters
 
@@ -874,7 +786,7 @@ Defined in: [result.ts:263](https://github.com/madkarmaa/results-ts/blob/393ae2e
 
 > **or**\<`T2`, `F`\>(`res`): [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\> \| [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:264](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L264)
+Defined in: [result.ts:219](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L219)
 
 ##### Type Parameters
 
@@ -902,11 +814,9 @@ Defined in: [result.ts:264](https://github.com/madkarmaa/results-ts/blob/393ae2e
 
 > **orElse**\<`T2`, `F`\>(`f`): [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:275](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L275)
+Defined in: [result.ts:226](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L226)
 
 Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
-
-This function can be used for control flow based on result values.
 
 #### Type Parameters
 
@@ -928,17 +838,13 @@ This function can be used for control flow based on result values.
 
 [`Result`](../type-aliases/Result.md)\<`T` \| `T2`, `F`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### orElseAsync()
 
 > **orElseAsync**\<`T2`, `F`\>(`f`): [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-Defined in: [result.ts:282](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L282)
+Defined in: [result.ts:231](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L231)
 
 Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
 
@@ -962,17 +868,13 @@ Async version of `orElse`. Calls an async `f` if the result is `Err`, otherwise 
 
 [`AsyncResult`](AsyncResult.md)\<`T` \| `T2`, `F`\>
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### toString()
 
 > **toString**(): `string`
 
-Defined in: [result.ts:53](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L53)
+Defined in: [result.ts:52](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L52)
 
 #### Returns
 
@@ -984,12 +886,12 @@ Defined in: [result.ts:53](https://github.com/madkarmaa/results-ts/blob/393ae2e7
 
 > **transpose**\<`T`, `E`\>(`this`): [`Option`](../type-aliases/Option.md)\<[`Result`](../type-aliases/Result.md)\<`T`, `E`\>\>
 
-Defined in: [result.ts:324](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L324)
+Defined in: [result.ts:267](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L267)
 
 Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
-`Ok(None)` will be mapped to `None`. `Ok(Some(_))` and `Err(_)` will be mapped to
-`Some(Ok(_))` and `Some(Err(_))`.
+Converts `Ok(None)` to `None`, `Ok(Some(value))` to `Some(Ok(value))`,
+and `Err(error)` to `Some(Err(error))`.
 
 #### Type Parameters
 
@@ -1013,7 +915,7 @@ Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
 #### Throws
 
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
+`TransposeError` if an `Ok` value is not an `Option`.
 
 ***
 
@@ -1021,9 +923,9 @@ If this method throws an error other than a panic, it indicates misuse of the li
 
 > **unwrap**(): `T`
 
-Defined in: [result.ts:207](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L207)
+Defined in: [result.ts:173](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L173)
 
-Returns the contained `Ok` value, consuming the `self` value.
+Returns the contained `Ok` value.
 
 #### Returns
 
@@ -1031,7 +933,7 @@ Returns the contained `Ok` value, consuming the `self` value.
 
 #### Throws
 
-Panics if the value is an `Err`, with a panic message provided by the `Err`'s value.
+`PanicError` with the error value on `Err`.
 
 ***
 
@@ -1039,9 +941,9 @@ Panics if the value is an `Err`, with a panic message provided by the `Err`'s va
 
 > **unwrapErr**(): `E`
 
-Defined in: [result.ts:222](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L222)
+Defined in: [result.ts:187](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L187)
 
-Returns the contained `Err` value, consuming the `self` value.
+Returns the contained `Err` value.
 
 #### Returns
 
@@ -1049,7 +951,7 @@ Returns the contained `Err` value, consuming the `self` value.
 
 #### Throws
 
-Panics if the value is an `Ok`, with a custom panic message provided by the `Ok`'s value.
+`PanicError` with the success value on `Ok`.
 
 ***
 
@@ -1057,11 +959,11 @@ Panics if the value is an `Ok`, with a custom panic message provided by the `Ok`
 
 > **unwrapOr**\<`T2`\>(`fallback`): `T` \| `T2`
 
-Defined in: [result.ts:293](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L293)
+Defined in: [result.ts:240](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L240)
 
 Returns the contained `Ok` value or a provided default.
 
-Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
+JavaScript evaluates the fallback before the call. Use `unwrapOrElse` to compute it only on `Err`.
 
 #### Type Parameters
 
@@ -1079,19 +981,15 @@ Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the res
 
 `T` \| `T2`
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### unwrapOrElse()
 
 > **unwrapOrElse**\<`T2`\>(`f`): `T` \| `T2`
 
-Defined in: [result.ts:300](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L300)
+Defined in: [result.ts:245](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L245)
 
-Returns the contained `Ok` value or computes it from a closure.
+Returns the contained `Ok` value, or calls `f` with the error.
 
 #### Type Parameters
 
@@ -1109,19 +1007,15 @@ Returns the contained `Ok` value or computes it from a closure.
 
 `T` \| `T2`
 
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.
-
 ***
 
 ### unwrapOrElseAsync()
 
 > **unwrapOrElseAsync**\<`T2`\>(`f`): `Promise`\<`T` \| `T2`\>
 
-Defined in: [result.ts:307](https://github.com/madkarmaa/results-ts/blob/393ae2e7eb528eeed347cd9afb2844d3d0448a13/src/result.ts#L307)
+Defined in: [result.ts:250](https://github.com/madkarmaa/results-ts/blob/493f3f8eafc3c624562921c2d6fcb76392af4130/src/result.ts#L250)
 
-Async version of `unwrapOrElse`. Returns the contained `Ok` value or computes it from an async closure.
+Returns the `Ok` value, or awaits `f` with the error.
 
 #### Type Parameters
 
@@ -1138,7 +1032,3 @@ Async version of `unwrapOrElse`. Returns the contained `Ok` value or computes it
 #### Returns
 
 `Promise`\<`T` \| `T2`\>
-
-#### Throws
-
-If this method throws an error other than a panic, it indicates misuse of the library (garbage data, bypass of the type system, or invalid runtime input). Check your code.

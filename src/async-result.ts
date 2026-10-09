@@ -5,14 +5,13 @@ import { InvalidArgumentError } from './errors';
 import { ASYNC_START, isResultOperand, isAsyncResultOperand } from './utils';
 
 /**
- * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
- * but also carries all chainable `Result` methods.
+ * An awaitable wrapper around `Result<T, E>` with chainable methods.
  *
  * `and` and `or` accept sync or promise-like operands. Async operands resolve
- * concurrently with the receiver; either rejection propagates.
+ * concurrently with the receiver. Either rejection propagates.
  *
- * **Error behavior in async context:** Methods that throw synchronously on `Result`
- * (e.g. `unwrap` on `Err`, `flatten` on non-nested) will produce a rejected `Promise`.
+ * Methods that throw on `Result` reject on `AsyncResult`.
+ * For example, `unwrap` rejects on `Err`, and `flatten` rejects a non-nested value.
  */
 export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     /**
@@ -21,7 +20,7 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     isOk(): Promise<boolean>;
 
     /**
-     * Returns a `Promise` that resolves to `true` if the result is `Ok` and the value inside matches a predicate.
+     * Returns a `Promise` that resolves to `true` if the result is `Ok` and its value matches the predicate.
      */
     isOkAnd(f: (val: T) => boolean): Promise<boolean>;
 
@@ -51,8 +50,6 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Maps an `AsyncResult<T, E>` to `AsyncResult<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
-     *
-     * This function can be used to compose the results of two functions.
      */
     map<U>(f: (val: T) => U): AsyncResult<U, E>;
 
@@ -62,16 +59,14 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     mapAsync<U>(f: (val: T) => PromiseLike<U>): AsyncResult<U, E>;
 
     /**
-     * Returns the provided default (if `Err`), or applies a function to the contained value (if `Ok`).
+     * Returns the fallback on `Err`, or calls `f` with the `Ok` value.
      *
-     * Arguments passed to `mapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `mapOrElse`, which is lazily evaluated.
+     * JavaScript evaluates the fallback before the call. Use `mapOrElse` to compute it only on `Err`.
      */
     mapOr<U>(fallback: U, f: (val: T) => U): Promise<U>;
 
     /**
      * Maps an `AsyncResult<T, E>` to `U` by applying fallback function `fallbackFn` to a contained `Err` value, or function `f` to a contained `Ok` value.
-     *
-     * This function can be used to unpack a successful result while handling an error.
      */
     mapOrElse<U>(fallbackFn: (err: E) => U, f: (val: T) => U): Promise<U>;
 
@@ -85,8 +80,6 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
-     *
-     * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(f: (err: E) => F): AsyncResult<T, F>;
 
@@ -150,7 +143,7 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     /**
      * Returns `res` if the result is `Ok`, otherwise returns the `Err` value of `self`.
      *
-     * Arguments passed to `and` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `andThen`, which is lazily evaluated.
+     * JavaScript evaluates the operand before the call. Use `andThen` to compute it only on `Ok`.
      */
     and<U, E2>(
         res: Result<U, E2> | PromiseLike<Result<U, E2>>
@@ -158,8 +151,6 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Calls `f` if the result is `Ok`, otherwise returns the `Err` value of `self`.
-     *
-     * This function can be used for control flow based on `Result` values.
      */
     andThen<U, F>(f: (val: T) => Result<U, F>): AsyncResult<U, E | F>;
 
@@ -173,7 +164,7 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     /**
      * Returns `res` if the result is `Err`, otherwise returns the `Ok` value of `self`.
      *
-     * Arguments passed to `or` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `orElse`, which is lazily evaluated.
+     * JavaScript evaluates the operand before the call. Use `orElse` to compute it only on `Err`.
      */
     or<T2, F>(
         res: Result<T2, F> | PromiseLike<Result<T2, F>>
@@ -181,8 +172,6 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
 
     /**
      * Calls `f` if the result is `Err`, otherwise returns the `Ok` value of `self`.
-     *
-     * This function can be used for control flow based on result values.
      */
     orElse<T2, F>(f: (err: E) => Result<T2, F>): AsyncResult<T | T2, F>;
 
@@ -196,17 +185,17 @@ export interface AsyncResult<T, E> extends PromiseLike<Result<T, E>> {
     /**
      * Returns the contained `Ok` value or a provided default.
      *
-     * Arguments passed to `unwrapOr` are eagerly evaluated; if you are passing the result of a function call, it is recommended to use `unwrapOrElse`, which is lazily evaluated.
+     * JavaScript evaluates the fallback before the call. Use `unwrapOrElse` to compute it only on `Err`.
      */
     unwrapOr<T2>(fallback: T2): Promise<T | T2>;
 
     /**
-     * Returns the contained `Ok` value or computes it from a closure.
+     * Returns the contained `Ok` value, or calls `f` with the error.
      */
     unwrapOrElse<T2>(f: (err: E) => T2): Promise<T | T2>;
 
     /**
-     * Async version of `unwrapOrElse`. Returns the contained `Ok` value or computes it from an async closure.
+     * Returns the `Ok` value, or awaits `f` with the error.
      */
     unwrapOrElseAsync<T2>(f: (err: E) => PromiseLike<T2>): Promise<T | T2>;
 
@@ -413,24 +402,16 @@ export class AsyncResultImpl<T, E> implements AsyncResult<T, E> {
 }
 
 /**
- * Async counterpart of `catchUnwind`. Invokes a function, capturing the cause of a thrown
- * error or rejected `Promise` if one occurs.
+ * Wraps `fn` so a resolved value becomes `Ok(value)` and a throw or rejection becomes `Err(cause)`.
+ * Use this to adapt functions that throw or reject. Functions with expected failures should return `AsyncResult`.
  *
- * This function will return `Ok` with the function's result if it does not throw or reject, and
- * will return `Err(cause)` if the function throws or the returned `Promise` rejects. The cause
- * returned is the value with which the function originally threw or rejected.
- *
- * It is not recommended to use this function for a general try/catch mechanism. The `AsyncResult`
- * type is more appropriate to use for functions that can fail on a regular basis.
- *
- * When no `onThrow` handler is provided, the thrown/rejected value is wrapped as-is in an `Err`
- * (typed as `unknown`, since JavaScript allows throwing anything).
- * When `onThrow` is provided, it is called with the thrown value and its return value is wrapped
- * in an `Err`, allowing the error type to be narrowed and normalized.
+ * Without `onThrow`, the error type is `unknown`. With `onThrow`, its return value
+ * becomes the error. The handler receives the cause and the original arguments.
+ * Exceptions from `onThrow` reject the returned wrapper.
  *
  * @param fn - The throwing/async function to wrap.
  * @param onThrow - Optional handler invoked when `fn` throws or rejects; its return value becomes the `Err` payload.
- * @returns A function returning `AsyncResult<T, E>` that never throws.
+ * @returns A function that captures throws and rejections from `fn` in an `AsyncResult`.
  */
 export function catchUnwindAsync<T, Args extends unknown[]>(
     fn: (...args: Args) => PromiseLike<T> | T,
