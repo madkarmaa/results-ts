@@ -66,4 +66,4 @@ An Err is a resolved failure value. A thrown callback, rejected operand, or fail
 
 `Result.and` and `Result.or` accept promise-like operands and return AsyncResult for them. Option's `and`, `or`, `xor`, and `zip` similarly return AsyncOption for promise-like operands. These operands are resolved even when their values are unused, and their rejections propagate. On async wrappers the receiver and async operand resolve concurrently. Use `andThenAsync` or `orElseAsync` when starting the operation must depend on the receiver's variant.
 
-See the official [async guide](https://results-ts.madkarma.top/guide/async) and [error-handling guide](https://results-ts.madkarma.top/guide/error-handling) for additional context. Check installed declarations for available overloads.
+Read the async and error-handling sections in the [official LLM documentation bundle](https://results-ts.madkarma.top/llms.txt) for additional context. Check installed declarations for available overloads.

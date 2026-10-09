@@ -93,4 +93,4 @@ const transposed: Result<Option<number>, string> = absent.transpose();
 // transposed is Ok(None), so an optional missing value is not an error.
 ```
 
-Check the [Option API](https://results-ts.madkarma.top/api/interfaces/OptionMethods) for exact signatures, especially fallback types and mutation behavior.
+Read the Option API section in the [official LLM documentation bundle](https://results-ts.madkarma.top/llms.txt) for signatures and behavior, especially fallback types and mutation. Verify signatures against the installed declarations.

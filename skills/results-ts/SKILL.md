@@ -71,6 +71,6 @@ Use `match` or fallbacks for recoverable outcomes. `unwrap` and `expect` throw o
 - For async chains, Promise interop, or unavoidable external exceptions, read [async and exceptions](references/async-and-exceptions.md).
 - For nullish input, Option mutation, nested containers, or tuples, read [Option and composition](references/option-and-composition.md).
 
-Consult the [official guides and API reference](https://results-ts.madkarma.top/) for methods outside these examples. If working in the library repository, verify against `src/index.ts`, `src/result.ts`, `src/option.ts`, `src/async-result.ts`, and `src/async-option.ts`. These source paths are not expected in consuming projects.
+For online documentation, read the [official LLM documentation bundle](https://results-ts.madkarma.top/llms.txt) instead of the website's HTML. Use it for guides and API details beyond these examples, while checking signatures against the consuming project's installed declarations. If working in the library repository, verify against `src/index.ts`, `src/result.ts`, `src/option.ts`, `src/async-result.ts`, and `src/async-option.ts`. These source paths are not expected in consuming projects.
 
 Validate changed code with the consuming project's typecheck and focused tests. Cover both variants and, for async code, the difference between an Err value and a rejected operation.
