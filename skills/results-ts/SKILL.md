@@ -1,6 +1,6 @@
 ---
 name: results-ts
-description: Write and review TypeScript code using the results-ts package. Use when working with results-ts imports, Result and Option pipelines, AsyncResult and AsyncOption chains, or adapting exceptions with catchUnwind. Covers typed errors, lazy recovery, and library-specific pitfalls.
+description: Write and review TypeScript code using the results-ts package. Use when working with results-ts imports, Result and Option pipelines, or AsyncResult and AsyncOption chains. Covers typed errors, lazy recovery, and library-specific pitfalls.
 license: MIT
 ---
 
@@ -10,7 +10,7 @@ Use this skill for the `results-ts` package. Check the consuming project's insta
 
 Install with `bun add results-ts` if needed, or use the project's established package manager. Import values and types from `results-ts`; implementation classes and error classes are private.
 
-Return `AsyncResult<T, E>` or `AsyncOption<T>` from async APIs that produce containers. Keep functions returning these chainable wrappers free of the `async` keyword; return a wrapper created by an async method or exception adapter. Use native promises of containers only when interoperating with an existing dependency.
+Return `AsyncResult<T, E>` or `AsyncOption<T>` from async APIs that produce containers. Keep functions returning these chainable wrappers free of the `async` keyword; return a wrapper created by an async method. Use native promises of containers only when interoperating with an existing dependency.
 
 ## Choose the operation
 
@@ -32,7 +32,9 @@ Return `AsyncResult<T, E>` or `AsyncOption<T>` from async APIs that produce cont
 
 ## Keep failures typed
 
-Return Result directly for expected failures. Prefer discriminated error unions at application boundaries; narrow unknown input rather than asserting a domain type. Avoid `any` and casts that conceal mismatched success or error types.
+Return Result or AsyncResult directly for expected failures. Code you control must return Err for recoverable failures. Do not throw an error just to capture it in a container. Prefer discriminated error unions at application boundaries; narrow unknown input rather than asserting a domain type. Avoid `any` and casts that conceal mismatched success or error types.
+
+Avoid `catchUnwind` and `catchUnwindAsync` unless a dependency throws or rejects and its failure behavior cannot be changed, such as a fixed Node API. They are a last resort for that external boundary. Do not use them for routine failures, general try/catch, or constructing an AsyncResult. Prefer an existing nonthrowing or Result-returning API when available.
 
 ```typescript
 import { Err, Ok, type Result } from 'results-ts';
@@ -60,13 +62,13 @@ Use `match` or fallbacks for recoverable outcomes. `unwrap` and `expect` throw o
 ## Avoid eager work and uncaught failures
 
 - `and`, `or`, `unwrapOr`, `mapOr`, and `okOr` receive values that JavaScript evaluates before the call. Use callback-based alternatives when work should run only for the selected variant.
-- Callback exceptions propagate. Ordinary chains do not convert throws or promise rejections to Err. Adapt throwing dependencies with `catchUnwind` or `catchUnwindAsync` at their boundary.
-- `AsyncResult` and `AsyncOption` are exported types, not constructors. Create wrappers through async methods or `catchUnwindAsync`.
+- Callback exceptions propagate. Ordinary chains do not convert throws or promise rejections to Err. Handle expected failures with explicit Err returns. Only introduce an exception adapter for an unavoidable external failure as described above.
+- `AsyncResult` and `AsyncOption` are exported types, not constructors. Create wrappers through async methods.
 - Option has mutating methods. Do not assume every container operation is immutable.
 
 ## Read details for the task
 
-- For async chains, Promise interop, or exception adapters, read [async and exceptions](references/async-and-exceptions.md).
+- For async chains, Promise interop, or unavoidable external exceptions, read [async and exceptions](references/async-and-exceptions.md).
 - For nullish input, Option mutation, nested containers, or tuples, read [Option and composition](references/option-and-composition.md).
 
 Consult the [official guides and API reference](https://results-ts.madkarma.top/) for methods outside these examples. If working in the library repository, verify against `src/index.ts`, `src/result.ts`, `src/option.ts`, `src/async-result.ts`, and `src/async-option.ts`. These source paths are not expected in consuming projects.

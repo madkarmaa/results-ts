@@ -44,56 +44,21 @@ When interoperating with an existing `Promise<Result<T, E>>` or `Promise<Option<
 
 When a chaining callback returns multiple Result error variants and inference selects only one, annotate its Result return type or provide the method's success and error generics. For example, use `andThenAsync<User, LoadError>` when those are the callback's output types. Preserve the full error union rather than casting branches.
 
-## Capture exceptions at the dependency boundary
+## Reserve exception adapters for unavoidable external failures
+
+Avoid `catchUnwind` and `catchUnwindAsync`. Use one only when an external operation actually throws or rejects, its failure behavior is outside the project's control, and no suitable nonthrowing or Result-returning API is available. Fixed Node APIs are an example of this exception.
+
+For code the project controls, return Result or AsyncResult with explicit Ok and Err variants. Handle HTTP status failures and invalid input with Err directly. Never throw to feed an exception adapter, wrap ordinary application pipelines in one, or use one merely to obtain an AsyncResult.
+
+This follows [Rust's recommendation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html) to use Result for regular failures rather than catch_unwind as a general try/catch mechanism.
+
+When an external operation meets these conditions, wrap only the unavoidable throwing operation. Perform application validation and other expected-failure handling outside that adapter.
 
 `catchUnwind(fn, onThrow?)` returns a callable function. Calling it returns Result. `catchUnwindAsync(fn, onThrow?)` also returns a callable function; calling it returns AsyncResult and captures both synchronous throws and rejections.
 
 Without `onThrow`, the error type is `unknown`. With it, the returned value becomes the error payload. The handler receives `(thrown, ...originalArgs)`. Normalize errors synchronously; exceptions from the handler itself still throw or reject.
 
 Keep `JSON.parse` and `response.json()` results typed as `unknown` until runtime validation succeeds. Their permissive built-in declarations do not validate a domain type. Give parsing adapters an explicit `unknown` or `Promise<unknown>` return type.
-
-```typescript
-import { catchUnwind, type Result } from 'results-ts';
-
-type ParseError = { readonly code: 'INVALID_JSON'; readonly message: string };
-const parseJson = (text: string): unknown => JSON.parse(text);
-const safeParse = catchUnwind(parseJson, (thrown): ParseError => ({
-    code: 'INVALID_JSON',
-    message: thrown instanceof Error ? thrown.message : String(thrown)
-}));
-
-const result: Result<unknown, ParseError> = safeParse('{"id":1}');
-// Parsing succeeds; validate the unknown payload before using it as a domain type.
-```
-
-```typescript
-import { catchUnwindAsync, type AsyncResult } from 'results-ts';
-
-type RequestError = {
-    readonly code: 'REQUEST_FAILED';
-    readonly url: string;
-    readonly message: string;
-};
-
-const readJson = catchUnwindAsync(
-    async (url: string): Promise<unknown> => {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
-    },
-    (thrown, url): RequestError => ({
-        code: 'REQUEST_FAILED',
-        url,
-        message: thrown instanceof Error ? thrown.message : String(thrown)
-    })
-);
-
-const loadJson = (url: string): AsyncResult<unknown, RequestError> =>
-    readJson(url);
-// Call loadJson with the application's URL, then validate its unknown payload.
-```
-
-Do not wrap a function that already returns Result without accounting for nesting. `catchUnwind` wraps its return value in Ok. If adapting such a function is necessary, `flatten()` removes one Result layer and preserves both error types. The same applies to `catchUnwindAsync` and its async wrapper.
 
 ## Rejections and operand evaluation
 
