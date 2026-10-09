@@ -2,7 +2,7 @@
 
 ## Absence is explicit
 
-Call `None()` to construct absence. Use `None<T>()` when an empty Option needs a type for later operations. `Some(null)` and `Some(undefined)` are present values. Constructors do not convert nullish input to None.
+Call `None()` to create an absent value. Use `None<T>()` to give an empty Option a type for later operations. `Some(null)` and `Some(undefined)` are present values. Constructors do not convert nullish input to None.
 
 ```typescript
 import { None, Some, type Option } from 'results-ts';
@@ -19,9 +19,9 @@ const label = fromNullable('  Ada  ')
 
 `fromNullable` above is a local adapter, not a results-ts export. Use an existing project adapter if available.
 
-Turn absence into a domain error with `okOr` or `okOrElse`. The latter computes its error only for None. `okOrElseAsync` returns AsyncResult when error construction needs async work.
+Convert absence to a domain error with `okOr` or `okOrElse`. `okOrElse` computes its error only for None. Use `okOrElseAsync` if computing the error requires async work. It returns AsyncResult.
 
-For an async Option-producing API, return `AsyncOption<T>` directly so callers can chain before awaiting:
+Return `AsyncOption<T>` from async Option APIs so callers can chain before awaiting:
 
 ```typescript
 import { None, Some, type AsyncOption } from 'results-ts';
@@ -51,22 +51,22 @@ These synchronous Option methods mutate the receiver:
 | `takeIf(predicate)`             | Remove if present and predicate succeeds | Removed value as Option, otherwise None |
 | `replace(value)`                | Replace with Some                        | Previous Option                         |
 
-Aliases to the same Option observe these mutations. `const` prevents reassignment of a variable; it does not prevent Option mutation. Result transformations may return the original container, and payload objects are not deep-cloned. Do not infer copying from a transformation call.
+Aliases to the same Option see these mutations. `const` prevents variable reassignment but does not prevent Option mutation. Result methods may return the original container. The library does not deep-clone payload objects, so a transformation does not guarantee a copy.
 
 ```typescript
 import { None } from 'results-ts';
 
 const cached = None<number>();
-const initial = cached.getOrInsertWith(() => 42); // 42, cached is Some(42).
-const removed = cached.take(); // Some(42), cached is now None.
-const fallback = cached.unwrapOr(0); // 0.
+const initial = cached.getOrInsertWith(() => 42); // Returns 42 and sets cached to Some(42).
+const removed = cached.take(); // Returns Some(42) and leaves cached as None.
+const fallback = cached.unwrapOr(0); // Returns 0.
 ```
 
-AsyncOption omits the mutation methods listed above. Await it to obtain an Option if mutation is required. A synchronous Option's `getOrInsertWithAsync` shares a pending factory among concurrent calls. Avoid overlapping mutation unless the project's tests cover the intended ordering.
+AsyncOption has none of the mutation methods listed above. Await it to get an Option if you need to mutate it. Concurrent calls to a synchronous Option's `getOrInsertWithAsync` share the pending factory call. Test the intended order before mixing this operation with other mutations.
 
 ## Nesting and tuples
 
-Use `andThen` to avoid introducing nesting. Use `flatten()` to remove one existing layer, only on `Result<Result<T, F>, E>` or `Option<Option<T>>`. Result flattening preserves `E | F`. `transpose()` swaps Result and Option nesting:
+Use `andThen` to avoid nesting. Use `flatten()` to remove one layer from `Result<Result<T, F>, E>` or `Option<Option<T>>`. Result flattening preserves `E | F`. `transpose()` swaps Result and Option nesting:
 
 | Input                  | Output                 |
 | ---------------------- | ---------------------- |
@@ -79,9 +79,9 @@ Use `andThen` to avoid introducing nesting. Use `flatten()` to remove one existi
 | `Ok(None)`             | `None`                 |
 | `Err(error)`           | `Some(Err(error))`     |
 
-Do not cast a non-nested container to call these methods. Invalid inner values can throw at runtime.
+Call these methods only on containers with the required nesting. Do not cast a container to bypass that requirement. Invalid inner values can throw at runtime.
 
-`Option.zip(other)` produces Some of a tuple only when both values are present. `unzip()` requires an Option of a two-element tuple and returns two Options. Use explicit tuple typing when array inference would lose the tuple shape.
+`Option.zip(other)` returns Some containing a tuple only when both values are present. `unzip()` requires an Option containing a two-element tuple and returns two Options. Specify the tuple type if TypeScript would otherwise infer an array.
 
 ```typescript
 import { None, Some, type Option, type Result } from 'results-ts';
@@ -93,4 +93,4 @@ const transposed: Result<Option<number>, string> = absent.transpose();
 // transposed is Ok(None), so an optional missing value is not an error.
 ```
 
-Read the Option API section in the [official LLM documentation bundle](https://results-ts.madkarma.top/llms.txt) for signatures and behavior, especially fallback types and mutation. Verify signatures against the installed declarations.
+Read the Option API section in [llms.txt](https://results-ts.madkarma.top/llms.txt) for fallback types and mutation behavior. Check signatures against the installed declarations.

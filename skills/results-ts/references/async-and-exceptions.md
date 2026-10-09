@@ -9,11 +9,11 @@
 | `PromiseLike<U>`                                        | `mapAsync`     | AsyncResult or AsyncOption of U |
 | `PromiseLike<Result<U, F>>` or `PromiseLike<Option<U>>` | `andThenAsync` | A flat async wrapper            |
 
-Use the async variants even on an existing async wrapper when the callback is asynchronous. Do not rely on `map(async ...)` to await a callback payload. Async predicates use `filterAsync` on Option; async effects use `inspectAsync` and, for Result errors, `inspectErrAsync`.
+Use async methods when the callback is async, even on an existing async wrapper. `map(async ...)` leaves a Promise in the payload. Use `filterAsync` for async Option predicates. Use `inspectAsync` for async effects and `inspectErrAsync` for effects on Result errors.
 
-Expose `AsyncResult<T, E>` and `AsyncOption<T>` as return types for container-producing async functions so callers can chain before awaiting. Return a wrapper directly from an ordinary function. An `async` function returns a native Promise and loses the wrapper's chainable methods. The promise-like callback contracts above accept AsyncResult and AsyncOption too.
+Return `AsyncResult<T, E>` or `AsyncOption<T>` so callers can chain methods before awaiting. Return the wrapper from an ordinary function. An `async` function returns a native Promise and loses the wrapper's methods. AsyncResult and AsyncOption satisfy the PromiseLike callback types in the table.
 
-Awaiting `AsyncResult<T, E>` yields `Result<T, E>`. Awaiting `AsyncOption<T>` yields `Option<T>`. Transforming methods keep the chainable wrapper. Extraction and branching methods such as `match`, `unwrapOr`, and `isOk` return native promises and must be awaited. An async predicate result does not narrow a container; await the container first when synchronous narrowing is needed.
+Awaiting `AsyncResult<T, E>` yields `Result<T, E>`. Awaiting `AsyncOption<T>` yields `Option<T>`. Methods that transform values return wrappers you can keep chaining. Methods such as `match`, `unwrapOr`, and `isOk` return native promises. Await them to get their values. Async predicates do not narrow the container's type. Await the container first if you need synchronous type narrowing.
 
 ```typescript
 import { Err, Ok, type AsyncResult, type Result } from 'results-ts';
@@ -40,30 +40,30 @@ const name = await Ok(1)
 // name is 'Ada'.
 ```
 
-When interoperating with an existing `Promise<Result<T, E>>` or `Promise<Option<T>>`, await it before chaining or call its producer through `andThenAsync`. Prefer wrapper return types for new application APIs. AsyncResult and AsyncOption implement `PromiseLike`; do not assume native `.catch` or `.finally` methods exist. Use `await` with `try`/`catch`, or `Promise.resolve(wrapper)` when a native Promise is needed.
+If a dependency returns `Promise<Result<T, E>>` or `Promise<Option<T>>`, await it before chaining or call its function through `andThenAsync`. Return AsyncResult or AsyncOption from new application APIs. These wrappers implement `PromiseLike` and have no native `.catch` or `.finally` methods. Use `await` with `try`/`catch`, or `Promise.resolve(wrapper)` if you need a native Promise.
 
-When a chaining callback returns multiple Result error variants and inference selects only one, annotate its Result return type or provide the method's success and error generics. For example, use `andThenAsync<User, LoadError>` when those are the callback's output types. Preserve the full error union rather than casting branches.
+If TypeScript infers only one error variant from a callback, annotate its Result return type or supply the method's success and error types. For example, use `andThenAsync<User, LoadError>` for those callback output types. Keep the full error union. Do not cast branches to silence the error.
 
 ## Reserve exception adapters for unavoidable external failures
 
-Avoid `catchUnwind` and `catchUnwindAsync`. Use one only when an external operation actually throws or rejects, its failure behavior is outside the project's control, and no suitable nonthrowing or Result-returning API is available. Fixed Node APIs are an example of this exception.
+Avoid `catchUnwind` and `catchUnwindAsync`. Use one only when an external operation throws or rejects, you cannot change that behavior, and no suitable nonthrowing or Result-returning API exists. Some Node APIs require this exception.
 
-For code the project controls, return Result or AsyncResult with explicit Ok and Err variants. Handle HTTP status failures and invalid input with Err directly. Never throw to feed an exception adapter, wrap ordinary application pipelines in one, or use one merely to obtain an AsyncResult.
+Code the project controls must return Result or AsyncResult with explicit Ok and Err variants. Return Err for HTTP status failures and invalid input. Never throw an error to capture it in an adapter. Do not wrap ordinary application pipelines or use an adapter just to create an AsyncResult.
 
 This follows [Rust's recommendation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html) to use Result for regular failures rather than catch_unwind as a general try/catch mechanism.
 
-When an external operation meets these conditions, wrap only the unavoidable throwing operation. Perform application validation and other expected-failure handling outside that adapter.
+Wrap only the external operation that can throw or reject. Validate input and handle expected failures outside the adapter.
 
-`catchUnwind(fn, onThrow?)` returns a callable function. Calling it returns Result. `catchUnwindAsync(fn, onThrow?)` also returns a callable function; calling it returns AsyncResult and captures both synchronous throws and rejections.
+`catchUnwind(fn, onThrow?)` returns a function that produces Result when called. `catchUnwindAsync(fn, onThrow?)` returns a function that produces AsyncResult and captures synchronous throws and rejections.
 
-Without `onThrow`, the error type is `unknown`. With it, the returned value becomes the error payload. The handler receives `(thrown, ...originalArgs)`. Normalize errors synchronously; exceptions from the handler itself still throw or reject.
+Without `onThrow`, the error type is `unknown`. If supplied, this handler receives `(thrown, ...originalArgs)` and returns the error payload. The handler must be synchronous. Its own exceptions still throw or reject.
 
-Keep `JSON.parse` and `response.json()` results typed as `unknown` until runtime validation succeeds. Their permissive built-in declarations do not validate a domain type. Give parsing adapters an explicit `unknown` or `Promise<unknown>` return type.
+Keep `JSON.parse` and `response.json()` results typed as `unknown` until runtime validation succeeds. Their built-in declarations do not validate a domain type. Give parsing adapters an explicit `unknown` or `Promise<unknown>` return type.
 
 ## Rejections and operand evaluation
 
-An Err is a resolved failure value. A thrown callback, rejected operand, or failed `unwrap` is still an exception or rejection. `mapErr`, `orElse`, and an Err `match` handler only handle contained errors. They do not catch rejections introduced elsewhere in a chain.
+An Err is a failure value, not a rejection. `mapErr`, `orElse`, and the Err handler in `match` handle only that value. They do not catch callback exceptions, rejected operands, or panics from `unwrap`.
 
-`Result.and` and `Result.or` accept promise-like operands and return AsyncResult for them. Option's `and`, `or`, `xor`, and `zip` similarly return AsyncOption for promise-like operands. These operands are resolved even when their values are unused, and their rejections propagate. On async wrappers the receiver and async operand resolve concurrently. Use `andThenAsync` or `orElseAsync` when starting the operation must depend on the receiver's variant.
+`Result.and` and `Result.or` accept PromiseLike operands and return AsyncResult for them. Option's `and`, `or`, `xor`, and `zip` return AsyncOption for PromiseLike operands. These methods resolve the operand even when they do not use its value. Its rejections propagate. On async wrappers, the receiver and async operand resolve concurrently. Use `andThenAsync` or `orElseAsync` to start an operation only for the selected variant.
 
-Read the async and error-handling sections in the [official LLM documentation bundle](https://results-ts.madkarma.top/llms.txt) for additional context. Check installed declarations for available overloads.
+Read the async and error-handling sections in [llms.txt](https://results-ts.madkarma.top/llms.txt). Check installed declarations for available overloads.
