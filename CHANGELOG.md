@@ -1,3 +1,13 @@
+## [4.3.1-canary.1](https://github.com/madkarmaa/results-ts/compare/v4.3.0...v4.3.1-canary.1) (2026-10-09)
+
+### Performance Improvements
+
+- allocate option insertion bookkeeping lazily ([7a47964](https://github.com/madkarmaa/results-ts/commit/7a479646ac4574aac0406bc0750eef972bdcc5b5))
+- reduce async kickoff allocations ([6304f43](https://github.com/madkarmaa/results-ts/commit/6304f43ac36a6620fb98f9047ce2cc15a82d007e))
+- share immutable result state in fresh wrappers ([61622af](https://github.com/madkarmaa/results-ts/commit/61622afd15e078cb5fc60d2e7070effc78c4821a))
+- simplify async insertion cleanup ([c2b7584](https://github.com/madkarmaa/results-ts/commit/c2b75843714c9c4ece1aa39fa325bcf60824af1c))
+- store option payloads without intermediate objects ([a98eee9](https://github.com/madkarmaa/results-ts/commit/a98eee9c8448fd2b0cffdc2e7124d79ed1ec4133))
+
 # [4.3.0](https://github.com/madkarmaa/results-ts/compare/v4.2.7...v4.3.0) (2026-10-08)
 
 ### Bug Fixes
