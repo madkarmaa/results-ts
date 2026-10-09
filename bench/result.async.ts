@@ -20,9 +20,12 @@ group('Async Result - terminal unwrap', () => {
     bench('AsyncResult.unwrap (Ok path)', async () => {
         do_not_optimize(await okAsync.unwrap());
     }).gc('once');
-    bench('AsyncResult.unwrap (Err path)', async () => {
+    bench('AsyncResult.unwrapErr (Err path)', async () => {
+        do_not_optimize(await errAsync.unwrapErr());
+    }).gc('once');
+    bench('AsyncResult.unwrap (Err path -> panic)', async () => {
         try {
-            await errAsync.unwrapErr();
+            await errAsync.unwrap();
         } catch (e) {
             do_not_optimize(e);
         }

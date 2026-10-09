@@ -2,7 +2,7 @@ import { Ok, Err, type Result } from './result';
 import { type Option } from './option';
 import { type AsyncOption, AsyncOptionImpl } from './async-option';
 import { InvalidArgumentError } from './errors';
-import { isResultOperand, isAsyncResultOperand } from './utils';
+import { ASYNC_START, isResultOperand, isAsyncResultOperand } from './utils';
 
 /**
  * An async wrapper around `Result<T, E>` that is `PromiseLike` (so it's awaitable)
@@ -451,16 +451,15 @@ export function catchUnwindAsync<T, Args extends unknown[], E>(
         throw new InvalidArgumentError("'onThrow' must be a function");
 
     return function (this: unknown, ...args: Args): AsyncResult<T, unknown> {
-        const handleThrown = (thrown: unknown) =>
-            Err(
-                onThrow === undefined
-                    ? thrown
-                    : onThrow.call(this, thrown, ...args)
-            );
+        const handleThrown =
+            onThrow === undefined
+                ? Err
+                : (thrown: unknown) => Err(onThrow.call(this, thrown, ...args));
 
-        const result = Promise.resolve()
-            .then(() => fn.apply(this, args))
-            .then(Ok, handleThrown);
+        const result = ASYNC_START.then(() => fn.apply(this, args)).then(
+            Ok,
+            handleThrown
+        );
 
         return new AsyncResultImpl(result);
     };

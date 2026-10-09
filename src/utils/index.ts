@@ -3,6 +3,10 @@ import type { Result } from '../result';
 
 export * from './either';
 
+// Each .then still queues its own reaction; only the fulfilled kickoff promise
+// is shared, avoiding an allocation without changing callback scheduling.
+export const ASYNC_START: Promise<void> = Promise.resolve();
+
 export function isOptionOperand<T>(
     value: Option<T> | PromiseLike<Option<T>>
 ): value is Option<T> {

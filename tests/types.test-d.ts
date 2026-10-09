@@ -419,6 +419,60 @@ describe('Result types', () => {
 });
 
 describe('Async Wrappers (AsyncOption & AsyncResult)', () => {
+    test('async Option callbacks retain value, error, and terminal promise types', () => {
+        const option = Some(5).mapAsync(async (value) => value);
+        expectTypeOf(option.inspectAsync(async () => {})).toEqualTypeOf<
+            AsyncOption<number>
+        >();
+        expectTypeOf(
+            option.filterAsync(async (value) => value > 0)
+        ).toEqualTypeOf<AsyncOption<number>>();
+        expectTypeOf(option.okOrElseAsync(async () => 'missing')).toEqualTypeOf<
+            AsyncResult<number, string>
+        >();
+        expectTypeOf(
+            option.mapOrElseAsync(
+                async () => 'fallback',
+                async (value) => String(value)
+            )
+        ).toEqualTypeOf<Promise<string>>();
+        expectTypeOf(option.unwrapOrElseAsync(async () => 0)).toEqualTypeOf<
+            Promise<number>
+        >();
+        expectTypeOf(option.then((value) => value.unwrap())).toEqualTypeOf<
+            PromiseLike<number>
+        >();
+        // @ts-expect-error - Option fallback must preserve the contained value type
+        option.unwrapOrElseAsync(async () => 'wrong');
+    });
+
+    test('async Result callbacks retain error unions and fallback unions', () => {
+        const result = Ok(5)
+            .or(Err('failure'))
+            .mapAsync(async (value) => value);
+        expectTypeOf(result.inspectAsync(async () => {})).toEqualTypeOf<
+            AsyncResult<number, string>
+        >();
+        expectTypeOf(result.inspectErrAsync(async () => {})).toEqualTypeOf<
+            AsyncResult<number, string>
+        >();
+        expectTypeOf(
+            result.andThenAsync(async (value) => Err(value > 0))
+        ).toEqualTypeOf<AsyncResult<never, string | boolean>>();
+        expectTypeOf(
+            result.mapOrElseAsync(
+                async (error) => error.length,
+                async (value) => value
+            )
+        ).toEqualTypeOf<Promise<number>>();
+        expectTypeOf(
+            result.unwrapOrElseAsync(async (error) => error)
+        ).toEqualTypeOf<Promise<number | string>>();
+        expectTypeOf(result.then((value) => value.unwrap())).toEqualTypeOf<
+            PromiseLike<number>
+        >();
+    });
+
     test('AsyncOption promise-like structural behavior', () => {
         const asyncOpt = {} as AsyncOption<number>;
 

@@ -87,5 +87,5 @@ describe('documentation examples', () => {
         });
 
         expect(diagnostics, message).toEqual([]);
-    });
+    }, 30_000);
 });

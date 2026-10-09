@@ -10,6 +10,7 @@ import {
     Right,
     isLeft,
     isRight,
+    ASYNC_START,
     EMPTY_ITERATOR,
     OneItemIterator,
     isPromiseLike,
@@ -332,6 +333,7 @@ interface ResultMethods<T, E> {
 }
 
 class ResultImpl<T, E> implements ResultMethods<T, E> {
+    // Private states are immutable, so fresh wrappers can safely share them.
     readonly #state: Either<E, T>;
 
     static name = 'Result';
@@ -416,12 +418,12 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state))
-            return new AsyncResultImpl(Promise.resolve(Err(state.left)));
+            return new AsyncResultImpl(
+                Promise.resolve(new ResultImpl<U, E>(state))
+            );
 
         return new AsyncResultImpl(
-            Promise.resolve()
-                .then(() => f(state.right))
-                .then(Ok)
+            ASYNC_START.then(() => f(state.right)).then(Ok)
         );
     }
 
@@ -485,12 +487,12 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isLeft(state))
             return new AsyncResultImpl(
-                Promise.resolve()
-                    .then(() => f(state.left))
-                    .then((err) => Err(err))
+                ASYNC_START.then(() => f(state.left)).then(Err)
             );
 
-        return new AsyncResultImpl(Promise.resolve(Ok(state.right)));
+        return new AsyncResultImpl(
+            Promise.resolve(new ResultImpl<T, F>(state))
+        );
     }
 
     inspect(f: (val: T) => void): Result<T, E> {
@@ -509,9 +511,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isRight(state))
             return new AsyncResultImpl(
-                Promise.resolve()
-                    .then(() => f(state.right))
-                    .then(() => this)
+                ASYNC_START.then(() => f(state.right)).then(() => this)
             );
 
         return new AsyncResultImpl(Promise.resolve(this));
@@ -533,9 +533,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
         const state = this.#state;
         if (isLeft(state))
             return new AsyncResultImpl(
-                Promise.resolve()
-                    .then(() => f(state.left))
-                    .then(() => this)
+                ASYNC_START.then(() => f(state.left)).then(() => this)
             );
 
         return new AsyncResultImpl(Promise.resolve(this));
@@ -630,11 +628,11 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isRight(state))
-            return new AsyncResultImpl(
-                Promise.resolve().then(() => f(state.right))
-            );
+            return new AsyncResultImpl(ASYNC_START.then(() => f(state.right)));
 
-        return new AsyncResultImpl(Promise.resolve(Err(state.left)));
+        return new AsyncResultImpl(
+            Promise.resolve(new ResultImpl<U, E | F>(state))
+        );
     }
 
     or<T2, F>(res: Result<T2, F>): Result<T | T2, F>;
@@ -679,11 +677,11 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
 
         const state = this.#state;
         if (isLeft(state))
-            return new AsyncResultImpl(
-                Promise.resolve().then(() => f(state.left))
-            );
+            return new AsyncResultImpl(ASYNC_START.then(() => f(state.left)));
 
-        return new AsyncResultImpl(Promise.resolve(Ok<T | T2>(state.right)));
+        return new AsyncResultImpl(
+            Promise.resolve(new ResultImpl<T | T2, F>(state))
+        );
     }
 
     unwrapOr<T2>(fallback: T2): T | T2 {
@@ -712,7 +710,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     flatten<U, F>(this: ResultImpl<Result<U, F>, E>): Result<U, E | F> {
         const state = this.#state;
 
-        if (isLeft(state)) return new ResultImpl(Left(state.left));
+        if (isLeft(state)) return new ResultImpl<U, E | F>(state);
 
         if (typeof state.right._isOk !== 'boolean')
             throw new FlattenError(
@@ -725,7 +723,7 @@ class ResultImpl<T, E> implements ResultMethods<T, E> {
     transpose<T, E>(this: ResultImpl<Option<T>, E>): Option<Result<T, E>> {
         const state = this.#state;
 
-        if (isLeft(state)) return Some(Err(state.left));
+        if (isLeft(state)) return Some(new ResultImpl<T, E>(state));
 
         if (typeof state.right._isSome !== 'boolean')
             throw new TransposeError(
