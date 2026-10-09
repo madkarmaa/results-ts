@@ -62,6 +62,31 @@ describe('private state and payload preservation', () => {
         expect(option._isSome).toBe(false);
     });
 
+    test('Result variants ignore inherited payload-shaped properties', () => {
+        const previous = Object.getOwnPropertyDescriptor(
+            Object.prototype,
+            'right'
+        );
+        try {
+            Object.defineProperty(Object.prototype, 'right', {
+                value: 'inherited payload',
+                configurable: true
+            });
+            const ok = Ok(undefined);
+            const err = Err(undefined);
+            expect(ok.isOk()).toBe(true);
+            expect(ok.unwrap()).toBeUndefined();
+            expect(err.isErr()).toBe(true);
+            expect(err.unwrapErr()).toBeUndefined();
+            expect(err.map(() => 'unused')).toBe(err);
+            expect(err.flatten().unwrapErr()).toBeUndefined();
+        } finally {
+            if (previous)
+                Object.defineProperty(Object.prototype, 'right', previous);
+            else Reflect.deleteProperty(Object.prototype, 'right');
+        }
+    });
+
     test('takeIf keeps the original payload across reentrant mutation', () => {
         const original = { id: 1 };
         const replacement = { id: 2 };
